@@ -1,34 +1,12 @@
-export type InitResponse = {
-  type: "init";
-  postId: string;
-  count: number;
-  username: string;
-};
-
-export type IncrementResponse = {
-  type: "increment";
-  postId: string;
-  count: number;
-};
-
-export type IncrementRequest = {
-  amount: number;
-};
-
-export type DecrementResponse = {
-  type: "decrement";
-  postId: string;
-  count: number;
-};
-
-export type DecrementRequest = {
-  amount: number;
-};
+// ModPilot AI — API endpoint registry
 
 export const ApiEndpoint = {
-  Init: "/api/init",
-  Increment: "/api/increment",
-  Decrement: "/api/decrement",
+  // ModPilot data endpoints
+  Queue: "/api/queue",
+  Action: "/api/action",
+  Stats: "/api/stats",
+
+  // Devvit internal triggers
   OnPostCreate: "/internal/menu/post-create",
   OnAppInstall: "/internal/on-app-install",
 } as const;

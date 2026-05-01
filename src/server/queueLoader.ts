@@ -1,31 +1,25 @@
 // ModPilot AI — Queue Fetching and Normalization
 
 import { reddit, context } from "@devvit/web/server";
+import type { Post, User } from "@devvit/reddit";
 import type { PreparedPost, TriageItem } from "../shared/types.ts";
 import { scorePost } from "./scorer.ts";
+import { analyzeWithClaude, shouldAnalyzeWithClaude } from "./claude.ts";
 
 // ---------------------------------------------------------------------------
 // Helpers
 // ---------------------------------------------------------------------------
 
 /**
- * Returns the account age in days for a given username.
- * Uses the reddit API — note: called once per batch, not per-item.
+ * Returns the account age in days for a given User object.
  */
-async function extractAuthorAge(username: string): Promise<number> {
-  try {
-    const user = await reddit.getUserByUsername(username);
-    const createdAt = (user as unknown as { createdAt: number }).createdAt ?? Date.now();
-    const ageMs = Date.now() - createdAt;
-    return Math.floor(ageMs / (1000 * 60 * 60 * 24));
-  } catch {
-    // Unknown account age — treat as established to avoid false positives
-    return 365;
-  }
+export function extractAuthorAge(user: User): number {
+  const ageMs = Date.now() - user.createdAt.getTime();
+  return Math.max(0, Math.floor(ageMs / (1000 * 60 * 60 * 24)));
 }
 
 /**
- * Counts external links (http/https) in a post body.
+ * Counts external links (http/https URLs) in a text body.
  */
 export function countLinks(body: string): number {
   const matches = body.match(/https?:\/\/[^\s)>\]"]+/gi);
@@ -33,11 +27,10 @@ export function countLinks(body: string): number {
 }
 
 /**
- * Detects flair status from a raw post object.
+ * Detects flair status from a Post object.
  */
-export function detectFlair(post: RawPost): { hasFlair: boolean; flairText: string | null } {
-  const flairText =
-    (post.link_flair_text as string | null) ?? null;
+export function detectFlair(post: Post): { hasFlair: boolean; flairText: string | null } {
+  const flairText = post.flair?.text ?? null;
   return {
     hasFlair: flairText !== null && flairText.trim().length > 0,
     flairText,
@@ -45,46 +38,30 @@ export function detectFlair(post: RawPost): { hasFlair: boolean; flairText: stri
 }
 
 // ---------------------------------------------------------------------------
-// Types (raw Reddit mod queue post shape)
-// ---------------------------------------------------------------------------
-
-interface RawPost {
-  id: string;
-  title: string;
-  selftext?: string;
-  author: string;
-  subreddit: string;
-  url: string;
-  permalink: string;
-  link_flair_text?: string | null;
-  created_utc: number;
-}
-
-// ---------------------------------------------------------------------------
 // Normalization
 // ---------------------------------------------------------------------------
 
 /**
- * Normalizes a raw Reddit post + pre-fetched author age into a PreparedPost.
- * Never calls Reddit API — all enrichment happens upstream in fetchModQueue.
+ * Normalizes a Devvit Post + pre-resolved author age into a PreparedPost.
+ * Never calls the Reddit API — all enrichment happens upstream.
  */
-export function prepareTriageItem(post: RawPost, authorAge: number): PreparedPost {
-  const body = post.selftext ?? "";
+export function prepareTriageItem(post: Post, authorAge: number): PreparedPost {
+  const body = post.body ?? "";
   const { hasFlair, flairText } = detectFlair(post);
 
   return {
     id: post.id,
     title: post.title,
     body,
-    author: post.author,
+    author: post.authorName,
     authorAge,
-    subreddit: post.subreddit,
+    subreddit: post.subredditName,
     url: post.url,
     permalink: post.permalink,
     numLinks: countLinks(body),
     hasFlair,
     flairText,
-    createdAt: Math.floor(post.created_utc * 1000),
+    createdAt: post.createdAt.getTime(),
   };
 }
 
@@ -94,10 +71,14 @@ export function prepareTriageItem(post: RawPost, authorAge: number): PreparedPos
 
 /**
  * Fetches the full mod queue for the current subreddit as a batch,
- * enriches each post with author age, scores it, and returns TriageItems.
+ * enriches each post with author age, scores it, optionally runs Claude
+ * analysis, and returns TriageItems sorted by descending score.
  *
- * Batch strategy: fetch all posts first, then resolve author ages in parallel
- * to avoid serial per-item API calls.
+ * Batch strategy:
+ *   1. Fetch all posts via getModQueue listing in one call
+ *   2. Deduplicate authors → resolve ages in parallel
+ *   3. Score all posts locally (synchronous)
+ *   4. Run Claude only on medium/high risk items (parallel)
  */
 export async function fetchModQueue(): Promise<TriageItem[]> {
   const subreddit = context.subredditName;
@@ -105,60 +86,72 @@ export async function fetchModQueue(): Promise<TriageItem[]> {
     throw new Error("No subreddit context available");
   }
 
-  // 1. Batch-fetch the mod queue (all items at once)
-  const rawPosts = await fetchRawQueue(subreddit);
-  if (rawPosts.length === 0) return [];
+  // 1. Batch-fetch the mod queue (posts only, up to 100)
+  const listing = reddit.getModQueue({ subreddit, type: "post", limit: 100 });
+  const posts = await listing.all();
 
-  // 2. Deduplicate authors to minimize API calls
-  const uniqueAuthors = [...new Set(rawPosts.map((p) => p.author))];
+  if (posts.length === 0) return [];
+
+  // 2. Deduplicate authors and batch-resolve ages in parallel
+  const uniqueAuthors = [...new Set(posts.map((p) => p.authorName))];
   const authorAgeMap = new Map<string, number>();
 
-  // Batch-resolve author ages in parallel
-  const ages = await Promise.all(uniqueAuthors.map((u) => extractAuthorAge(u)));
+  const userResults = await Promise.allSettled(
+    uniqueAuthors.map((u) => reddit.getUserByUsername(u)),
+  );
+
   uniqueAuthors.forEach((username, i) => {
-    authorAgeMap.set(username, ages[i] ?? 365);
+    const result = userResults[i];
+    if (result?.status === "fulfilled" && result.value) {
+      authorAgeMap.set(username, extractAuthorAge(result.value));
+    } else {
+      // Unknown / deleted account — treat as established to avoid false positives
+      authorAgeMap.set(username, 365);
+    }
   });
 
-  // 3. Prepare and score each post
-  const items: TriageItem[] = rawPosts.map((raw) => {
-    const authorAge = authorAgeMap.get(raw.author) ?? 365;
-    const prepared = prepareTriageItem(raw, authorAge);
+  // 3. Prepare and score all posts synchronously
+  const preparedItems = posts.map((post) => {
+    const authorAge = authorAgeMap.get(post.authorName) ?? 365;
+    const prepared = prepareTriageItem(post, authorAge);
     const scoringResult = scorePost(prepared);
+    return { prepared, scoringResult };
+  });
+
+  // 4. Run Claude only on medium/high risk items, in parallel
+  const claudeResults = await Promise.allSettled(
+    preparedItems.map(({ prepared, scoringResult }) => {
+      if (!shouldAnalyzeWithClaude(scoringResult.score)) {
+        return Promise.resolve(null);
+      }
+      return analyzeWithClaude(prepared, scoringResult);
+    }),
+  );
+
+  // 5. Assemble final TriageItems
+  const items: TriageItem[] = preparedItems.map(({ prepared, scoringResult }, i) => {
+    const claudeResult =
+      claudeResults[i]?.status === "fulfilled"
+        ? claudeResults[i].value
+        : null;
+
+    const finalResult = claudeResult
+      ? {
+          ...scoringResult,
+          aiSummary: claudeResult.summary,
+          category: claudeResult.category,
+        }
+      : scoringResult;
 
     return {
       ...prepared,
-      scoringResult,
-      status: "pending",
+      scoringResult: finalResult,
+      status: "pending" as const,
     };
   });
 
+  // Sort descending by score so highest risk appears first
+  items.sort((a, b) => b.scoringResult.score - a.scoringResult.score);
+
   return items;
-}
-
-// ---------------------------------------------------------------------------
-// Raw queue fetch (uses Reddit listing API)
-// ---------------------------------------------------------------------------
-
-async function fetchRawQueue(subreddit: string): Promise<RawPost[]> {
-  try {
-    // Use the reddit API listing — fetch up to 100 items at once
-    const listing = await (reddit as unknown as RedditWithMod).getModerationQueue({
-      subreddit,
-      type: "links",
-      limit: 100,
-    });
-    return listing ?? [];
-  } catch (err) {
-    console.error("fetchModQueue error:", err);
-    return [];
-  }
-}
-
-// Minimal type shim for Devvit reddit API moderation methods
-interface RedditWithMod {
-  getModerationQueue(opts: {
-    subreddit: string;
-    type: string;
-    limit: number;
-  }): Promise<RawPost[]>;
 }

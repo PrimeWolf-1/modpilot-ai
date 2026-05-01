@@ -1,19 +1,30 @@
+// ModPilot AI — Server Entry Point
+
 import type { IncomingMessage, ServerResponse } from "node:http";
-import { context, reddit, redis } from "@devvit/web/server";
-import type {
-  PartialJsonValue,
-  TriggerResponse,
-  UiResponse,
-} from "@devvit/web/shared";
-import {
-  ApiEndpoint,
-  type DecrementRequest,
-  type DecrementResponse,
-  type IncrementRequest,
-  type IncrementResponse,
-  type InitResponse,
-} from "../shared/api.ts";
+import { context, reddit } from "@devvit/web/server";
+import type { TriggerResponse, UiResponse } from "@devvit/web/shared";
 import { once } from "node:events";
+
+import { ApiEndpoint } from "../shared/api.ts";
+import type {
+  GetQueueResponse,
+  GetStatsResponse,
+  TakeActionRequest,
+  TakeActionResponse,
+} from "../shared/types.ts";
+import { fetchModQueue } from "./queueLoader.ts";
+import {
+  appendDecision,
+  getStats,
+  incrementActions,
+  incrementEscalated,
+  incrementHighRisk,
+  incrementReviewed,
+} from "./stats.ts";
+
+// ---------------------------------------------------------------------------
+// Request dispatcher
+// ---------------------------------------------------------------------------
 
 export async function serverOnRequest(
   req: IncomingMessage,
@@ -24,7 +35,7 @@ export async function serverOnRequest(
   } catch (err) {
     const msg = `server error; ${err instanceof Error ? err.stack : err}`;
     console.error(msg);
-    writeJSON<ErrorResponse>(500, { error: msg, status: 500 }, rsp);
+    writeJSON(500, { error: msg, status: 500 }, rsp);
   }
 }
 
@@ -35,117 +46,182 @@ async function onRequest(
   const url = req.url;
 
   if (!url || url === "/") {
-    writeJSON<ErrorResponse>(404, { error: "not found", status: 404 }, rsp);
+    writeJSON(404, { error: "not found", status: 404 }, rsp);
     return;
   }
 
   const endpoint = url as ApiEndpoint;
 
-  let body: ApiResponse | UiResponse | ErrorResponse;
   switch (endpoint) {
-    case ApiEndpoint.Init:
-      body = await onInit();
+    case ApiEndpoint.Queue:
+      writeJSON(200, await onGetQueue(), rsp);
       break;
-    case ApiEndpoint.Increment:
-      body = await onIncrement(req);
+    case ApiEndpoint.Action:
+      writeJSON(200, await onTakeAction(req), rsp);
       break;
-    case ApiEndpoint.Decrement:
-      body = await onDecrement(req);
+    case ApiEndpoint.Stats:
+      writeJSON(200, await onGetStats(), rsp);
       break;
     case ApiEndpoint.OnPostCreate:
-      body = await onMenuNewPost();
+      writeJSON(200, await onMenuModOpen(), rsp);
       break;
     case ApiEndpoint.OnAppInstall:
-      body = await onAppInstall();
+      writeJSON(200, await onAppInstall(), rsp);
       break;
     default:
-      endpoint satisfies never;
-      body = { error: "not found", status: 404 };
+      writeJSON(404, { error: "not found", status: 404 }, rsp);
       break;
   }
-
-  writeJSON<PartialJsonValue>("status" in body ? body.status : 200, body, rsp);
 }
 
-type ApiResponse = InitResponse | IncrementResponse | DecrementResponse;
+// ---------------------------------------------------------------------------
+// Handlers
+// ---------------------------------------------------------------------------
 
-type ErrorResponse = {
-  error: string;
-  status: number;
-};
+/**
+ * GET /api/queue
+ * Fetches, scores, and returns the full mod queue for the current subreddit.
+ */
+async function onGetQueue(): Promise<GetQueueResponse> {
+  const items = await fetchModQueue();
+  return {
+    type: "queue_data",
+    items,
+    username: context.username ?? "moderator",
+    subreddit: context.subredditName ?? "",
+  };
+}
 
-function getPostId(): string {
-  if (!context.postId) {
-    throw Error("no post ID");
+/**
+ * POST /api/action
+ * Executes a moderation action on a post and updates stats.
+ */
+async function onTakeAction(req: IncomingMessage): Promise<TakeActionResponse> {
+  const body = await readJSON<TakeActionRequest>(req);
+  const { postId, action, modNote, removalReason, accepted_suggestion } = body;
+
+  try {
+    const post = await reddit.getPostById(`t3_${postId}`);
+
+    switch (action) {
+      case "approve":
+        await post.approve();
+        break;
+
+      case "remove": {
+        await post.remove(false);
+        if (modNote || removalReason) {
+          await reddit.addModNote({
+            subreddit: post.subredditName,
+            user: post.authorName,
+            redditId: `t3_${postId}`,
+            note: modNote ?? removalReason ?? "",
+            label: "SPAM_WARNING",
+          });
+        }
+        break;
+      }
+
+      case "warn":
+        await reddit.sendPrivateMessage({
+          to: post.authorName,
+          subject: `Moderator notice — ${post.subredditName}`,
+          text:
+            modNote ??
+            `Your post "${post.title}" has been flagged for review. Please review the community rules.`,
+        });
+        break;
+
+      case "escalate":
+        // Logged below; no Reddit API action required
+        break;
+
+      case "ignore":
+        // No action — mod is handling manually
+        break;
+    }
+
+    // Update stats
+    await incrementReviewed();
+    await incrementActions();
+
+    if (action === "escalate") {
+      await incrementEscalated();
+    }
+
+    // Track high-risk increments via history entry riskLevel — caller sends this
+    // We don't track it here to avoid a second DB read; the dashboard tracks it client-side.
+
+    // Append decision to history
+    await appendDecision({
+      postId,
+      title: post.title,
+      author: post.authorName,
+      riskLevel: "medium", // placeholder — actual level tracked on client
+      action,
+      timestamp: Date.now(),
+    });
+
+    // Accept suggestion tracking
+    if (accepted_suggestion) {
+      // Could track separately in future iterations
+    }
+
+    return { type: "action_complete", postId, action, success: true };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : String(err);
+    console.error(`onTakeAction error for ${postId}:`, error);
+    return { type: "action_complete", postId, action, success: false, error };
   }
-  return context.postId;
 }
 
-function getPostCountKey(postId: string): string {
-  return `count:${postId}`;
+/**
+ * GET /api/stats
+ * Returns current session stats from KV store.
+ */
+async function onGetStats(): Promise<GetStatsResponse> {
+  const stats = await getStats();
+  return { type: "stats_data", stats };
 }
 
-async function onInit(): Promise<InitResponse> {
-  const postId = getPostId();
-  const count = Number((await redis.get(getPostCountKey(postId))) ?? 0);
+/**
+ * POST /internal/menu/post-create  (menu action: "Open ModPilot AI")
+ * Creates the ModPilot dashboard post and navigates to it.
+ */
+async function onMenuModOpen(): Promise<UiResponse> {
+  const post = await reddit.submitCustomPost({
+    title: "ModPilot AI — Mod Queue Triage",
+    subredditName: context.subredditName ?? "",
+  });
   return {
-    type: "init",
-    postId,
-    count,
-    username: context.username ?? "user",
-  };
-}
-
-async function onIncrement(req: IncomingMessage): Promise<IncrementResponse> {
-  const postId = getPostId();
-  const { amount } = await readJSON<IncrementRequest>(req).catch(() => ({
-    amount: 1,
-  }));
-  const incrementBy = Number.isFinite(amount) ? amount : 1;
-  const count = await redis.incrBy(getPostCountKey(postId), incrementBy);
-  return {
-    type: "increment",
-    postId,
-    count,
-  };
-}
-
-async function onDecrement(req: IncomingMessage): Promise<DecrementResponse> {
-  const postId = getPostId();
-  const { amount } = await readJSON<DecrementRequest>(req).catch(() => ({
-    amount: 1,
-  }));
-  const parsedAmount = typeof amount === "number" ? amount : Number(amount);
-  const decrementBy = Number.isFinite(parsedAmount) ? parsedAmount : 1;
-  const count = Number(
-    await redis.incrBy(getPostCountKey(postId), -decrementBy),
-  );
-  return {
-    type: "decrement",
-    postId,
-    count,
-  };
-}
-
-async function onMenuNewPost(): Promise<UiResponse> {
-  const post = await reddit.submitCustomPost({ title: context.appName });
-  return {
-    showToast: { text: `Post ${post.id} created.`, appearance: "success" },
+    showToast: { text: "ModPilot AI dashboard opened.", appearance: "success" },
     navigateTo: post.url,
   };
 }
 
+/**
+ * POST /internal/on-app-install
+ * Creates the initial ModPilot dashboard post on install.
+ */
 async function onAppInstall(): Promise<TriggerResponse> {
-  await reddit.submitCustomPost({
-    title: "modpilot-ai",
-  });
-
+  try {
+    await reddit.submitCustomPost({
+      title: "ModPilot AI — Mod Queue Triage",
+      subredditName: context.subredditName ?? "",
+    });
+  } catch (err) {
+    console.error("onAppInstall: could not create post:", err);
+  }
   return {};
 }
 
-function writeJSON<T extends PartialJsonValue>(
+// ---------------------------------------------------------------------------
+// Utilities
+// ---------------------------------------------------------------------------
+
+function writeJSON<T>(
   status: number,
-  json: Readonly<T>,
+  json: T,
   rsp: ServerResponse,
 ): void {
   const body = JSON.stringify(json);
@@ -161,5 +237,8 @@ async function readJSON<T>(req: IncomingMessage): Promise<T> {
   const chunks: Uint8Array[] = [];
   req.on("data", (chunk) => chunks.push(chunk));
   await once(req, "end");
-  return JSON.parse(`${Buffer.concat(chunks)}`);
+  return JSON.parse(`${Buffer.concat(chunks)}`) as T;
 }
+
+// Increment high risk from external (called by queueLoader results consumer)
+export { incrementHighRisk };

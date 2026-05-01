@@ -152,11 +152,11 @@ const BLACKLIST = [
 ];
 
 // ---------------------------------------------------------------------------
-// Score thresholds
+// Score thresholds (exported for use in claude.ts)
 // ---------------------------------------------------------------------------
 
-const THRESHOLD_HIGH = 55;
-const THRESHOLD_MEDIUM = 25;
+export const THRESHOLD_HIGH = 55;
+export const THRESHOLD_MEDIUM = 25;
 
 // ---------------------------------------------------------------------------
 // AUTO_HIGH_RISK override conditions

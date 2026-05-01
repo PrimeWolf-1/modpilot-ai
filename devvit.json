@@ -20,8 +20,8 @@
   "menu": {
     "items": [
       {
-        "label": "Create a new post",
-        "description": "modpilot-ai",
+        "label": "Open ModPilot AI",
+        "description": "Open the ModPilot AI mod queue triage dashboard",
         "location": "subreddit",
         "forUserType": "moderator",
         "endpoint": "/internal/menu/post-create"
