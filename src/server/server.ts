@@ -98,7 +98,7 @@ async function onGetQueue(): Promise<GetQueueResponse> {
  */
 async function onTakeAction(req: IncomingMessage): Promise<TakeActionResponse> {
   const body = await readJSON<TakeActionRequest>(req);
-  const { postId, action, modNote, removalReason, accepted_suggestion } = body;
+  const { postId, action, riskLevel, category, signals, modNote, removalReason, accepted_suggestion } = body;
 
   try {
     const post = await reddit.getPostById(`t3_${postId}`);
@@ -141,31 +141,27 @@ async function onTakeAction(req: IncomingMessage): Promise<TakeActionResponse> {
         break;
     }
 
-    // Update stats
-    await incrementReviewed();
-    await incrementActions();
+    // Update stats (all in parallel for speed)
+    const statsOps: Promise<void>[] = [
+      incrementReviewed(),
+      incrementActions(),
+    ];
+    if (action === "escalate") statsOps.push(incrementEscalated());
+    if (riskLevel === "high")   statsOps.push(incrementHighRisk());
+    await Promise.all(statsOps);
 
-    if (action === "escalate") {
-      await incrementEscalated();
-    }
-
-    // Track high-risk increments via history entry riskLevel — caller sends this
-    // We don't track it here to avoid a second DB read; the dashboard tracks it client-side.
-
-    // Append decision to history
+    // Append full decision record to 50-item history
     await appendDecision({
       postId,
       title: post.title,
       author: post.authorName,
-      riskLevel: "medium", // placeholder — actual level tracked on client
+      riskLevel,
+      category,
+      signals,
       action,
+      accepted_suggestion,
       timestamp: Date.now(),
     });
-
-    // Accept suggestion tracking
-    if (accepted_suggestion) {
-      // Could track separately in future iterations
-    }
 
     return { type: "action_complete", postId, action, success: true };
   } catch (err) {
@@ -240,5 +236,3 @@ async function readJSON<T>(req: IncomingMessage): Promise<T> {
   return JSON.parse(`${Buffer.concat(chunks)}`) as T;
 }
 
-// Increment high risk from external (called by queueLoader results consumer)
-export { incrementHighRisk };

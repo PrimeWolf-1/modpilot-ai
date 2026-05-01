@@ -830,3 +830,341 @@ button {
 .stat-value.pop {
   animation: numberPop 0.35s ease;
 }
+
+/* =========================================================
+   WEEKLY SUMMARY OVERLAY (item 14)
+   ========================================================= */
+.summary-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.6);
+  z-index: 300;
+  display: flex;
+  align-items: flex-start;
+  justify-content: flex-end;
+  padding: calc(var(--nav-h) + 8px) 8px 8px 8px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s;
+}
+.summary-overlay.open {
+  opacity: 1;
+  pointer-events: all;
+}
+
+.summary-panel {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  width: 360px;
+  max-height: calc(100vh - var(--nav-h) - 20px);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  transform: translateY(-8px);
+  transition: transform 0.2s;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+}
+.summary-overlay.open .summary-panel {
+  transform: translateY(0);
+}
+
+.summary-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 14px 10px;
+  border-bottom: 1px solid var(--border);
+  flex-shrink: 0;
+}
+.summary-title {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text);
+}
+.summary-close {
+  width: 26px;
+  height: 26px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 6px;
+  font-size: 14px;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.summary-close:hover { background: var(--surface-2); color: var(--text); }
+
+.summary-body {
+  flex: 1;
+  overflow-y: auto;
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+.summary-body::-webkit-scrollbar { width: 4px; }
+.summary-body::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
+
+.sum-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.sum-section-label {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.7px;
+  color: var(--text-dim);
+}
+
+/* Stats grid */
+.sum-stats-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+.sum-stat-box {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 10px 12px;
+}
+.sum-stat-value {
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text);
+  line-height: 1;
+  margin-bottom: 4px;
+}
+.sum-stat-value.high   { color: var(--high); }
+.sum-stat-value.review { color: var(--review); }
+.sum-stat-value.ai     { color: var(--ai); }
+.sum-stat-label {
+  font-size: 10px;
+  color: var(--text-muted);
+}
+
+/* Bar chart */
+.sum-chart {
+  display: flex;
+  align-items: flex-end;
+  gap: 4px;
+  height: 64px;
+  padding: 0 2px;
+}
+.bar-col {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  height: 100%;
+  justify-content: flex-end;
+}
+.bar-wrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 1px;
+}
+.bar-reviewed {
+  width: 100%;
+  background: var(--review-border);
+  border-radius: 2px 2px 0 0;
+  min-height: 2px;
+  transition: height 0.4s ease;
+}
+.bar-high {
+  width: 100%;
+  background: var(--high-border);
+  border-radius: 2px 2px 0 0;
+  min-height: 2px;
+  position: absolute;
+  bottom: 0;
+}
+.bar-label {
+  font-size: 8px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+
+/* Trend */
+.sum-trend {
+  font-size: 11px;
+  padding: 5px 8px;
+  border-radius: 5px;
+  font-weight: 500;
+}
+.trend-up   { color: var(--low);  background: var(--low-bg);  }
+.trend-down { color: var(--medium); background: var(--medium-bg); }
+
+/* List items (signals & categories) */
+.sum-list {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+.sum-list-item {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.sum-list-name {
+  font-size: 11px;
+  color: var(--text-muted);
+  min-width: 110px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.sum-list-bar-wrap {
+  flex: 1;
+  height: 4px;
+  background: var(--surface-3);
+  border-radius: 2px;
+  overflow: hidden;
+}
+.sum-list-bar {
+  height: 100%;
+  background: var(--ai-border);
+  border-radius: 2px;
+  transition: width 0.4s ease;
+}
+.sum-list-count {
+  font-size: 10px;
+  color: var(--text-dim);
+  min-width: 18px;
+  text-align: right;
+}
+
+/* Acceptance rate */
+.sum-acceptance {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.sum-acceptance-bar {
+  flex: 1;
+  height: 8px;
+  background: var(--surface-3);
+  border-radius: 4px;
+  overflow: hidden;
+}
+.sum-acceptance-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--ai-border), var(--ai));
+  border-radius: 4px;
+  transition: width 0.5s ease;
+}
+.sum-acceptance-pct {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--ai);
+  min-width: 36px;
+}
+.sum-acceptance-note {
+  font-size: 10px;
+  color: var(--text-dim);
+}
+
+/* History list */
+.sum-history {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 200px;
+  overflow-y: auto;
+}
+.sum-history::-webkit-scrollbar { width: 3px; }
+.sum-history::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
+
+.sum-history-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 6px;
+  border-radius: 4px;
+  font-size: 10px;
+}
+.sum-history-item:hover { background: var(--surface-2); }
+
+.sum-history-risk {
+  font-size: 8px;
+  flex-shrink: 0;
+}
+.sum-history-risk.high         { color: var(--high); }
+.sum-history-risk.medium       { color: var(--medium); }
+.sum-history-risk.low          { color: var(--low); }
+.sum-history-risk.needs_review { color: var(--review); }
+
+.sum-history-title {
+  flex: 1;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.sum-history-action {
+  color: var(--text-dim);
+  font-size: 9px;
+  flex-shrink: 0;
+  text-transform: capitalize;
+}
+.sum-history-time {
+  color: var(--text-dim);
+  font-size: 9px;
+  flex-shrink: 0;
+}
+
+.sum-empty {
+  font-size: 11px;
+  color: var(--text-dim);
+  font-style: italic;
+}
+
+/* =========================================================
+   POLISH PASS (item 15)
+   ========================================================= */
+
+/* Confidence values fade in when card renders */
+.card-confidence {
+  animation: fadeIn 0.3s ease 0.1s both;
+}
+
+/* Column header glow pulse on high-risk col when items present */
+#col-high .col-header {
+  box-shadow: 0 2px 12px var(--high-glow);
+}
+
+/* Intensity bar animates width from 0 on load */
+.card-intensity-fill {
+  animation: barGrow 0.5s ease 0.2s both;
+}
+@keyframes barGrow {
+  from { width: 0 !important; }
+}
+
+/* Panel slide-in state: fade in body content */
+#detail-panel.open .panel-body {
+  animation: fadeIn 0.18s ease 0.1s both;
+}
+
+/* Loading state shimmer on detail panel while queue loads */
+.panel-ai-loading {
+  animation: loadingPulse 1.4s ease-in-out infinite;
+}
+@keyframes loadingPulse {
+  0%, 100% { opacity: 0.5; }
+  50%       { opacity: 1; }
+}
+
+/* Refresh button spin class */
+#nav-refresh.spinning {
+  opacity: 0.7;
+}

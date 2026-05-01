@@ -157,6 +157,9 @@ async function sendAction(
     const payload: TakeActionRequest = {
       postId: item.id,
       action,
+      riskLevel: item.scoringResult.riskLevel,
+      category: item.scoringResult.category,
+      signals: item.scoringResult.signals.map((s) => s.name),
       accepted_suggestion,
       modNote: item.scoringResult.modNote,
     };
@@ -192,6 +195,9 @@ async function confirmRemoveWithNote(): Promise<void> {
     const payload: TakeActionRequest = {
       postId: item.id,
       action: "remove",
+      riskLevel: item.scoringResult.riskLevel,
+      category: item.scoringResult.category,
+      signals: item.scoringResult.signals.map((s) => s.name),
       accepted_suggestion: true,
       modNote: note || item.scoringResult.modNote,
       removalReason: note,

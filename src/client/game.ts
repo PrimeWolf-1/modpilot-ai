@@ -1,11 +1,12 @@
-// ModPilot AI — Dashboard Main Entry Point (items 9-13)
+// ModPilot AI — Dashboard Main Entry Point (items 9-14)
 
 import { requestExpandedMode } from "@devvit/web/client";
 import { ApiEndpoint } from "../shared/api.ts";
-import type { GetQueueResponse, GetStatsResponse, TriageItem } from "../shared/types.ts";
+import type { GetQueueResponse, GetStatsResponse, SessionStats, TriageItem } from "../shared/types.ts";
 import { createCard } from "./card.ts";
 import { openPanel, initPanel } from "./panel.ts";
 import { updateStatsBar, updateQueueCount, setStatus } from "./statsbar.ts";
+import { openSummary } from "./summary.ts";
 
 // ---------------------------------------------------------------------------
 // State
@@ -13,6 +14,7 @@ import { updateStatsBar, updateQueueCount, setStatus } from "./statsbar.ts";
 
 let allItems: TriageItem[] = [];
 let currentUsername = "";
+let latestStats: SessionStats | null = null;
 
 // =========================================================
 // COLUMN MAPPING
@@ -45,9 +47,13 @@ async function init(): Promise<void> {
     void loadQueue();
   });
 
-  // Wire AI chip click (placeholder for summary panel — Phase 4 item 14)
+  // Wire AI chip click → weekly summary panel (item 14)
   document.getElementById("nav-ai-chip")?.addEventListener("click", () => {
-    setStatus("Weekly summary coming soon…", 3000);
+    if (latestStats) {
+      openSummary(latestStats, currentUsername);
+    } else {
+      setStatus("Loading stats…", 2000);
+    }
   });
 
   await Promise.all([loadQueue(), loadStats()]);
@@ -99,6 +105,7 @@ async function loadStats(): Promise<void> {
     const resp = await fetch(ApiEndpoint.Stats);
     if (!resp.ok) return;
     const data = (await resp.json()) as GetStatsResponse;
+    latestStats = data.stats;
     updateStatsBar(data.stats, currentUsername);
   } catch (err) {
     console.error("loadStats error:", err);

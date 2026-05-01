@@ -63,7 +63,10 @@ export interface DecisionRecord {
   title: string;
   author: string;
   riskLevel: RiskLevel;
+  category: Category;
+  signals: SignalName[];
   action: string;
+  accepted_suggestion: boolean;
   timestamp: number;
 }
 
@@ -94,6 +97,9 @@ export interface GetQueueResponse {
 export interface TakeActionRequest {
   postId: string;
   action: "approve" | "remove" | "warn" | "escalate" | "ignore";
+  riskLevel: RiskLevel;
+  category: Category;
+  signals: SignalName[];
   modNote?: string;
   removalReason?: string;
   accepted_suggestion: boolean;
