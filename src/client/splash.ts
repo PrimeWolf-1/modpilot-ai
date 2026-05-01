@@ -1,32 +1,19 @@
-import { navigateTo, context, requestExpandedMode } from "@devvit/web/client";
+// ModPilot AI — Splash / Launcher
 
-const docsLink = document.getElementById("docs-link") as HTMLDivElement;
-const playtestLink = document.getElementById("playtest-link") as HTMLDivElement;
-const discordLink = document.getElementById("discord-link") as HTMLDivElement;
-const startButton = document.getElementById(
-  "start-button",
-) as HTMLButtonElement;
+import { context, requestExpandedMode } from "@devvit/web/client";
 
-startButton.addEventListener("click", (e) => {
-  requestExpandedMode(e, "game");
-});
+const startButton = document.getElementById("start-button") as HTMLButtonElement;
+const greeting = document.getElementById("greeting") as HTMLDivElement;
 
-docsLink.addEventListener("click", () => {
-  navigateTo("https://developers.reddit.com/docs");
-});
+function init(): void {
+  const username = context.username;
+  if (username && greeting) {
+    greeting.textContent = `Welcome, u/${username}`;
+  }
 
-playtestLink.addEventListener("click", () => {
-  navigateTo("https://www.reddit.com/r/Devvit");
-});
-
-discordLink.addEventListener("click", () => {
-  navigateTo("https://discord.com/invite/R7yu2wh9Qz");
-});
-
-const titleElement = document.getElementById("title") as HTMLHeadingElement;
-
-function init() {
-  titleElement.textContent = `Hey ${context.username ?? "user"} 👋`;
+  startButton?.addEventListener("click", (e) => {
+    requestExpandedMode(e, "game");
+  });
 }
 
 init();

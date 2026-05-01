@@ -1,86 +1,62 @@
-* {
+/* ModPilot AI — Splash / Launcher Styles */
+
+*, *::before, *::after {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
-  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica,
-    Arial, sans-serif;
-  color: #000000;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 }
 
-.app {
+body.app {
   display: flex;
-  position: relative;
   flex-direction: column;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   height: 100vh;
-  margin: 0;
-  gap: 16px;
-}
-
-.snoo {
-  object-fit: contain;
-  width: 50%;
-  max-width: 250px;
-  margin: 0 auto;
+  background: #0b1120;
+  gap: 20px;
 }
 
 .content {
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: 8px;
+  gap: 6px;
 }
 
-.title {
-  font-size: 1.5em;
-  font-weight: bold;
-  text-align: center;
+.logo {
+  font-size: 24px;
+  font-weight: 800;
+  color: #e2e8f0;
+  letter-spacing: -0.5px;
+}
+.logo span {
+  color: #b794f4;
 }
 
-.description {
-  font-size: 1em;
-  text-align: center;
-  color: #5c6c74;
+.tagline {
+  font-size: 13px;
+  color: #8896b3;
 }
 
-.code {
-  background-color: #e5ebee;
-  padding: 2px 4px;
-  border-radius: 4px;
+.greeting {
+  font-size: 12px;
+  color: #4a5568;
+  margin-top: 2px;
 }
 
-.start-button {
-  background-color: #d93900;
-  color: #ffffff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  line-height: 1;
-  border: none;
-  padding: 6px 16px;
-  height: 28px;
-  font-size: 1.1em;
-  border-radius: 12px;
+.launch-btn {
+  background: rgba(183, 148, 244, 0.15);
+  border: 1px solid rgba(183, 148, 244, 0.4);
+  border-radius: 8px;
+  padding: 10px 28px;
+  font-size: 14px;
+  font-weight: 600;
+  color: #b794f4;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: background 0.2s, box-shadow 0.2s;
 }
-
-.footer {
-  position: absolute;
-  bottom: 16px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: flex;
-  gap: 12px;
-  font-size: 0.8em;
-  color: #666666;
-}
-
-.docs-link {
-  cursor: pointer;
-}
-
-.divider {
-  color: rgba(0, 0, 0, 0.1);
+.launch-btn:hover {
+  background: rgba(183, 148, 244, 0.25);
+  box-shadow: 0 0 16px rgba(183, 148, 244, 0.2);
 }

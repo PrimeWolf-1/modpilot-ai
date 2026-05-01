@@ -3,32 +3,196 @@
   <head>
     <link rel="stylesheet" type="text/css" href="game.css" />
     <meta charset="UTF-8" />
-    <meta
-      name="viewport"
-      content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width, height=device-height, user-scalable=0"
-    />
-    <title>devvit</title>
+    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width, height=device-height, user-scalable=0" />
+    <title>ModPilot AI</title>
   </head>
-  <body class="app">
-    <img class="snoo" src="/snoo.png" alt="Snoo" />
-    <div class="content">
-      <h1 class="title" id="title"></h1>
-      <p class="description">
-        Edit <span class="code">src/client/game.ts</span> to get started.
-      </p>
+  <body>
+
+    <!-- ===== TOP NAVIGATION BAR ===== -->
+    <nav id="nav">
+      <div class="nav-logo">Mod<span>Pilot</span> AI</div>
+      <div class="nav-subreddit" id="nav-subreddit">r/…</div>
+      <div class="nav-spacer"></div>
+      <div class="nav-ai-chip" id="nav-ai-chip" title="Click for weekly summary">
+        <span id="nav-ai-label">AI Active</span>
+      </div>
+      <button id="nav-refresh" title="Refresh queue">
+        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+        </svg>
+        Refresh
+      </button>
+    </nav>
+
+    <!-- ===== STATS BAR ===== -->
+    <div id="statsbar">
+      <div class="stat-item">
+        <span class="stat-value" id="stat-reviewed">0</span>
+        <span class="stat-label">Reviewed</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value" id="stat-high-risk">0</span>
+        <span class="stat-label">High Risk</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value" id="stat-time-saved">—</span>
+        <span class="stat-label">Time Saved</span>
+      </div>
+      <div class="stat-divider"></div>
+      <div class="stat-item">
+        <span class="stat-value" id="stat-queue-count">0</span>
+        <span class="stat-label">In Queue</span>
+      </div>
+      <div class="stat-status" id="stat-status">loading queue…</div>
     </div>
-    <div class="counter-row">
-      <button class="counter-button" id="decrement-button">-</button>
-      <span class="counter-value" id="counter-value">0</span>
-      <button class="counter-button" id="increment-button">+</button>
+
+    <!-- ===== QUEUE GRID — 4 COLUMNS ===== -->
+    <main id="queue-grid">
+
+      <!-- High Risk -->
+      <div class="column" id="col-high">
+        <div class="col-header">
+          <span class="col-title">High Risk</span>
+          <span class="col-badge" id="badge-high">0</span>
+        </div>
+        <div class="col-cards" id="cards-high"></div>
+      </div>
+
+      <!-- Medium -->
+      <div class="column" id="col-medium">
+        <div class="col-header">
+          <span class="col-title">Medium</span>
+          <span class="col-badge" id="badge-medium">0</span>
+        </div>
+        <div class="col-cards" id="cards-medium"></div>
+      </div>
+
+      <!-- Low Risk -->
+      <div class="column" id="col-low">
+        <div class="col-header">
+          <span class="col-title">Low Risk</span>
+          <span class="col-badge" id="badge-low">0</span>
+        </div>
+        <div class="col-cards" id="cards-low"></div>
+      </div>
+
+      <!-- Needs Review -->
+      <div class="column" id="col-review">
+        <div class="col-header">
+          <span class="col-title">Needs Review</span>
+          <span class="col-badge" id="badge-review">0</span>
+        </div>
+        <div class="col-cards" id="cards-review"></div>
+      </div>
+
+    </main>
+
+    <!-- ===== DETAIL PANEL (right slide) ===== -->
+    <aside id="detail-panel">
+      <div class="panel-header">
+        <div class="panel-title-text" id="panel-title">—</div>
+        <button class="panel-close" id="panel-close" title="Close">✕</button>
+      </div>
+
+      <div class="panel-body" id="panel-body">
+
+        <!-- Risk breakdown -->
+        <div class="panel-section">
+          <div class="panel-section-label">Risk Breakdown</div>
+          <div class="risk-breakdown">
+            <div class="breakdown-item">
+              <div class="breakdown-key">User</div>
+              <div class="breakdown-value" id="panel-author">—</div>
+            </div>
+            <div class="breakdown-item">
+              <div class="breakdown-key">Account Age</div>
+              <div class="breakdown-value" id="panel-age">—</div>
+            </div>
+            <div class="breakdown-item">
+              <div class="breakdown-key">Risk Level</div>
+              <div class="breakdown-value" id="panel-risk">—</div>
+            </div>
+            <div class="breakdown-item">
+              <div class="breakdown-key">Confidence</div>
+              <div class="breakdown-value" id="panel-confidence">—</div>
+            </div>
+            <div class="breakdown-item" style="grid-column: span 2">
+              <div class="breakdown-key">Category</div>
+              <div class="breakdown-value" id="panel-category">—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Detected signals -->
+        <div class="panel-section">
+          <div class="panel-section-label">Detected Signals</div>
+          <div class="panel-signals" id="panel-signals"></div>
+        </div>
+
+        <!-- AI Summary -->
+        <div class="panel-section" id="panel-ai-section">
+          <div class="panel-section-label">AI Summary</div>
+          <div class="panel-ai-summary" id="panel-ai-summary">
+            <span class="panel-ai-loading">Analyzing…</span>
+          </div>
+        </div>
+
+        <!-- Suggested action -->
+        <div class="panel-section">
+          <div class="panel-section-label">Suggested Action</div>
+          <div class="panel-suggestion">
+            <div class="suggestion-action" id="panel-suggest-action">—</div>
+            <div class="suggestion-reason" id="panel-suggest-reason">—</div>
+            <div class="suggestion-note" id="panel-suggest-note" title="Click to copy mod note">
+              <span id="panel-note-text">—</span>
+              <span class="copy-icon">⎘</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action buttons -->
+        <div class="panel-section">
+          <div class="panel-section-label">Actions</div>
+          <div class="panel-actions">
+            <div class="action-row">
+              <button class="action-btn approve" id="btn-approve">Approve</button>
+              <button class="action-btn remove" id="btn-remove">Remove</button>
+            </div>
+            <div class="action-row">
+              <button class="action-btn warn" id="btn-warn">Send Warning</button>
+              <button class="action-btn neutral" id="btn-escalate">Needs Review</button>
+            </div>
+            <div class="action-row">
+              <button class="action-btn neutral" id="btn-ignore" style="flex: 0.5">Ignore</button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Remove confirmation sub-panel -->
+        <div class="remove-confirm" id="remove-confirm">
+          <div class="remove-confirm-label">Confirm Removal</div>
+          <textarea class="remove-note-textarea" id="remove-note" placeholder="Mod note / removal reason (optional)"></textarea>
+          <div class="remove-confirm-btns">
+            <button class="action-btn remove" id="btn-remove-confirm" style="flex: 2">Remove with note</button>
+            <button class="action-btn neutral" id="btn-remove-no-note" style="flex: 1">Remove</button>
+            <button class="action-btn neutral" id="btn-remove-cancel" style="flex: 1">Cancel</button>
+          </div>
+        </div>
+
+      </div>
+    </aside>
+
+    <!-- ===== LOADING OVERLAY ===== -->
+    <div id="loading-overlay">
+      <div class="spinner"></div>
+      <div class="loading-text" id="loading-text">Loading mod queue…</div>
     </div>
-    <footer class="footer">
-      <div class="docs-link" tabindex="0" id="docs-link">Docs</div>
-      <span class="divider">|</span>
-      <div class="docs-link" tabindex="0" id="playtest-link">r/Devvit</div>
-      <span class="divider">|</span>
-      <div class="docs-link" tabindex="0" id="discord-link">Discord</div>
-    </footer>
+
+    <!-- ===== ERROR BANNER ===== -->
+    <div id="error-banner"></div>
+
     <script type="module" src="game.js" defer></script>
   </body>
 </html>
