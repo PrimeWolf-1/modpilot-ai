@@ -70,12 +70,12 @@ export function prepareTriageItem(post: Post, authorAge: number): PreparedPost {
 // ---------------------------------------------------------------------------
 
 /**
- * Fetches the full mod queue for the current subreddit as a batch,
+ * Fetches the unmoderated queue for the current subreddit as a batch,
  * enriches each post with author age, scores it, optionally runs Claude
  * analysis, and returns TriageItems sorted by descending score.
  *
  * Batch strategy:
- *   1. Fetch all posts via getModQueue listing in one call
+ *   1. Fetch all posts via getUnmoderated listing in one call
  *   2. Deduplicate authors → resolve ages in parallel
  *   3. Score all posts locally (synchronous)
  *   4. Run Claude only on medium/high risk items (parallel)
@@ -86,8 +86,8 @@ export async function fetchModQueue(): Promise<TriageItem[]> {
     throw new Error("No subreddit context available");
   }
 
-  // 1. Batch-fetch the mod queue (posts only, up to 100)
-  const listing = reddit.getModQueue({ subreddit, type: "post", limit: 100 });
+  // 1. Batch-fetch unmoderated posts (new posts awaiting initial review, up to 100)
+  const listing = reddit.getUnmoderated({ subreddit, type: "post", limit: 100 });
   const posts = await listing.all();
 
   if (posts.length === 0) return [];
