@@ -2,6 +2,9 @@
 <html lang="en">
   <head>
     <link rel="stylesheet" type="text/css" href="game.css" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@600;700&family=Rajdhani:wght@500;600&display=swap" rel="stylesheet" />
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ModPilot AI</title>
@@ -149,15 +152,23 @@
           </div>
         </div>
 
-        <!-- Suggested action -->
+        <!-- AI Recommendation Card -->
         <div class="panel-section">
-          <div class="panel-section-label">Suggested Action</div>
-          <div class="panel-suggestion">
-            <div class="suggestion-action" id="panel-suggest-action">—</div>
-            <div class="suggestion-reason" id="panel-suggest-reason">—</div>
-            <div class="suggestion-note" id="panel-suggest-note" title="Click to copy mod note">
-              <span id="panel-note-text">—</span>
-              <span class="copy-icon">⎘</span>
+          <div class="panel-section-label">AI Recommendation</div>
+          <div class="ai-rec-card">
+            <div class="ai-rec-header">
+              <span class="ai-rec-eyebrow">Recommended Action</span>
+              <span class="ai-rec-action" id="panel-suggest-action">—</span>
+            </div>
+            <div class="ai-rec-body">
+              <div class="ai-rec-block">
+                <div class="ai-rec-block-label">Reason</div>
+                <div class="ai-rec-block-text" id="panel-suggest-reason">—</div>
+              </div>
+              <div class="ai-rec-block ai-rec-note-row" id="panel-suggest-note" title="Click to copy mod note">
+                <div class="ai-rec-block-label">Mod Note <span class="copy-icon">⎘</span></div>
+                <div class="ai-rec-block-text" id="panel-note-text">—</div>
+              </div>
             </div>
           </div>
         </div>
