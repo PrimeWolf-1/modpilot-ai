@@ -28,11 +28,23 @@
       }
     ]
   },
+  "settings": {
+    "global": {
+      "GROQ_API_KEY": {
+        "type": "string",
+        "label": "Groq API Key",
+        "isSecret": true
+      }
+    }
+  },
   "triggers": {
     "onAppInstall": "/internal/on-app-install"
   },
   "scripts": {
     "dev": "node --experimental-strip-types ./tools/build.ts --watch",
     "build": "node --experimental-strip-types ./tools/build.ts --minify"
+  },
+  "dev": {
+    "subreddit": "modpilot_ai_dev"
   }
 }
