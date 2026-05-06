@@ -153,7 +153,7 @@ const BLACKLIST = [
 ];
 
 // ---------------------------------------------------------------------------
-// Score thresholds (exported for use in claude.ts)
+// Score thresholds (exported for use in groq.ts)
 // ---------------------------------------------------------------------------
 
 export const THRESHOLD_HIGH = 55;

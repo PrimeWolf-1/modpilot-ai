@@ -4,7 +4,7 @@ import { reddit, context } from "@devvit/web/server";
 import type { Post, User } from "@devvit/reddit";
 import type { PreparedPost, TriageItem } from "../shared/types.ts";
 import { scorePost } from "./scorer.ts";
-import { analyzeWithClaude, shouldAnalyzeWithClaude } from "./claude.ts";
+import { analyzeWithGroq, shouldAnalyzeWithGroq } from "./groq.ts";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -78,7 +78,7 @@ export function prepareTriageItem(post: Post, authorAge: number): PreparedPost {
  *   1. Fetch all posts via getUnmoderated listing in one call
  *   2. Deduplicate authors → resolve ages in parallel
  *   3. Score all posts locally (synchronous)
- *   4. Run Claude only on medium/high risk items (parallel)
+ *   4. Run Groq only on medium/high risk items (parallel)
  */
 export async function fetchModQueue(): Promise<TriageItem[]> {
   const subreddit = context.subredditName;
@@ -118,28 +118,28 @@ export async function fetchModQueue(): Promise<TriageItem[]> {
     return { prepared, scoringResult };
   });
 
-  // 4. Run Claude only on medium/high risk items, in parallel
-  const claudeResults = await Promise.allSettled(
+  // 4. Run Groq only on medium/high risk items, in parallel
+  const groqResults = await Promise.allSettled(
     preparedItems.map(({ prepared, scoringResult }) => {
-      if (!shouldAnalyzeWithClaude(scoringResult.score)) {
+      if (!shouldAnalyzeWithGroq(scoringResult.score)) {
         return Promise.resolve(null);
       }
-      return analyzeWithClaude(prepared, scoringResult);
+      return analyzeWithGroq(prepared, scoringResult);
     }),
   );
 
   // 5. Assemble final TriageItems
   const items: TriageItem[] = preparedItems.map(({ prepared, scoringResult }, i) => {
-    const claudeResult =
-      claudeResults[i]?.status === "fulfilled"
-        ? claudeResults[i].value
+    const groqResult =
+      groqResults[i]?.status === "fulfilled"
+        ? groqResults[i].value
         : null;
 
-    const finalResult = claudeResult
+    const finalResult = groqResult
       ? {
           ...scoringResult,
-          aiSummary: claudeResult.summary,
-          category: claudeResult.category,
+          aiSummary: groqResult.summary,
+          category: groqResult.category,
         }
       : scoringResult;
 
