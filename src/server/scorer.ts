@@ -37,7 +37,7 @@ const SIGNALS: SignalDefinition[] = [
     name: "external_links",
     label: "External Links",
     weight: 15,
-    test: (p) => p.numLinks >= 2,
+    test: (p) => p.numLinks >= 1,
   },
   {
     name: "urgency_language",
@@ -49,7 +49,7 @@ const SIGNALS: SignalDefinition[] = [
     name: "money_phrases",
     label: "Money / Financial Language",
     weight: 20,
-    test: (p) => containsAny(p.title + " " + p.body, MONEY_PHRASES),
+    test: (p) => containsAny(p.title + " " + p.body, MONEY_PHRASES) || /\$\d+/.test(p.title + " " + p.body),
   },
   {
     name: "promo_phrases",
@@ -126,6 +126,7 @@ const PROMO_PHRASES = [
   "my channel",
   "my discord",
   "join my",
+  "join now",
   "use my code",
   "use code",
   "referral",
