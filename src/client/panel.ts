@@ -27,6 +27,7 @@ export function openPanel(item: TriageItem, callback: ActionCallback): void {
 
   const panel = document.getElementById("detail-panel");
   panel?.classList.add("open");
+  document.getElementById("panel-backdrop")?.classList.add("visible");
 
   hideRemoveConfirm();
 }
@@ -35,6 +36,7 @@ export function openPanel(item: TriageItem, callback: ActionCallback): void {
 export function closePanel(): void {
   const panel = document.getElementById("detail-panel");
   panel?.classList.remove("open");
+  document.getElementById("panel-backdrop")?.classList.remove("visible");
 
   document.querySelectorAll(".card.selected").forEach((el) =>
     el.classList.remove("selected"),
@@ -47,6 +49,11 @@ export function closePanel(): void {
 /** Wires up panel close button and outside-click behavior. */
 export function initPanel(onOutsideClick: () => void): void {
   document.getElementById("panel-close")?.addEventListener("click", () => {
+    closePanel();
+    onOutsideClick();
+  });
+
+  document.getElementById("panel-backdrop")?.addEventListener("click", () => {
     closePanel();
     onOutsideClick();
   });

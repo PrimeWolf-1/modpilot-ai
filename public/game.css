@@ -233,14 +233,24 @@ button {
 }
 
 /* =========================================================
-   QUEUE GRID (4 columns)
+   APP BODY — grid + panel side-by-side
    ========================================================= */
-#queue-grid {
+#app-body {
   position: fixed;
   top: calc(var(--nav-h) + var(--stats-h));
   left: 0;
   right: 0;
   bottom: 0;
+  display: flex;
+  overflow: hidden;
+}
+
+/* =========================================================
+   QUEUE GRID (4 columns)
+   ========================================================= */
+#queue-grid {
+  flex: 1;
+  min-width: 0;
   display: flex;
   gap: 0;
   overflow: hidden;
@@ -475,25 +485,50 @@ button {
 }
 
 /* =========================================================
-   DETAIL PANEL
+   DETAIL PANEL — right side, inside the dashboard layout
    ========================================================= */
 #detail-panel {
-  position: fixed;
-  top: var(--nav-h);
-  right: 0;
-  width: 340px;
-  bottom: 0;
+  width: 0;
+  flex-shrink: 0;
   background: var(--surface);
   border-left: 1px solid var(--border);
-  transform: translateX(100%);
-  transition: transform 0.22s cubic-bezier(0.4, 0, 0.2, 1);
-  z-index: 80;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
 }
 #detail-panel.open {
-  transform: translateX(0);
+  width: 340px;
+}
+
+/* Keep content at full width so it doesn't squish during slide animation */
+.panel-header,
+.panel-body {
+  min-width: 340px;
+  width: 340px;
+}
+
+/* Mobile bottom-sheet drag handle — hidden on desktop */
+.panel-drag-handle {
+  display: none;
+  width: 36px;
+  height: 4px;
+  background: var(--border-2);
+  border-radius: 2px;
+  margin: 10px auto 0;
+  flex-shrink: 0;
+}
+
+/* Backdrop behind mobile bottom sheet — hidden on desktop */
+#panel-backdrop {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 199;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.28s;
 }
 
 .panel-header {
@@ -1167,4 +1202,61 @@ button {
 /* Refresh button spin class */
 #nav-refresh.spinning {
   opacity: 0.7;
+}
+
+/* =========================================================
+   MOBILE — bottom sheet panel + horizontal-scroll grid
+   ========================================================= */
+@media (max-width: 767px) {
+  /* Grid scrolls horizontally so all 4 columns are reachable */
+  #queue-grid {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+  .column {
+    min-width: 220px;
+    flex-shrink: 0;
+  }
+
+  /* Show the drag handle */
+  .panel-drag-handle {
+    display: block;
+  }
+
+  /* Enable backdrop */
+  #panel-backdrop {
+    display: block;
+  }
+  #panel-backdrop.visible {
+    opacity: 1;
+    pointer-events: all;
+  }
+
+  /* Detail panel becomes a bottom sheet */
+  #detail-panel {
+    position: fixed;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    max-height: 80vh;
+    border-left: none;
+    border-top: 1px solid var(--border);
+    border-radius: 14px 14px 0 0;
+    transform: translateY(100%);
+    transition: transform 0.28s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 200;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.4);
+  }
+  #detail-panel.open {
+    width: 100%;
+    transform: translateY(0);
+  }
+
+  /* Reset desktop fixed-width constraints */
+  .panel-header,
+  .panel-body {
+    min-width: unset;
+    width: 100%;
+  }
 }
