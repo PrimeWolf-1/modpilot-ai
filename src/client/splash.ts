@@ -14,6 +14,11 @@ function init(): void {
   startButton?.addEventListener("click", (e) => {
     requestExpandedMode(e, "game");
   });
+
+  // On desktop skip the splash and open the dashboard directly
+  if (window.innerWidth >= 768) {
+    startButton?.click();
+  }
 }
 
 init();

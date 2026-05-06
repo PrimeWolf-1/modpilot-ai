@@ -73,11 +73,31 @@
 html, body {
   height: 100%;
   overflow: hidden;
-  background: var(--bg);
+  background-color: var(--bg);
+  background-image:
+    linear-gradient(rgba(36, 48, 80, 0.35) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(36, 48, 80, 0.35) 1px, transparent 1px);
+  background-size: 48px 48px;
   color: var(--text);
   font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
   font-size: 13px;
   line-height: 1.4;
+}
+
+/* Subtle scan-line overlay */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: repeating-linear-gradient(
+    to bottom,
+    transparent 0px,
+    transparent 2px,
+    rgba(0, 0, 0, 0.04) 2px,
+    rgba(0, 0, 0, 0.04) 3px
+  );
+  pointer-events: none;
+  z-index: 9998;
 }
 
 button {
@@ -151,7 +171,14 @@ button {
   height: 6px;
   border-radius: 50%;
   background: var(--ai);
-  animation: pulse 2s ease-in-out infinite;
+  box-shadow: 0 0 0 0 rgba(183, 148, 244, 0.5);
+  animation: aiDot 2s ease-in-out infinite;
+}
+
+@keyframes aiDot {
+  0%   { opacity: 1; box-shadow: 0 0 0 0 rgba(183, 148, 244, 0.5); }
+  50%  { opacity: 0.5; box-shadow: 0 0 0 5px rgba(183, 148, 244, 0); }
+  100% { opacity: 1; box-shadow: 0 0 0 0 rgba(183, 148, 244, 0.5); }
 }
 
 #nav-refresh {
@@ -352,10 +379,10 @@ button {
 }
 
 /* Risk-specific card hover glow */
-.card.risk-high:hover    { box-shadow: 0 0 12px var(--high-glow); border-color: var(--high-border); }
-.card.risk-medium:hover  { box-shadow: 0 0 12px var(--medium-glow); border-color: var(--medium-border); }
-.card.risk-low:hover     { box-shadow: 0 0 12px var(--low-glow); border-color: var(--low-border); }
-.card.risk-needs_review:hover { box-shadow: 0 0 12px var(--review-glow); border-color: var(--review-border); }
+.card.risk-high:hover    { box-shadow: 0 0 18px var(--high-glow), 0 0 6px rgba(245,101,101,0.12); border-color: var(--high-border); }
+.card.risk-medium:hover  { box-shadow: 0 0 18px var(--medium-glow), 0 0 6px rgba(246,173,85,0.12); border-color: var(--medium-border); }
+.card.risk-low:hover     { box-shadow: 0 0 18px var(--low-glow), 0 0 6px rgba(104,211,145,0.12); border-color: var(--low-border); }
+.card.risk-needs_review:hover { box-shadow: 0 0 18px var(--review-glow), 0 0 6px rgba(99,179,237,0.12); border-color: var(--review-border); }
 
 .card.selected {
   border-color: var(--ai-border);
@@ -401,6 +428,21 @@ button {
 .risk-badge.medium       { background: var(--medium-bg); color: var(--medium); border: 1px solid var(--medium-border); }
 .risk-badge.low          { background: var(--low-bg); color: var(--low); border: 1px solid var(--low-border); }
 .risk-badge.needs_review { background: var(--review-bg); color: var(--review); border: 1px solid var(--review-border); }
+
+/* HUD risk icon + badge wrapper */
+.card-risk-hud {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  flex-shrink: 0;
+}
+.card-risk-hud svg {
+  flex-shrink: 0;
+}
+.card-risk-hud.high         { color: var(--high); }
+.card-risk-hud.medium       { color: var(--medium); }
+.card-risk-hud.low          { color: var(--low); }
+.card-risk-hud.needs_review { color: var(--review); }
 
 /* Card meta row */
 .card-meta {

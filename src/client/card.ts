@@ -9,6 +9,13 @@ const RISK_LABELS: Record<string, string> = {
   needs_review: "Review",
 };
 
+const RISK_ICONS: Record<string, string> = {
+  high: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>`,
+  medium: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>`,
+  low: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg>`,
+  needs_review: `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>`,
+};
+
 /**
  * Creates a risk card DOM element for a TriageItem.
  * @param item - The triage item to render
@@ -41,10 +48,15 @@ export function createCard(
   // Intensity bar width (0–100 based on score clamped to 100)
   const intensity = Math.min(100, scoringResult.score);
 
+  const riskIcon = RISK_ICONS[scoringResult.riskLevel] ?? "";
+
   card.innerHTML = `
     <div class="card-header">
       <div class="card-title">${escapeHtml(item.title)}</div>
-      <span class="risk-badge ${scoringResult.riskLevel}">${badgeLabel}</span>
+      <div class="card-risk-hud ${scoringResult.riskLevel}">
+        ${riskIcon}
+        <span class="risk-badge ${scoringResult.riskLevel}">${badgeLabel}</span>
+      </div>
     </div>
     <div class="card-meta">
       <span>u/${escapeHtml(item.author)}</span>
