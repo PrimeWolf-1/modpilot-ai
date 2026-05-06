@@ -1,25 +1,25 @@
-// ModPilot AI — Claude API Integration
+// ModPilot AI — Groq API Integration
 
 import { settings } from "@devvit/web/server";
 import type { Category, PreparedPost, ScoringResult } from "../shared/types.ts";
 import { THRESHOLD_MEDIUM } from "./scorer.ts";
 
-const MODEL = "claude-sonnet-4-20250514";
+const MODEL = "llama3-70b-8192";
 const MAX_TOKENS = 300;
 
 // ---------------------------------------------------------------------------
 // Guard: only fire for medium and high risk items
 // ---------------------------------------------------------------------------
 
-export function shouldAnalyzeWithClaude(score: number): boolean {
+export function shouldAnalyzeWithGroq(score: number): boolean {
   return score >= THRESHOLD_MEDIUM;
 }
 
 // ---------------------------------------------------------------------------
-// Claude analysis result
+// Groq analysis result
 // ---------------------------------------------------------------------------
 
-interface ClaudeAnalysis {
+interface GroqAnalysis {
   summary: string;
   category: Category;
   confidence_adjustment: number;
@@ -77,34 +77,33 @@ Return ONLY this JSON object:
 // Main analyzer
 // ---------------------------------------------------------------------------
 
-export async function analyzeWithClaude(
+export async function analyzeWithGroq(
   post: PreparedPost,
   scoring: Omit<ScoringResult, "aiSummary">,
 ): Promise<{ summary: string; category: Category } | null> {
-  if (!shouldAnalyzeWithClaude(scoring.score)) return null;
+  if (!shouldAnalyzeWithGroq(scoring.score)) return null;
 
   let apiKey: string | undefined;
   try {
-    apiKey = await settings.get<string>("ANTHROPIC_API_KEY");
+    apiKey = await settings.get<string>("GROQ_API_KEY");
   } catch {
-    console.warn("claude.ts: failed to read ANTHROPIC_API_KEY from settings");
+    console.warn("groq.ts: failed to read GROQ_API_KEY from settings");
     return null;
   }
 
   if (!apiKey) {
-    console.warn("claude.ts: ANTHROPIC_API_KEY not configured");
+    console.warn("groq.ts: GROQ_API_KEY not configured");
     return null;
   }
 
   const prompt = buildPrompt(post, scoring);
 
   try {
-    const response = await fetch("https://api.anthropic.com/v1/messages", {
+    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
+        "Authorization": `Bearer ${apiKey}`,
       },
       body: JSON.stringify({
         model: MODEL,
@@ -115,23 +114,23 @@ export async function analyzeWithClaude(
 
     if (!response.ok) {
       const errText = await response.text().catch(() => "");
-      console.error(`Claude API error ${response.status}: ${errText}`);
+      console.error(`Groq API error ${response.status}: ${errText}`);
       return null;
     }
 
     const data = (await response.json()) as {
-      content: Array<{ type: string; text: string }>;
+      choices: Array<{ message: { content: string } }>;
     };
-    const text = data.content?.find((c) => c.type === "text")?.text ?? "";
+    const text = data.choices?.[0]?.message?.content ?? "";
 
     // Strict JSON-only parsing — extract first JSON object from response
     const jsonMatch = text.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error("Claude response contained no JSON:", text.slice(0, 200));
+      console.error("Groq response contained no JSON:", text.slice(0, 200));
       return null;
     }
 
-    const parsed = JSON.parse(jsonMatch[0]) as Partial<ClaudeAnalysis>;
+    const parsed = JSON.parse(jsonMatch[0]) as Partial<GroqAnalysis>;
 
     if (!parsed.summary || !parsed.category) return null;
 
@@ -141,7 +140,7 @@ export async function analyzeWithClaude(
     };
   } catch (err) {
     // Fallback to rule-based result — never block the UI
-    console.error("Claude API call failed, falling back to rule-based:", err);
+    console.error("Groq API call failed, falling back to rule-based:", err);
     return null;
   }
 }

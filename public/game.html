@@ -3,7 +3,7 @@
   <head>
     <link rel="stylesheet" type="text/css" href="game.css" />
     <meta charset="UTF-8" />
-    <meta name="viewport" content="initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0, width=device-width, height=device-height, user-scalable=0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ModPilot AI</title>
   </head>
   <body>
@@ -48,6 +48,9 @@
       <div class="stat-status" id="stat-status">loading queue…</div>
     </div>
 
+    <!-- ===== APP BODY (grid + panel side-by-side) ===== -->
+    <div id="app-body">
+
     <!-- ===== QUEUE GRID — 4 COLUMNS ===== -->
     <main id="queue-grid">
 
@@ -89,8 +92,9 @@
 
     </main>
 
-    <!-- ===== DETAIL PANEL (right slide) ===== -->
+    <!-- ===== DETAIL PANEL (right slide / mobile bottom sheet) ===== -->
     <aside id="detail-panel">
+      <div class="panel-drag-handle"></div>
       <div class="panel-header">
         <div class="panel-title-text" id="panel-title">—</div>
         <button class="panel-close" id="panel-close" title="Close">✕</button>
@@ -183,6 +187,11 @@
 
       </div>
     </aside>
+
+    </div><!-- #app-body -->
+
+    <!-- ===== BACKDROP (mobile bottom sheet) ===== -->
+    <div id="panel-backdrop"></div>
 
     <!-- ===== LOADING OVERLAY ===== -->
     <div id="loading-overlay">
