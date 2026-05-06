@@ -58,6 +58,7 @@
 
   /* Nav */
   --nav-h: 52px;
+  --banner-h: 32px;
   --stats-h: 46px;
 }
 
@@ -206,11 +207,55 @@ button {
 }
 
 /* =========================================================
+   MOTIVATION BANNER
+   ========================================================= */
+#motive-banner {
+  position: fixed;
+  top: var(--nav-h);
+  left: 0;
+  right: 0;
+  height: var(--banner-h);
+  background: linear-gradient(90deg, rgba(0,210,150,0.07) 0%, rgba(0,180,255,0.05) 100%);
+  border-bottom: 1px solid rgba(0, 210, 150, 0.18);
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 9px;
+  z-index: 95;
+  overflow: hidden;
+}
+
+.motive-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: #00d296;
+  flex-shrink: 0;
+  box-shadow: 0 0 8px rgba(0, 210, 150, 0.8);
+  animation: motiveDot 3s ease-in-out infinite;
+}
+
+@keyframes motiveDot {
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(0,210,150,0.8); }
+  50%       { opacity: 0.5; box-shadow: 0 0 16px rgba(0,210,150,0); }
+}
+
+#motive-text {
+  font-size: 11px;
+  color: rgba(0, 210, 150, 0.85);
+  letter-spacing: 0.2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  transition: opacity 0.4s;
+}
+
+/* =========================================================
    STATS BAR
    ========================================================= */
 #statsbar {
   position: fixed;
-  top: var(--nav-h);
+  top: calc(var(--nav-h) + var(--banner-h));
   left: 0;
   right: 0;
   height: var(--stats-h);
@@ -268,7 +313,7 @@ button {
    ========================================================= */
 #app-body {
   position: fixed;
-  top: calc(var(--nav-h) + var(--stats-h));
+  top: calc(var(--nav-h) + var(--banner-h) + var(--stats-h));
   left: 0;
   right: 0;
   bottom: 0;
@@ -497,6 +542,19 @@ button {
 @keyframes tagAppear {
   from { opacity: 0; transform: scale(0.9); }
   to   { opacity: 1; transform: scale(1); }
+}
+
+/* AI reason snippet on card */
+.card-ai-reason {
+  font-size: 10px;
+  color: var(--text-dim);
+  font-style: italic;
+  line-height: 1.4;
+  margin-bottom: 6px;
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
 }
 
 /* Intensity bar */
@@ -878,7 +936,7 @@ button {
 
 #error-banner {
   position: fixed;
-  top: calc(var(--nav-h) + var(--stats-h) + 8px);
+  top: calc(var(--nav-h) + var(--banner-h) + var(--stats-h) + 8px);
   left: 50%;
   transform: translateX(-50%);
   background: var(--high-bg);
@@ -1254,9 +1312,47 @@ button {
 }
 
 /* =========================================================
+   ACTION TOAST
+   ========================================================= */
+#action-toast {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  background: var(--surface-2);
+  border: 1px solid var(--border-2);
+  border-radius: 8px;
+  padding: 8px 18px;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--text);
+  z-index: 250;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.2s, transform 0.2s;
+  white-space: nowrap;
+}
+#action-toast.visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+#action-toast.toast-approve  { border-color: var(--low-border);    color: var(--low);    background: var(--low-bg); }
+#action-toast.toast-remove   { border-color: var(--high-border);   color: var(--high);   background: var(--high-bg); }
+#action-toast.toast-warn     { border-color: var(--medium-border); color: var(--medium); background: var(--medium-bg); }
+#action-toast.toast-escalate { border-color: var(--review-border); color: var(--review); background: var(--review-bg); }
+#action-toast.toast-ignore   { border-color: var(--border-2); color: var(--text-muted); }
+
+/* =========================================================
    MOBILE — bottom sheet panel + horizontal-scroll grid
    ========================================================= */
 @media (max-width: 767px) {
+  /* Hide banner on mobile — not enough vertical space */
+  #motive-banner { display: none; }
+
+  /* Re-anchor statsbar and app-body without banner */
+  #statsbar { top: var(--nav-h); }
+  #app-body  { top: calc(var(--nav-h) + var(--stats-h)); }
+
   /* Grid scrolls horizontally so all 4 columns are reachable */
   #queue-grid {
     overflow-x: auto;

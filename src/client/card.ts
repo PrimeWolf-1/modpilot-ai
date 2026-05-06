@@ -67,6 +67,9 @@ export function createCard(
       ${scoringResult.confidence}% confidence
     </div>
     <div class="card-signals">${signalTags}</div>
+    ${scoringResult.aiSummary
+      ? `<div class="card-ai-reason">${escapeHtml(scoringResult.aiSummary.slice(0, 80))}${scoringResult.aiSummary.length > 80 ? "…" : ""}</div>`
+      : ""}
     <div class="card-intensity-bar">
       <div class="card-intensity-fill" style="width: ${intensity}%"></div>
     </div>

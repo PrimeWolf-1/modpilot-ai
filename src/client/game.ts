@@ -5,7 +5,7 @@ import { ApiEndpoint } from "../shared/api.ts";
 import type { GetQueueResponse, GetStatsResponse, SessionStats, TriageItem } from "../shared/types.ts";
 import { createCard } from "./card.ts";
 import { openPanel, initPanel } from "./panel.ts";
-import { updateStatsBar, updateQueueCount, setStatus } from "./statsbar.ts";
+import { updateStatsBar, updateQueueCount, setStatus, updateMotivationBanner } from "./statsbar.ts";
 import { openSummary } from "./summary.ts";
 
 // ---------------------------------------------------------------------------
@@ -107,6 +107,7 @@ async function loadStats(): Promise<void> {
     const data = (await resp.json()) as GetStatsResponse;
     latestStats = data.stats;
     updateStatsBar(data.stats, currentUsername);
+    updateMotivationBanner(data.stats);
   } catch (err) {
     console.error("loadStats error:", err);
   }
@@ -177,7 +178,6 @@ function renderQueue(items: TriageItem[]): void {
 // =========================================================
 
 function onActionComplete(postId: string, action: string, _accepted: boolean): void {
-  // Mark item as no longer pending in local state
   const item = allItems.find((i) => i.id === postId);
   if (item) {
     item.status = action === "approve"
@@ -191,10 +191,8 @@ function onActionComplete(postId: string, action: string, _accepted: boolean): v
       : "ignored";
   }
 
-  // Update badges
   updateBadges();
-
-  // Reload stats to reflect changes
+  showActionToast(action);
   void loadStats();
 }
 
@@ -242,6 +240,30 @@ function showError(msg: string): void {
   banner.textContent = msg;
   banner.classList.add("visible");
   setTimeout(() => banner.classList.remove("visible"), 5000);
+}
+
+let toastTimer: ReturnType<typeof setTimeout> | null = null;
+
+function showActionToast(action: string): void {
+  const toast = document.getElementById("action-toast");
+  if (!toast) return;
+
+  const labels: Record<string, string> = {
+    approve:  "✓ Approved",
+    remove:   "✕ Removed",
+    warn:     "⚠ Warning sent",
+    escalate: "⬆ Escalated for review",
+    ignore:   "— Ignored",
+  };
+
+  toast.textContent = labels[action] ?? `✓ ${action}`;
+  toast.className = `toast-${action} visible`;
+
+  if (toastTimer) clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => {
+    toast.classList.remove("visible");
+    toastTimer = null;
+  }, 2200);
 }
 
 function setRefreshSpinning(spinning: boolean): void {
