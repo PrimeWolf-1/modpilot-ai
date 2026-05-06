@@ -28,6 +28,12 @@
       }
     ]
   },
+  "permissions": {
+    "http": {
+      "enable": true,
+      "domains": ["api.groq.com"]
+    }
+  },
   "settings": {
     "global": {
       "GROQ_API_KEY": {
