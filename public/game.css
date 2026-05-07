@@ -577,7 +577,6 @@ button {
 }
 .card-risk-hud svg {
   flex-shrink: 0;
-  filter: drop-shadow(0 0 5px currentColor) drop-shadow(0 0 10px currentColor);
   opacity: 0.95;
 }
 .card-risk-hud.high         { color: var(--high); }
@@ -1562,51 +1561,6 @@ button {
   object-fit: contain;
   display: block;
   flex-shrink: 0;
-  transition: filter 0.2s ease;
-}
-
-/* Holographic multi-layer drop-shadow — resting state */
-.col-risk-icon.risk-icon-high   {
-  filter: drop-shadow(0 0 3px rgba(245,101,101,0.85))
-          drop-shadow(0 0 10px rgba(245,101,101,0.38))
-          drop-shadow(0 0 22px rgba(245,101,101,0.15));
-}
-.col-risk-icon.risk-icon-medium {
-  filter: drop-shadow(0 0 3px rgba(246,173,85,0.85))
-          drop-shadow(0 0 10px rgba(246,173,85,0.38))
-          drop-shadow(0 0 22px rgba(246,173,85,0.15));
-}
-.col-risk-icon.risk-icon-low {
-  filter: drop-shadow(0 0 3px rgba(104,211,145,0.85))
-          drop-shadow(0 0 10px rgba(104,211,145,0.38))
-          drop-shadow(0 0 22px rgba(104,211,145,0.15));
-}
-.col-risk-icon.risk-icon-review {
-  filter: drop-shadow(0 0 3px rgba(167,139,250,0.85))
-          drop-shadow(0 0 10px rgba(167,139,250,0.38))
-          drop-shadow(0 0 22px rgba(167,139,250,0.15));
-}
-
-/* Hover: expand outer glow layers */
-.col-icon-slot:hover .col-risk-icon.risk-icon-high   {
-  filter: drop-shadow(0 0 4px rgba(245,101,101,0.90))
-          drop-shadow(0 0 14px rgba(245,101,101,0.52))
-          drop-shadow(0 0 32px rgba(245,101,101,0.25));
-}
-.col-icon-slot:hover .col-risk-icon.risk-icon-medium {
-  filter: drop-shadow(0 0 4px rgba(246,173,85,0.90))
-          drop-shadow(0 0 14px rgba(246,173,85,0.52))
-          drop-shadow(0 0 32px rgba(246,173,85,0.25));
-}
-.col-icon-slot:hover .col-risk-icon.risk-icon-low {
-  filter: drop-shadow(0 0 4px rgba(104,211,145,0.90))
-          drop-shadow(0 0 14px rgba(104,211,145,0.52))
-          drop-shadow(0 0 32px rgba(104,211,145,0.25));
-}
-.col-icon-slot:hover .col-risk-icon.risk-icon-review {
-  filter: drop-shadow(0 0 4px rgba(167,139,250,0.90))
-          drop-shadow(0 0 14px rgba(167,139,250,0.52))
-          drop-shadow(0 0 32px rgba(167,139,250,0.25));
 }
 
 /* ---- Detail panel risk icon ----------------------------------- */
