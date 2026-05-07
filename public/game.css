@@ -421,7 +421,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 8px;
+  gap: 10px;
   padding: 10px 12px 8px;
   border-bottom: 2px solid transparent;
   flex-shrink: 0;
@@ -1533,37 +1533,67 @@ button {
    RISK ICONS — column headers + detail panel
    ========================================================= */
 
-/* ---- Column header icon slot ---------------------------------- */
+/* ---- Column header icon — backing plate ----------------------- */
+/* .col-icon-slot is the circular dark disc that creates contrast
+   so icons (especially purple needs-review) read against any
+   column background. The img sits centered inside it.           */
 .col-icon-slot {
   display: flex;
   align-items: center;
+  justify-content: center;
   flex-shrink: 0;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: rgba(0, 0, 0, 0.32);
+  transition: box-shadow 0.2s ease;
 }
 .col-icon-slot:empty { display: none; }
 
-/* Column header icons: 28px, RGBA-transparent PNG, risk-colored glow */
+/* Resting ring + ambient glow per risk column */
+#col-high   .col-icon-slot { box-shadow: 0 0 0 1px rgba(245,101,101,0.28), 0 0 12px rgba(245,101,101,0.28); }
+#col-medium .col-icon-slot { box-shadow: 0 0 0 1px rgba(246,173,85,0.28),  0 0 12px rgba(246,173,85,0.28);  }
+#col-low    .col-icon-slot { box-shadow: 0 0 0 1px rgba(104,211,145,0.28), 0 0 12px rgba(104,211,145,0.28); }
+#col-review .col-icon-slot { box-shadow: 0 0 0 1px rgba(99,179,237,0.28),  0 0 12px rgba(99,179,237,0.28);  }
+
+/* Hover: ring sharpens, glow expands */
+#col-high   .col-icon-slot:hover { box-shadow: 0 0 0 1px rgba(245,101,101,0.55), 0 0 20px rgba(245,101,101,0.50); }
+#col-medium .col-icon-slot:hover { box-shadow: 0 0 0 1px rgba(246,173,85,0.55),  0 0 20px rgba(246,173,85,0.50);  }
+#col-low    .col-icon-slot:hover { box-shadow: 0 0 0 1px rgba(104,211,145,0.55), 0 0 20px rgba(104,211,145,0.50); }
+#col-review .col-icon-slot:hover { box-shadow: 0 0 0 1px rgba(99,179,237,0.55),  0 0 20px rgba(99,179,237,0.50);  }
+
+/* Icon image: 24px inside the 36px disc (6px all-around padding) */
 .col-risk-icon {
-  width: 28px;
-  height: 28px;
+  width: 24px;
+  height: 24px;
   object-fit: contain;
   display: block;
   flex-shrink: 0;
+  transition: filter 0.2s ease;
 }
-.col-risk-icon.risk-icon-high   { filter: drop-shadow(0 0 6px rgba(245,101,101,0.80)); }
-.col-risk-icon.risk-icon-medium { filter: drop-shadow(0 0 6px rgba(246,173,85,0.80));  }
-.col-risk-icon.risk-icon-low    { filter: drop-shadow(0 0 6px rgba(104,211,145,0.80)); }
-.col-risk-icon.risk-icon-review { filter: drop-shadow(0 0 6px rgba(99,179,237,0.80));  }
+
+/* Resting drop-shadow glow per icon */
+.col-risk-icon.risk-icon-high   { filter: drop-shadow(0 0 4px rgba(245,101,101,0.90)); }
+.col-risk-icon.risk-icon-medium { filter: drop-shadow(0 0 4px rgba(246,173,85,0.90));  }
+.col-risk-icon.risk-icon-low    { filter: drop-shadow(0 0 4px rgba(104,211,145,0.90)); }
+.col-risk-icon.risk-icon-review { filter: drop-shadow(0 0 4px rgba(99,179,237,0.90));  }
+
+/* Hover: icon glow doubles */
+.col-icon-slot:hover .col-risk-icon.risk-icon-high   { filter: drop-shadow(0 0 6px rgba(245,101,101,1.0)) drop-shadow(0 0 12px rgba(245,101,101,0.55)); }
+.col-icon-slot:hover .col-risk-icon.risk-icon-medium { filter: drop-shadow(0 0 6px rgba(246,173,85,1.0))  drop-shadow(0 0 12px rgba(246,173,85,0.55));  }
+.col-icon-slot:hover .col-risk-icon.risk-icon-low    { filter: drop-shadow(0 0 6px rgba(104,211,145,1.0)) drop-shadow(0 0 12px rgba(104,211,145,0.55)); }
+.col-icon-slot:hover .col-risk-icon.risk-icon-review { filter: drop-shadow(0 0 6px rgba(99,179,237,1.0))  drop-shadow(0 0 12px rgba(99,179,237,0.55));  }
 
 /* ---- Detail panel risk icon ----------------------------------- */
-/* Sits inside .breakdown-value which already carries the risk color,
-   so currentColor resolves to the correct risk tint automatically. */
+/* .breakdown-value.{high|medium|...} already sets color: var(--risk),
+   so currentColor on the drop-shadow inherits the correct tint.  */
 .panel-risk-icon {
-  width: 18px;
-  height: 18px;
+  width: 20px;
+  height: 20px;
   object-fit: contain;
   display: block;
   flex-shrink: 0;
-  filter: drop-shadow(0 0 6px currentColor);
+  filter: drop-shadow(0 0 5px currentColor);
 }
 
 /* ---- Risk breakdown value row — flex to seat the icon --------- */
