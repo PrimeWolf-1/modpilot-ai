@@ -58,7 +58,7 @@
 
   /* Layout */
   --nav-h: 44px;
-  --ops-h: 90px;
+  --ops-h: 92px;
 }
 
 /* =========================================================
@@ -225,16 +225,16 @@ button {
   background: var(--surface-3);
   border-color: var(--border-2);
   color: var(--text-muted);
-  box-shadow: 0 0 10px rgba(183, 148, 244, 0.18);
+  box-shadow: 0 0 8px rgba(18, 191, 208, 0.14);
 }
 #nav-focus.active {
-  background: rgba(183, 148, 244, 0.10);
-  border-color: rgba(183, 148, 244, 0.50);
-  color: var(--ai);
-  box-shadow: 0 0 16px rgba(183, 148, 244, 0.40);
+  background: rgba(18, 191, 208, 0.10);
+  border-color: rgba(18, 191, 208, 0.45);
+  color: #12bfd0;
+  box-shadow: 0 0 14px rgba(18, 191, 208, 0.35);
 }
 #nav-focus.active svg {
-  filter: drop-shadow(0 0 5px rgba(183, 148, 244, 0.80));
+  filter: drop-shadow(0 0 4px rgba(18, 191, 208, 0.80));
 }
 
 /* =========================================================
@@ -265,73 +265,74 @@ button {
   transition: opacity 0.35s ease;
 }
 
-/* Row 2: MOTD broadcast */
+/* Row 2: MOTD operator directive */
 .ops-motd {
   display: flex;
   align-items: center;
-  padding: 0 16px;
+  padding: 0 20px;
   gap: 12px;
-  height: 30px;
+  height: 32px;
   flex-shrink: 0;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(90deg,
-    rgba(0,210,150,0.10) 0%,
-    rgba(0,180,255,0.07) 50%,
-    rgba(0,210,150,0.10) 100%);
-  border-bottom: 1px solid rgba(0, 210, 150, 0.20);
-  box-shadow: 0 2px 14px rgba(0, 210, 150, 0.08);
+  background: linear-gradient(180deg, rgba(18,191,208,0.07) 0%, rgba(18,191,208,0.04) 100%);
+  border-bottom: 1px solid rgba(18,191,208,0.18);
   transition: opacity 0.35s ease;
 }
 
+/* Subtle sweep — barely visible, broadcast terminal feel */
 .ops-motd::after {
   content: "";
   position: absolute;
   top: 0;
-  left: -40%;
-  width: 40%;
+  left: -60%;
+  width: 60%;
   height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(0,210,150,0.10), transparent);
-  animation: bannerSweep 6s linear infinite;
+  background: linear-gradient(90deg, transparent, rgba(18,191,208,0.06), transparent);
+  animation: bannerSweep 9s linear infinite;
   pointer-events: none;
 }
 
 @keyframes bannerSweep {
-  from { left: -40%; }
+  from { left: -60%; }
   to   { left: 140%; }
 }
 
+/* Signal indicator dot — calm slow pulse */
 .motive-dot {
-  width: 7px;
-  height: 7px;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
-  background: #00d296;
+  background: #12bfd0;
   flex-shrink: 0;
-  box-shadow: 0 0 8px rgba(0, 210, 150, 0.9), 0 0 18px rgba(0, 210, 150, 0.4);
-  animation: motiveDot 2s ease-in-out infinite;
+  box-shadow: 0 0 6px rgba(18,191,208,0.85), 0 0 14px rgba(18,191,208,0.35);
+  animation: motiveDot 3s ease-in-out infinite;
 }
 
 @keyframes motiveDot {
-  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(0,210,150,0.9), 0 0 18px rgba(0,210,150,0.4); }
-  50%       { opacity: 0.55; box-shadow: 0 0 3px rgba(0,210,150,0.5), 0 0 0 rgba(0,210,150,0); }
+  0%, 100% { opacity: 1;    box-shadow: 0 0 6px rgba(18,191,208,0.85), 0 0 14px rgba(18,191,208,0.35); }
+  50%       { opacity: 0.45; box-shadow: 0 0 3px rgba(18,191,208,0.50), 0 0 0   rgba(18,191,208,0);    }
 }
 
 #motive-text {
   font-family: 'Orbitron', monospace;
-  font-size: 11px;
+  font-size: 12px;
   font-weight: 700;
-  color: rgba(0, 236, 178, 0.98);
+  color: rgba(18, 191, 208, 0.92);
   letter-spacing: 2.5px;
   text-transform: uppercase;
-  text-shadow: 0 0 14px rgba(0, 210, 150, 0.90), 0 0 36px rgba(0, 210, 150, 0.50), 0 0 60px rgba(0, 210, 150, 0.20);
+  text-shadow:
+    0 0 16px rgba(18,191,208,0.55),
+    0 0 40px rgba(18,191,208,0.22),
+    0 0 80px rgba(18,191,208,0.08);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 #motive-text::before {
-  content: "▶  ";
-  font-size: 9px;
-  opacity: 0.65;
+  content: "▸  ";
+  font-size: 10px;
+  opacity: 0.55;
   letter-spacing: 0;
   vertical-align: middle;
 }
