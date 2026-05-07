@@ -211,52 +211,30 @@ button {
 #nav-focus {
   display: flex;
   align-items: center;
-  gap: 6px;
-  background: rgba(0, 210, 150, 0.07);
-  border: 1px solid rgba(0, 210, 150, 0.22);
-  border-radius: 20px;
-  padding: 4px 11px 4px 9px;
-  font-family: 'Orbitron', 'Rajdhani', monospace;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 1px;
-  color: rgba(0, 210, 150, 0.60);
-  cursor: pointer;
-  user-select: none;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-dim);
   flex-shrink: 0;
-  white-space: nowrap;
   transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, opacity 0.35s ease;
 }
 #nav-focus:hover {
-  background: rgba(0, 210, 150, 0.13);
-  border-color: rgba(0, 210, 150, 0.38);
-  color: rgba(0, 228, 168, 0.88);
+  background: var(--surface-3);
+  border-color: var(--border-2);
+  color: var(--text-muted);
+  box-shadow: 0 0 10px rgba(183, 148, 244, 0.18);
 }
 #nav-focus.active {
-  background: rgba(0, 210, 150, 0.13);
-  border-color: rgba(0, 210, 150, 0.55);
-  color: rgba(0, 236, 178, 1.0);
-  box-shadow: 0 0 14px rgba(0, 210, 150, 0.35), inset 0 0 8px rgba(0, 210, 150, 0.06);
+  background: rgba(183, 148, 244, 0.10);
+  border-color: rgba(183, 148, 244, 0.50);
+  color: var(--ai);
+  box-shadow: 0 0 16px rgba(183, 148, 244, 0.40);
 }
-
-.focus-pill-dot {
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: currentColor;
-  flex-shrink: 0;
-  transition: box-shadow 0.2s;
-}
-#nav-focus.active .focus-pill-dot {
-  box-shadow: 0 0 8px currentColor, 0 0 14px currentColor;
-  animation: focusDotPulse 2s ease-in-out infinite;
-}
-@keyframes focusDotPulse {
-  0%, 100% { opacity: 1; }
-  50%       { opacity: 0.35; }
-}
-.focus-pill-label {
-  line-height: 1;
+#nav-focus.active svg {
+  filter: drop-shadow(0 0 5px rgba(183, 148, 244, 0.80));
 }
 
 /* =========================================================
@@ -1555,12 +1533,14 @@ button {
    RISK ICONS — column headers + detail panel
    ========================================================= */
 
-/* Column header icon slot */
+/* Column header icon slot — collapses automatically when img is hidden by JS */
 .col-icon-slot {
   display: flex;
   align-items: center;
   flex-shrink: 0;
+  overflow: hidden;
 }
+.col-icon-slot:empty { display: none; }
 
 .col-risk-icon {
   width: 28px;

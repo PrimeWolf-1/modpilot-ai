@@ -158,11 +158,18 @@ function populatePanel(item: TriageItem): void {
 
   // Risk icon beside the risk level label
   if (riskEl) {
+    riskEl.innerHTML = "";
     const iconSrc = PANEL_RISK_ICONS[sr.riskLevel];
-    const imgHtml = iconSrc
-      ? `<img src="${iconSrc}" class="panel-risk-icon" alt="" aria-hidden="true" onerror="this.style.display='none'">`
-      : "";
-    riskEl.innerHTML = `${imgHtml}${formatRiskLabel(sr.riskLevel)}`;
+    if (iconSrc) {
+      const img = document.createElement("img");
+      img.src = iconSrc;
+      img.className = "panel-risk-icon";
+      img.alt = "";
+      img.setAttribute("aria-hidden", "true");
+      img.addEventListener("error", () => img.remove());
+      riskEl.appendChild(img);
+    }
+    riskEl.appendChild(document.createTextNode(formatRiskLabel(sr.riskLevel)));
   }
 
   // Suggested action

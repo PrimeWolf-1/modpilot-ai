@@ -59,6 +59,9 @@ async function init(): Promise<void> {
   // Wire focus mode toggle
   initFocusMode();
 
+  // Hide risk icon img elements that fail to load (CSP-safe, no inline handlers)
+  initRiskIconFallbacks();
+
   await Promise.all([loadQueue(), loadStats()]);
 }
 
@@ -83,8 +86,25 @@ function applyFocusMode(on: boolean, btn: HTMLElement): void {
   document.body.classList.toggle("focus-mode", on);
   btn.classList.toggle("active", on);
   btn.setAttribute("aria-pressed", String(on));
-  btn.title = on ? "Night Ops active — click to exit" : "Toggle Night Ops focus mode";
+  btn.title = "Focus Mode";
   localStorage.setItem("modpilot-focus-mode", on ? "1" : "0");
+}
+
+// =========================================================
+// RISK ICON FALLBACKS
+// =========================================================
+
+function initRiskIconFallbacks(): void {
+  document.querySelectorAll<HTMLImageElement>(".col-risk-icon").forEach((img) => {
+    const hideIconAndSlot = () => {
+      img.style.display = "none";
+      const slot = img.closest<HTMLElement>(".col-icon-slot");
+      if (slot) slot.style.display = "none";
+    };
+    img.addEventListener("error", hideIconAndSlot);
+    // Image may have already failed (cached failure or instant 404)
+    if (img.complete && img.naturalWidth === 0) hideIconAndSlot();
+  });
 }
 
 // =========================================================
