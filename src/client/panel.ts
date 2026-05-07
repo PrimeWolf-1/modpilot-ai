@@ -6,6 +6,13 @@ import { selectCard, removeCard } from "./card.ts";
 
 type ActionCallback = (postId: string, action: string, accepted: boolean) => void;
 
+const PANEL_RISK_ICONS: Record<string, string> = {
+  high:         "assets/risk-icons/high-risk.png",
+  medium:       "assets/risk-icons/medium.png",
+  low:          "assets/risk-icons/low-risk.png",
+  needs_review: "assets/risk-icons/needs-review.png",
+};
+
 let currentItem: TriageItem | null = null;
 let onActionComplete: ActionCallback | null = null;
 
@@ -149,9 +156,13 @@ function populatePanel(item: TriageItem): void {
     });
   }
 
-  // Icon slot on risk level value (forward-compatible — slot expands when icon is supplied)
+  // Risk icon beside the risk level label
   if (riskEl) {
-    riskEl.innerHTML = `<span class="icon-slot risk-icon-slot" aria-hidden="true"></span>${formatRiskLabel(sr.riskLevel)}`;
+    const iconSrc = PANEL_RISK_ICONS[sr.riskLevel];
+    const imgHtml = iconSrc
+      ? `<img src="${iconSrc}" class="panel-risk-icon" alt="" aria-hidden="true" onerror="this.style.display='none'">`
+      : "";
+    riskEl.innerHTML = `${imgHtml}${formatRiskLabel(sr.riskLevel)}`;
   }
 
   // Suggested action

@@ -211,28 +211,52 @@ button {
 #nav-focus {
   display: flex;
   align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 6px;
-  color: var(--text-dim);
-  transition: background 0.2s, color 0.2s, border-color 0.2s, box-shadow 0.2s, opacity 0.35s ease;
+  gap: 6px;
+  background: rgba(0, 210, 150, 0.07);
+  border: 1px solid rgba(0, 210, 150, 0.22);
+  border-radius: 20px;
+  padding: 4px 11px 4px 9px;
+  font-family: 'Orbitron', 'Rajdhani', monospace;
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: rgba(0, 210, 150, 0.60);
+  cursor: pointer;
+  user-select: none;
   flex-shrink: 0;
+  white-space: nowrap;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, opacity 0.35s ease;
 }
 #nav-focus:hover {
-  background: var(--surface-3);
-  color: var(--text-muted);
+  background: rgba(0, 210, 150, 0.13);
+  border-color: rgba(0, 210, 150, 0.38);
+  color: rgba(0, 228, 168, 0.88);
 }
 #nav-focus.active {
-  background: rgba(99, 179, 237, 0.12);
-  border-color: rgba(99, 179, 237, 0.45);
-  color: var(--review);
-  box-shadow: 0 0 10px rgba(99, 179, 237, 0.30);
+  background: rgba(0, 210, 150, 0.13);
+  border-color: rgba(0, 210, 150, 0.55);
+  color: rgba(0, 236, 178, 1.0);
+  box-shadow: 0 0 14px rgba(0, 210, 150, 0.35), inset 0 0 8px rgba(0, 210, 150, 0.06);
 }
-#nav-focus.active svg {
-  filter: drop-shadow(0 0 5px rgba(99, 179, 237, 0.70));
+
+.focus-pill-dot {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  flex-shrink: 0;
+  transition: box-shadow 0.2s;
+}
+#nav-focus.active .focus-pill-dot {
+  box-shadow: 0 0 8px currentColor, 0 0 14px currentColor;
+  animation: focusDotPulse 2s ease-in-out infinite;
+}
+@keyframes focusDotPulse {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.35; }
+}
+.focus-pill-label {
+  line-height: 1;
 }
 
 /* =========================================================
@@ -418,7 +442,8 @@ button {
 .col-header {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-start;
+  gap: 8px;
   padding: 10px 12px 8px;
   border-bottom: 2px solid transparent;
   flex-shrink: 0;
@@ -435,6 +460,8 @@ button {
   text-transform: uppercase;
   letter-spacing: 0.9px;
   color: var(--text-muted);
+  flex: 1;
+  min-width: 0;
 }
 
 #col-high   .col-title { color: var(--high);   text-shadow: 0 0 12px rgba(245,101,101,0.90), 0 0 28px rgba(245,101,101,0.45); }
@@ -1525,35 +1552,42 @@ button {
 }
 
 /* =========================================================
-   ICON SLOTS — forward-compatible placeholder for future glyphs
+   RISK ICONS — column headers + detail panel
    ========================================================= */
-.icon-slot {
-  display: inline-flex;
+
+/* Column header icon slot */
+.col-icon-slot {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  width: 0;
-  height: 14px;
-  overflow: hidden;
   flex-shrink: 0;
-  vertical-align: middle;
-  transition: width 0.15s;
-}
-/* When an icon SVG/image is inserted, the slot auto-expands */
-.icon-slot:not(:empty) {
-  width: 16px;
-  margin-right: 4px;
 }
 
-/* Column header already uses flex — icon slot aligns naturally */
-.col-header {
-  gap: 6px;
+.col-risk-icon {
+  width: 28px;
+  height: 28px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
+}
+.col-risk-icon.risk-icon-high   { filter: drop-shadow(0 0 5px rgba(245,101,101,0.75)); }
+.col-risk-icon.risk-icon-medium { filter: drop-shadow(0 0 5px rgba(246,173,85,0.75));  }
+.col-risk-icon.risk-icon-low    { filter: drop-shadow(0 0 5px rgba(104,211,145,0.75)); }
+.col-risk-icon.risk-icon-review { filter: drop-shadow(0 0 5px rgba(99,179,237,0.75));  }
+
+/* Detail panel risk icon (sits inside .breakdown-value) */
+.panel-risk-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  display: block;
+  flex-shrink: 0;
 }
 
-/* Risk label in panel breakdown uses flex to seat the icon slot */
+/* Risk label in panel breakdown uses flex to seat the icon */
 .breakdown-value {
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
 }
 
 /* =========================================================

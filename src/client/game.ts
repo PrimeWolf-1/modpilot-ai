@@ -83,7 +83,7 @@ function applyFocusMode(on: boolean, btn: HTMLElement): void {
   document.body.classList.toggle("focus-mode", on);
   btn.classList.toggle("active", on);
   btn.setAttribute("aria-pressed", String(on));
-  btn.title = on ? "Focus Mode — On (click to exit)" : "Focus Mode — Night Ops";
+  btn.title = on ? "Night Ops active — click to exit" : "Toggle Night Ops focus mode";
   localStorage.setItem("modpilot-focus-mode", on ? "1" : "0");
 }
 
