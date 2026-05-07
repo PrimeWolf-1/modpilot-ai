@@ -388,6 +388,7 @@ button {
   bottom: 0;
   display: flex;
   overflow: hidden;
+  transition: box-shadow 0.5s ease;
 }
 
 /* =========================================================
@@ -1655,7 +1656,78 @@ button {
    FOCUS MODE — Night Ops toggle
    ========================================================= */
 
-/* Chrome elements dim out to focus attention on cards + panel */
+/* --- Global atmosphere: CSS variable cascade ---
+   Redefining these on body causes every element using them to
+   automatically render with the deeper/more intense values.   */
+body.focus-mode {
+  /* Slightly deeper background and surfaces */
+  background-color:  #070d18;
+  background-image:  radial-gradient(ellipse at 50% 40%, #0d1623 0%, #070d18 55%, #030810 100%);
+  --surface:   #101826;
+  --surface-2: #162033;
+  --surface-3: #1c2840;
+
+  /* Boosted risk glows — cascade to confidence text-shadows,
+     intensity bar shadows, and threat meter fills */
+  --high-glow:   rgba(245, 101, 101, 0.48);
+  --medium-glow: rgba(246, 173, 85,  0.32);
+  --low-glow:    rgba(104, 211, 145, 0.30);
+  --review-glow: rgba(99,  179, 237, 0.30);
+
+  /* Slightly richer risk borders */
+  --high-border:   rgba(245, 101, 101, 0.55);
+  --medium-border: rgba(246, 173, 85,  0.42);
+  --low-border:    rgba(104, 211, 145, 0.42);
+  --review-border: rgba(99,  179, 237, 0.42);
+}
+
+/* --- Vignette: inset shadow on the content area ---
+   Creates an operational ambiance — edges of the grid recede,
+   drawing eye toward the center. Transitions smoothly.        */
+body.focus-mode #app-body {
+  box-shadow:
+    inset  60px 0   80px rgba(0,0,0,0.22),
+    inset -60px 0   80px rgba(0,0,0,0.22),
+    inset 0    60px 80px rgba(0,0,0,0.18),
+    inset 0  -40px  60px rgba(0,0,0,0.14);
+}
+
+/* --- Column separators feel crisper in focus mode ---       */
+body.focus-mode .column {
+  border-right-color: var(--border-2);
+}
+
+/* --- Column headers: stronger neon emanation ---            */
+body.focus-mode #col-high   .col-header { box-shadow: 0 3px 32px rgba(245,101,101,0.44); }
+body.focus-mode #col-medium .col-header { box-shadow: 0 3px 32px rgba(246,173,85,0.44);  }
+body.focus-mode #col-low    .col-header { box-shadow: 0 3px 32px rgba(104,211,145,0.44); }
+body.focus-mode #col-review .col-header { box-shadow: 0 3px 32px rgba(99,179,237,0.44);  }
+
+body.focus-mode #col-high   .col-title { text-shadow: 0 0 16px rgba(245,101,101,1.0), 0 0 36px rgba(245,101,101,0.55); }
+body.focus-mode #col-medium .col-title { text-shadow: 0 0 16px rgba(246,173,85,1.0),  0 0 36px rgba(246,173,85,0.55);  }
+body.focus-mode #col-low    .col-title { text-shadow: 0 0 16px rgba(104,211,145,1.0), 0 0 36px rgba(104,211,145,0.55); }
+body.focus-mode #col-review .col-title { text-shadow: 0 0 16px rgba(99,179,237,1.0),  0 0 36px rgba(99,179,237,0.55);  }
+
+/* --- Card resting state: tighten left-border glow ---       */
+body.focus-mode .card.risk-high {
+  box-shadow: inset 4px 0 18px rgba(245,101,101,0.18);
+}
+body.focus-mode .card.risk-medium {
+  box-shadow: inset 3px 0 14px rgba(246,173,85,0.14);
+}
+
+/* --- Card hover: deeper, wider glow ---                     */
+body.focus-mode .card.risk-high:hover    { box-shadow: 0 8px 36px rgba(245,101,101,0.58), 0 0 0 1px rgba(245,101,101,0.40); }
+body.focus-mode .card.risk-medium:hover  { box-shadow: 0 8px 36px rgba(246,173,85,0.58),  0 0 0 1px rgba(246,173,85,0.40);  }
+body.focus-mode .card.risk-low:hover     { box-shadow: 0 8px 36px rgba(104,211,145,0.58), 0 0 0 1px rgba(104,211,145,0.40); }
+body.focus-mode .card.risk-needs_review:hover { box-shadow: 0 8px 36px rgba(99,179,237,0.58), 0 0 0 1px rgba(99,179,237,0.40); }
+
+/* --- Threat meter pulses harder in focus mode ---           */
+body.focus-mode .threat-meter.high .threat-meter-fill {
+  box-shadow: 0 0 20px rgba(245,101,101,0.80), 0 0 40px rgba(245,101,101,0.40);
+}
+
+/* --- Chrome elements dim out ---                            */
 body.focus-mode #motive-banner              { opacity: 0.30; }
 body.focus-mode #motive-banner:hover        { opacity: 0.85; }
 body.focus-mode #statsbar                   { opacity: 0.55; }
@@ -1665,31 +1737,13 @@ body.focus-mode .nav-subreddit              { opacity: 0.40; }
 body.focus-mode .nav-ai-chip                { opacity: 0.40; }
 body.focus-mode #nav-refresh                { opacity: 0.40; }
 
-/* Restore hovered/focused chrome so nothing becomes unusable */
 body.focus-mode .nav-logo:hover,
 body.focus-mode .nav-subreddit:hover,
 body.focus-mode .nav-ai-chip:hover,
 body.focus-mode #nav-refresh:hover          { opacity: 1; }
 
-/* Column headers: stronger neon glow to compensate for darker feel */
-body.focus-mode #col-high   .col-header { box-shadow: 0 3px 30px rgba(245,101,101,0.42); }
-body.focus-mode #col-medium .col-header { box-shadow: 0 3px 30px rgba(246,173,85,0.42);  }
-body.focus-mode #col-low    .col-header { box-shadow: 0 3px 30px rgba(104,211,145,0.42); }
-body.focus-mode #col-review .col-header { box-shadow: 0 3px 30px rgba(99,179,237,0.42);  }
-
-body.focus-mode #col-high   .col-title { text-shadow: 0 0 16px rgba(245,101,101,1.0), 0 0 36px rgba(245,101,101,0.55); }
-body.focus-mode #col-medium .col-title { text-shadow: 0 0 16px rgba(246,173,85,1.0),  0 0 36px rgba(246,173,85,0.55);  }
-body.focus-mode #col-low    .col-title { text-shadow: 0 0 16px rgba(104,211,145,1.0), 0 0 36px rgba(104,211,145,0.55); }
-body.focus-mode #col-review .col-title { text-shadow: 0 0 16px rgba(99,179,237,1.0),  0 0 36px rgba(99,179,237,0.55);  }
-
-/* Card hover glows intensify in focus mode */
-body.focus-mode .card.risk-high:hover    { box-shadow: 0 8px 36px rgba(245,101,101,0.58), 0 0 0 1px rgba(245,101,101,0.40); }
-body.focus-mode .card.risk-medium:hover  { box-shadow: 0 8px 36px rgba(246,173,85,0.58),  0 0 0 1px rgba(246,173,85,0.40);  }
-body.focus-mode .card.risk-low:hover     { box-shadow: 0 8px 36px rgba(104,211,145,0.58), 0 0 0 1px rgba(104,211,145,0.40); }
-body.focus-mode .card.risk-needs_review:hover { box-shadow: 0 8px 36px rgba(99,179,237,0.58), 0 0 0 1px rgba(99,179,237,0.40); }
-
-/* Detail panel border brightens when open in focus mode */
+/* --- Detail panel: stronger depth shadow when open ---      */
 body.focus-mode #detail-panel.open {
   border-left-color: var(--border-2);
-  box-shadow: -4px 0 24px rgba(0, 0, 0, 0.35);
+  box-shadow: -6px 0 32px rgba(0, 0, 0, 0.50);
 }
