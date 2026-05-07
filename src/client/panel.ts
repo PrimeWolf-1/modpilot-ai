@@ -2,7 +2,7 @@
 
 import type { TriageItem, TakeActionRequest } from "../shared/types.ts";
 import { ApiEndpoint } from "../shared/api.ts";
-import { selectCard, removeCard } from "./card.ts";
+import { selectCard, removeCard, clearCardFocus } from "./card.ts";
 
 type ActionCallback = (postId: string, action: string, accepted: boolean) => void;
 
@@ -30,7 +30,7 @@ export function openPanel(item: TriageItem, callback: ActionCallback): void {
   onActionComplete = callback;
 
   populatePanel(item);
-  selectCard(item.id);
+  selectCard(item.id, item.scoringResult.riskLevel);
 
   const panel = document.getElementById("detail-panel");
   panel?.classList.add("open");
@@ -45,9 +45,7 @@ export function closePanel(): void {
   panel?.classList.remove("open");
   document.getElementById("panel-backdrop")?.classList.remove("visible");
 
-  document.querySelectorAll(".card.selected").forEach((el) =>
-    el.classList.remove("selected"),
-  );
+  clearCardFocus();
 
   currentItem = null;
   hideRemoveConfirm();

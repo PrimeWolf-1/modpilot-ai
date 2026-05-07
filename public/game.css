@@ -421,10 +421,14 @@ button {
   border-right: 1px solid var(--border);
   min-width: 0;
   overflow: hidden;
+  transition: opacity 0.3s ease;
 }
 .column:last-child {
   border-right: none;
 }
+
+#queue-grid.has-selection .column        { opacity: 0.5; }
+#queue-grid.has-selection .col-focused   { opacity: 1; }
 
 /* Column header */
 .col-header {
@@ -526,6 +530,7 @@ button {
 .card.selected {
   border-color: var(--ai);
   box-shadow: 0 0 0 1px var(--ai-border), 0 0 16px rgba(183,148,244,0.22);
+  background: var(--surface-2);
 }
 
 @keyframes cardApproveExit {
@@ -710,11 +715,19 @@ button {
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: width 0.22s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.3s ease,
+              border-left-color 0.3s ease;
 }
 #detail-panel.open {
   width: 340px;
 }
+
+/* Risk-color glow connecting panel to the selected card */
+#detail-panel[data-risk-focus="high"].open        { border-left-color: rgba(245,101,101,0.40); box-shadow: -6px 0 28px rgba(245,101,101,0.18); }
+#detail-panel[data-risk-focus="medium"].open      { border-left-color: rgba(246,173,85,0.36);  box-shadow: -6px 0 28px rgba(246,173,85,0.15);  }
+#detail-panel[data-risk-focus="low"].open         { border-left-color: rgba(104,211,145,0.36); box-shadow: -6px 0 28px rgba(104,211,145,0.15); }
+#detail-panel[data-risk-focus="needs_review"].open { border-left-color: rgba(167,139,250,0.40); box-shadow: -6px 0 28px rgba(167,139,250,0.18); }
 
 /* Keep content at full width so it doesn't squish during slide animation */
 .panel-header,

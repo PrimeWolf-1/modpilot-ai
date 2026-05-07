@@ -81,16 +81,35 @@ export function createCard(
 }
 
 /**
- * Marks a card as selected (highlighted) and deselects others.
+ * Marks a card as selected and activates the selection focus overlay.
  */
-export function selectCard(postId: string): void {
-  document.querySelectorAll(".card.selected").forEach((el) => {
-    el.classList.remove("selected");
-  });
-  const card = document.querySelector<HTMLElement>(
-    `.card[data-post-id="${postId}"]`,
-  );
-  card?.classList.add("selected");
+export function selectCard(postId: string, riskLevel?: string): void {
+  document.querySelectorAll(".card.selected").forEach((el) => el.classList.remove("selected"));
+  document.querySelectorAll<HTMLElement>(".column.col-focused").forEach((el) => el.classList.remove("col-focused"));
+
+  const card = document.querySelector<HTMLElement>(`.card[data-post-id="${postId}"]`);
+  if (!card) return;
+
+  card.classList.add("selected");
+  card.closest<HTMLElement>(".column")?.classList.add("col-focused");
+  document.getElementById("queue-grid")?.classList.add("has-selection");
+
+  const panel = document.getElementById("detail-panel");
+  if (panel) {
+    if (riskLevel) panel.dataset["riskFocus"] = riskLevel;
+    else delete panel.dataset["riskFocus"];
+  }
+}
+
+/**
+ * Clears all card selection and focus overlay state.
+ */
+export function clearCardFocus(): void {
+  document.querySelectorAll(".card.selected").forEach((el) => el.classList.remove("selected"));
+  document.querySelectorAll<HTMLElement>(".column.col-focused").forEach((el) => el.classList.remove("col-focused"));
+  document.getElementById("queue-grid")?.classList.remove("has-selection");
+  const panel = document.getElementById("detail-panel");
+  if (panel) delete panel.dataset["riskFocus"];
 }
 
 /**
