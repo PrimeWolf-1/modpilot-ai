@@ -228,15 +228,18 @@ function renderQueue(items: TriageItem[]): void {
 function onActionComplete(postId: string, action: string, _accepted: boolean): void {
   const item = allItems.find((i) => i.id === postId);
   if (item) {
-    item.status = action === "approve"
-      ? "approved"
-      : action === "remove"
-      ? "removed"
-      : action === "warn"
-      ? "warned"
-      : action === "escalate"
-      ? "escalated"
-      : "ignored";
+    if (action === "escalate") {
+      item.scoringResult.riskLevel = "needs_review";
+      // status stays "pending" so updateBadges() counts it in needs_review
+    } else {
+      item.status = action === "approve"
+        ? "approved"
+        : action === "remove"
+        ? "removed"
+        : action === "warn"
+        ? "warned"
+        : "ignored";
+    }
   }
 
   updateBadges();

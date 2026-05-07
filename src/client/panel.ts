@@ -194,7 +194,6 @@ async function sendAction(
   const item = currentItem;
 
   disableButtons();
-  closePanel();
 
   try {
     const payload: TakeActionRequest = {
@@ -218,7 +217,13 @@ async function sendAction(
       console.error("Action failed:", data.error);
     }
 
-    removeCard(item.id, action);
+    closePanel();
+
+    if (action === "escalate") {
+      moveCardToReview(item.id);
+    } else {
+      removeCard(item.id, action);
+    }
     onActionComplete?.(item.id, action, accepted_suggestion);
   } catch (err) {
     console.error("sendAction error:", err);
@@ -232,7 +237,6 @@ async function confirmRemoveWithNote(): Promise<void> {
   const note = (document.getElementById("remove-note") as HTMLTextAreaElement | null)?.value ?? "";
 
   disableButtons();
-  closePanel();
 
   try {
     const payload: TakeActionRequest = {
@@ -254,12 +258,34 @@ async function confirmRemoveWithNote(): Promise<void> {
 
     const data = await resp.json() as { success: boolean };
     if (data.success) {
+      closePanel();
       removeCard(item.id, "remove");
       onActionComplete?.(item.id, "remove", true);
+    } else {
+      enableButtons();
     }
   } catch (err) {
     console.error("confirmRemoveWithNote error:", err);
+    enableButtons();
   }
+}
+
+// ---------------------------------------------------------------------------
+// Move card to Needs Review column (escalate action)
+// ---------------------------------------------------------------------------
+
+function moveCardToReview(postId: string): void {
+  const card = document.querySelector<HTMLElement>(`.card[data-post-id="${postId}"]`);
+  const target = document.getElementById("cards-review");
+  if (!card || !target) return;
+
+  // Swap risk class to needs_review
+  card.classList.forEach((cls) => {
+    if (cls.startsWith("risk-")) card.classList.remove(cls);
+  });
+  card.classList.add("risk-needs_review");
+
+  target.appendChild(card);
 }
 
 // ---------------------------------------------------------------------------

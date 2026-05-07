@@ -1600,8 +1600,8 @@ button {
 
 /* Icon image: 56px, floating — no backing plate */
 .col-risk-icon {
-  width: 56px;
-  height: 56px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
   display: block;
   flex-shrink: 0;
