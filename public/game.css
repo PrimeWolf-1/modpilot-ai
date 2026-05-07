@@ -58,7 +58,7 @@
 
   /* Layout */
   --nav-h: 44px;
-  --ops-h: 92px;
+  --ops-h: 110px;
 }
 
 /* =========================================================
@@ -271,7 +271,7 @@ button {
   align-items: center;
   padding: 0 20px;
   gap: 12px;
-  height: 32px;
+  height: 50px;
   flex-shrink: 0;
   position: relative;
   overflow: hidden;
@@ -1670,14 +1670,14 @@ button {
    ========================================================= */
 @media (max-width: 767px) {
   /* Collapse ops-header rows on mobile */
-  #ops-header      { height: 72px; }
+  #ops-header      { height: 80px; }
   .ops-identity    { height: 24px; padding: 0 12px; gap: 8px; }
-  .ops-motd        { height: 24px; padding: 0 12px; }
+  .ops-motd        { height: 32px; padding: 0 12px; }
   #motive-text     { font-size: 9px; letter-spacing: 1.2px; }
   .ops-metrics     { height: 24px; gap: 12px; padding: 0 12px; }
   .stat-value      { font-size: 14px; }
 
-  #app-body { top: calc(var(--nav-h) + 72px); }
+  #app-body { top: calc(var(--nav-h) + 80px); }
 
   /* Grid scrolls horizontally so all 4 columns are reachable */
   #queue-grid {
