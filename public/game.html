@@ -11,13 +11,14 @@
   </head>
   <body>
 
-    <!-- ===== TOP NAVIGATION BAR (shell controls only) ===== -->
+    <!-- ===== TOP NAVIGATION BAR ===== -->
     <nav id="nav">
-      <button id="nav-focus" title="Operator Focus" aria-pressed="false">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
-        </svg>
-      </button>
+      <div class="nav-logo">Mod<span>Pilot</span> AI</div>
+      <div class="nav-subreddit" id="nav-subreddit">r/…</div>
+      <div class="ops-spacer"></div>
+      <div class="nav-ai-chip" id="nav-ai-chip" title="Click for weekly summary">
+        <span id="nav-ai-label">AI Active</span>
+      </div>
       <button id="nav-refresh" title="Refresh queue">
         <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
@@ -26,16 +27,8 @@
       </button>
     </nav>
 
-    <!-- ===== OPERATIONAL HEADER (identity + MOTD + metrics) ===== -->
+    <!-- ===== OPERATIONAL HEADER (MOTD + metrics) ===== -->
     <div id="ops-header">
-      <div class="ops-identity">
-        <div class="nav-logo">Mod<span>Pilot</span> AI</div>
-        <div class="nav-subreddit" id="nav-subreddit">r/…</div>
-        <div class="ops-spacer"></div>
-        <div class="nav-ai-chip" id="nav-ai-chip" title="Click for weekly summary">
-          <span id="nav-ai-label">AI Active</span>
-        </div>
-      </div>
       <div class="ops-motd">
         <span class="motive-dot"></span>
         <span id="motive-text">Loading…</span>

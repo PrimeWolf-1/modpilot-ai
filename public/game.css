@@ -58,7 +58,7 @@
 
   /* Layout */
   --nav-h: 44px;
-  --ops-h: 110px;
+  --ops-h: 90px;
 }
 
 /* =========================================================
@@ -120,7 +120,7 @@ button {
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
-  justify-content: flex-end;
+  justify-content: flex-start;
   padding: 0 16px;
   gap: 10px;
   z-index: 100;
@@ -265,18 +265,19 @@ button {
   transition: opacity 0.35s ease;
 }
 
-/* Row 2: MOTD operator directive */
+/* Row 1: MOTD operator directive */
 .ops-motd {
   display: flex;
   align-items: center;
+  justify-content: center;
   padding: 0 20px;
   gap: 12px;
-  height: 50px;
+  height: 60px;
   flex-shrink: 0;
   position: relative;
   overflow: hidden;
-  background: linear-gradient(180deg, rgba(18,191,208,0.07) 0%, rgba(18,191,208,0.04) 100%);
-  border-bottom: 1px solid rgba(18,191,208,0.18);
+  background: linear-gradient(180deg, rgba(18,191,208,0.09) 0%, rgba(18,191,208,0.04) 100%);
+  border-bottom: 1px solid rgba(18,191,208,0.22);
   transition: opacity 0.35s ease;
 }
 
@@ -316,15 +317,15 @@ button {
 
 #motive-text {
   font-family: 'Orbitron', monospace;
-  font-size: 12px;
+  font-size: 15px;
   font-weight: 700;
-  color: rgba(18, 191, 208, 0.92);
+  color: rgba(18, 191, 208, 0.96);
   letter-spacing: 2.5px;
   text-transform: uppercase;
   text-shadow:
-    0 0 16px rgba(18,191,208,0.55),
-    0 0 40px rgba(18,191,208,0.22),
-    0 0 80px rgba(18,191,208,0.08);
+    0 0 20px rgba(18,191,208,0.90),
+    0 0 50px rgba(18,191,208,0.45),
+    0 0 100px rgba(18,191,208,0.18);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -1670,14 +1671,13 @@ button {
    ========================================================= */
 @media (max-width: 767px) {
   /* Collapse ops-header rows on mobile */
-  #ops-header      { height: 80px; }
-  .ops-identity    { height: 24px; padding: 0 12px; gap: 8px; }
+  #ops-header      { height: 56px; }
   .ops-motd        { height: 32px; padding: 0 12px; }
-  #motive-text     { font-size: 9px; letter-spacing: 1.2px; }
+  #motive-text     { font-size: 10px; letter-spacing: 1.2px; }
   .ops-metrics     { height: 24px; gap: 12px; padding: 0 12px; }
   .stat-value      { font-size: 14px; }
 
-  #app-body { top: calc(var(--nav-h) + 80px); }
+  #app-body { top: calc(var(--nav-h) + 56px); }
 
   /* Grid scrolls horizontally so all 4 columns are reachable */
   #queue-grid {
@@ -1808,8 +1808,6 @@ body.focus-mode .threat-meter.high .threat-meter-fill {
 }
 
 /* --- Chrome elements dim out ---                            */
-body.focus-mode .ops-identity               { opacity: 0.35; }
-body.focus-mode .ops-identity:hover         { opacity: 1; }
 body.focus-mode .ops-motd                   { opacity: 0.28; }
 body.focus-mode .ops-motd:hover             { opacity: 0.88; }
 body.focus-mode .ops-metrics                { opacity: 0.50; }
