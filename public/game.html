@@ -66,6 +66,7 @@
       <!-- High Risk -->
       <div class="column" id="col-high">
         <div class="col-header">
+          <span class="icon-slot col-icon-slot" aria-hidden="true"></span>
           <span class="col-title">High Risk</span>
           <span class="col-badge" id="badge-high">0</span>
         </div>
@@ -75,6 +76,7 @@
       <!-- Medium -->
       <div class="column" id="col-medium">
         <div class="col-header">
+          <span class="icon-slot col-icon-slot" aria-hidden="true"></span>
           <span class="col-title">Medium</span>
           <span class="col-badge" id="badge-medium">0</span>
         </div>
@@ -84,6 +86,7 @@
       <!-- Low Risk -->
       <div class="column" id="col-low">
         <div class="col-header">
+          <span class="icon-slot col-icon-slot" aria-hidden="true"></span>
           <span class="col-title">Low Risk</span>
           <span class="col-badge" id="badge-low">0</span>
         </div>
@@ -93,6 +96,7 @@
       <!-- Needs Review -->
       <div class="column" id="col-review">
         <div class="col-header">
+          <span class="icon-slot col-icon-slot" aria-hidden="true"></span>
           <span class="col-title">Needs Review</span>
           <span class="col-badge" id="badge-review">0</span>
         </div>
@@ -144,9 +148,28 @@
           <div class="panel-signals" id="panel-signals"></div>
         </div>
 
-        <!-- AI Summary -->
+        <!-- Threat Meter -->
+        <div class="panel-section">
+          <div class="threat-meter" id="threat-meter">
+            <div class="threat-meter-header">
+              <span class="threat-meter-label">THREAT LEVEL</span>
+              <span class="threat-meter-pct" id="threat-meter-pct">—</span>
+            </div>
+            <div class="threat-meter-track">
+              <div class="threat-meter-fill" id="threat-meter-fill" style="width:0%"></div>
+              <div class="threat-meter-tick" style="left:25%"></div>
+              <div class="threat-meter-tick" style="left:50%"></div>
+              <div class="threat-meter-tick" style="left:75%"></div>
+            </div>
+            <div class="threat-meter-zones">
+              <span>SAFE</span><span>MED</span><span>HIGH</span><span>CRITICAL</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Threat Analysis -->
         <div class="panel-section" id="panel-ai-section">
-          <div class="panel-section-label">AI Summary</div>
+          <div class="panel-section-label">Threat Analysis</div>
           <div class="panel-ai-summary" id="panel-ai-summary">
             <span class="panel-ai-loading">Analyzing…</span>
           </div>

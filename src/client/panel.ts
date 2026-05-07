@@ -98,7 +98,6 @@ function populatePanel(item: TriageItem): void {
 
   const riskEl = document.getElementById("panel-risk");
   if (riskEl) {
-    riskEl.textContent = formatRiskLabel(sr.riskLevel);
     riskEl.className = `breakdown-value ${sr.riskLevel}`;
   }
 
@@ -122,16 +121,37 @@ function populatePanel(item: TriageItem): void {
     }
   }
 
-  // AI summary
+  // Threat analysis (formerly AI summary)
   const summaryEl = document.getElementById("panel-ai-summary");
   if (summaryEl) {
     if (sr.aiSummary) {
       summaryEl.textContent = sr.aiSummary;
     } else if (sr.riskLevel === "high" || sr.riskLevel === "medium") {
-      summaryEl.innerHTML = `<span class="panel-ai-loading">Analyzing with AI…</span>`;
+      summaryEl.innerHTML = `<span class="panel-ai-loading">Analyzing threat vectors…</span>`;
     } else {
-      summaryEl.innerHTML = `<span class="panel-ai-loading">No AI analysis for low-risk posts</span>`;
+      summaryEl.innerHTML = `<span class="panel-ai-loading">No threat vectors detected.</span>`;
     }
+  }
+
+  // Threat meter
+  const meterEl = document.getElementById("threat-meter");
+  const meterFill = document.getElementById("threat-meter-fill");
+  const meterPct = document.getElementById("threat-meter-pct");
+
+  if (meterEl) meterEl.className = `threat-meter ${sr.riskLevel}`;
+  if (meterPct) meterPct.textContent = `${sr.confidence}%`;
+  if (meterFill) {
+    meterFill.style.width = "0%";
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (meterFill) meterFill.style.width = `${sr.confidence}%`;
+      });
+    });
+  }
+
+  // Icon slot on risk level value (forward-compatible — slot expands when icon is supplied)
+  if (riskEl) {
+    riskEl.innerHTML = `<span class="icon-slot risk-icon-slot" aria-hidden="true"></span>${formatRiskLabel(sr.riskLevel)}`;
   }
 
   // Suggested action

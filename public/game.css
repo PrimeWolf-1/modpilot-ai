@@ -1379,6 +1379,139 @@ button {
 }
 
 /* =========================================================
+   THREAT METER
+   ========================================================= */
+.threat-meter {
+  background: rgba(0, 0, 0, 0.28);
+  border: 1px solid var(--border);
+  border-radius: 7px;
+  padding: 10px 12px 9px;
+  transition: border-color 0.3s;
+}
+.threat-meter.high         { border-color: rgba(245,101,101,0.40); }
+.threat-meter.medium       { border-color: rgba(246,173,85,0.30);  }
+.threat-meter.low          { border-color: rgba(104,211,145,0.22); }
+.threat-meter.needs_review { border-color: rgba(99,179,237,0.30);  }
+
+.threat-meter-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 9px;
+}
+
+.threat-meter-label {
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  color: #8faac4;
+}
+
+.threat-meter-pct {
+  font-family: 'Orbitron', 'Rajdhani', monospace;
+  font-size: 22px;
+  font-weight: 800;
+  line-height: 1;
+  transition: color 0.3s, text-shadow 0.3s;
+}
+.threat-meter.high         .threat-meter-pct { color: var(--high);   text-shadow: 0 0 16px rgba(245,101,101,0.70), 0 0 32px rgba(245,101,101,0.30); }
+.threat-meter.medium       .threat-meter-pct { color: var(--medium); text-shadow: 0 0 12px rgba(246,173,85,0.60); }
+.threat-meter.low          .threat-meter-pct { color: var(--low);    text-shadow: 0 0 10px rgba(104,211,145,0.50); }
+.threat-meter.needs_review .threat-meter-pct { color: var(--review); text-shadow: 0 0 10px rgba(99,179,237,0.50); }
+
+.threat-meter-track {
+  position: relative;
+  height: 10px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: 5px;
+  overflow: visible;
+  margin-bottom: 6px;
+}
+
+.threat-meter-fill {
+  position: absolute;
+  top: 0; left: 0; bottom: 0;
+  border-radius: 5px;
+  transition: width 0.75s cubic-bezier(0.4, 0, 0.2, 1);
+  min-width: 0;
+}
+.threat-meter.high .threat-meter-fill {
+  background: linear-gradient(90deg, rgba(245,101,101,0.5) 0%, var(--high) 100%);
+  box-shadow: 0 0 14px rgba(245,101,101,0.65), 0 0 28px rgba(245,101,101,0.30);
+  animation: threatPulse 2s ease-in-out infinite;
+}
+.threat-meter.medium .threat-meter-fill {
+  background: linear-gradient(90deg, rgba(246,173,85,0.45) 0%, var(--medium) 100%);
+  box-shadow: 0 0 10px rgba(246,173,85,0.50);
+}
+.threat-meter.low .threat-meter-fill {
+  background: linear-gradient(90deg, rgba(104,211,145,0.35) 0%, var(--low) 100%);
+  box-shadow: 0 0 8px rgba(104,211,145,0.35);
+}
+.threat-meter.needs_review .threat-meter-fill {
+  background: linear-gradient(90deg, rgba(99,179,237,0.35) 0%, var(--review) 100%);
+  box-shadow: 0 0 8px rgba(99,179,237,0.35);
+}
+
+@keyframes threatPulse {
+  0%, 100% { box-shadow: 0 0 14px rgba(245,101,101,0.65), 0 0 28px rgba(245,101,101,0.30); }
+  50%       { box-shadow: 0 0 22px rgba(245,101,101,0.90), 0 0 44px rgba(245,101,101,0.45); }
+}
+
+.threat-meter-tick {
+  position: absolute;
+  top: -3px;
+  width: 1px;
+  height: 16px;
+  background: var(--border-2);
+  transform: translateX(-50%);
+  pointer-events: none;
+}
+
+.threat-meter-zones {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+  font-weight: 700;
+  color: var(--text-dim);
+  letter-spacing: 0.5px;
+  text-transform: uppercase;
+}
+
+/* =========================================================
+   ICON SLOTS — forward-compatible placeholder for future glyphs
+   ========================================================= */
+.icon-slot {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0;
+  height: 14px;
+  overflow: hidden;
+  flex-shrink: 0;
+  vertical-align: middle;
+  transition: width 0.15s;
+}
+/* When an icon SVG/image is inserted, the slot auto-expands */
+.icon-slot:not(:empty) {
+  width: 16px;
+  margin-right: 4px;
+}
+
+/* Column header already uses flex — icon slot aligns naturally */
+.col-header {
+  gap: 6px;
+}
+
+/* Risk label in panel breakdown uses flex to seat the icon slot */
+.breakdown-value {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* =========================================================
    ACTION TOAST
    ========================================================= */
 #action-toast {

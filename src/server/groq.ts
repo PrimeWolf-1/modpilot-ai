@@ -1,8 +1,8 @@
 // ModPilot AI — Groq API Integration
 
-import { settings } from "@devvit/web/server";
 import type { Category, PreparedPost, ScoringResult } from "../shared/types.ts";
 import { THRESHOLD_MEDIUM } from "./scorer.ts";
+import { settings } from "@devvit/web/server";
 
 const MODEL = "llama3-70b-8192";
 const MAX_TOKENS = 300;
@@ -83,64 +83,68 @@ export async function analyzeWithGroq(
 ): Promise<{ summary: string; category: Category } | null> {
   if (!shouldAnalyzeWithGroq(scoring.score)) return null;
 
-  let apiKey: string | undefined;
-  try {
-    apiKey = await settings.get<string>("GROQ_API_KEY");
-  } catch {
-    console.warn("groq.ts: failed to read GROQ_API_KEY from settings");
-    return null;
-  }
-
-  if (!apiKey) {
-    console.warn("groq.ts: GROQ_API_KEY not configured");
+  const GROQ_API_KEY = (await settings.get<string>("GROQ_API_KEY")) ?? "";
+  if (!GROQ_API_KEY) {
+    console.warn("groq.ts: GROQ_API_KEY not configured in Devvit settings");
     return null;
   }
 
   const prompt = buildPrompt(post, scoring);
+  const fallback = { summary: "Threat classified using weighted moderation signal analysis.", category: scoring.category };
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10_000);
 
   try {
+    console.log("Groq fetch starting");
+
     const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${apiKey}`,
+        "Authorization": `Bearer ${GROQ_API_KEY}`,
       },
       body: JSON.stringify({
         model: MODEL,
         max_tokens: MAX_TOKENS,
         messages: [{ role: "user", content: prompt }],
       }),
+      signal: controller.signal,
     });
+
+    console.log(`Groq status: ${response.status}`);
 
     if (!response.ok) {
       const errText = await response.text().catch(() => "");
       console.error(`Groq API error ${response.status}: ${errText}`);
-      return null;
+      return fallback;
     }
 
-    const data = (await response.json()) as {
-      choices: Array<{ message: { content: string } }>;
-    };
-    const text = data.choices?.[0]?.message?.content ?? "";
+    const text = await response.text();
+    console.log("Groq raw response:", text.slice(0, 500));
 
-    // Strict JSON-only parsing — extract first JSON object from response
-    const jsonMatch = text.match(/\{[\s\S]*\}/);
+    const data = JSON.parse(text) as { choices: Array<{ message: { content: string } }> };
+    const content = data.choices?.[0]?.message?.content ?? "";
+
+    const jsonMatch = content.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
-      console.error("Groq response contained no JSON:", text.slice(0, 200));
-      return null;
+      console.error("Groq response contained no JSON:", content.slice(0, 200));
+      return fallback;
     }
 
     const parsed = JSON.parse(jsonMatch[0]) as Partial<GroqAnalysis>;
 
-    if (!parsed.summary || !parsed.category) return null;
+    if (!parsed.summary || !parsed.category) return fallback;
 
     return {
       summary: parsed.summary,
       category: validateCategory(parsed.category) ?? scoring.category,
     };
   } catch (err) {
-    // Fallback to rule-based result — never block the UI
-    console.error("Groq API call failed, falling back to rule-based:", err);
-    return null;
+    const isTimeout = err instanceof Error && err.name === "AbortError";
+    console.error(isTimeout ? "Groq request timed out after 10s" : `Groq API call failed: ${err}`);
+    return fallback;
+  } finally {
+    clearTimeout(timeoutId);
   }
 }
