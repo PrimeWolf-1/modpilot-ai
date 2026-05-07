@@ -11,14 +11,8 @@
   </head>
   <body>
 
-    <!-- ===== TOP NAVIGATION BAR ===== -->
+    <!-- ===== TOP NAVIGATION BAR (shell controls only) ===== -->
     <nav id="nav">
-      <div class="nav-logo">Mod<span>Pilot</span> AI</div>
-      <div class="nav-subreddit" id="nav-subreddit">r/…</div>
-      <div class="nav-spacer"></div>
-      <div class="nav-ai-chip" id="nav-ai-chip" title="Click for weekly summary">
-        <span id="nav-ai-label">AI Active</span>
-      </div>
       <button id="nav-focus" title="Focus Mode" aria-pressed="false">
         <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
           <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>
@@ -32,34 +26,42 @@
       </button>
     </nav>
 
-    <!-- ===== MOTIVATION BANNER ===== -->
-    <div id="motive-banner">
-      <span class="motive-dot"></span>
-      <span id="motive-text">Loading…</span>
-    </div>
-
-    <!-- ===== STATS BAR ===== -->
-    <div id="statsbar">
-      <div class="stat-item">
-        <span class="stat-value" id="stat-reviewed">0</span>
-        <span class="stat-label">Reviewed</span>
+    <!-- ===== OPERATIONAL HEADER (identity + MOTD + metrics) ===== -->
+    <div id="ops-header">
+      <div class="ops-identity">
+        <div class="nav-logo">Mod<span>Pilot</span> AI</div>
+        <div class="nav-subreddit" id="nav-subreddit">r/…</div>
+        <div class="ops-spacer"></div>
+        <div class="nav-ai-chip" id="nav-ai-chip" title="Click for weekly summary">
+          <span id="nav-ai-label">AI Active</span>
+        </div>
       </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-value" id="stat-high-risk">0</span>
-        <span class="stat-label">High Risk</span>
+      <div class="ops-motd">
+        <span class="motive-dot"></span>
+        <span id="motive-text">Loading…</span>
       </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-value" id="stat-time-saved">—</span>
-        <span class="stat-label">Time Saved</span>
+      <div class="ops-metrics">
+        <div class="stat-item">
+          <span class="stat-value" id="stat-reviewed">0</span>
+          <span class="stat-label">Reviewed</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value" id="stat-high-risk">0</span>
+          <span class="stat-label">High Risk</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value" id="stat-time-saved">—</span>
+          <span class="stat-label">Time Saved</span>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="stat-item">
+          <span class="stat-value" id="stat-queue-count">0</span>
+          <span class="stat-label">In Queue</span>
+        </div>
+        <div class="stat-status" id="stat-status">loading queue…</div>
       </div>
-      <div class="stat-divider"></div>
-      <div class="stat-item">
-        <span class="stat-value" id="stat-queue-count">0</span>
-        <span class="stat-label">In Queue</span>
-      </div>
-      <div class="stat-status" id="stat-status">loading queue…</div>
     </div>
 
     <!-- ===== APP BODY (grid + panel side-by-side) ===== -->

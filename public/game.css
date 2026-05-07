@@ -56,10 +56,9 @@
   --btn-neutral: var(--surface-3);
   --btn-neutral-hover: var(--border-2);
 
-  /* Nav */
-  --nav-h: 52px;
-  --banner-h: 54px;
-  --stats-h: 58px;
+  /* Layout */
+  --nav-h: 44px;
+  --ops-h: 90px;
 }
 
 /* =========================================================
@@ -121,8 +120,9 @@ button {
   border-bottom: 1px solid var(--border);
   display: flex;
   align-items: center;
+  justify-content: flex-end;
   padding: 0 16px;
-  gap: 12px;
+  gap: 10px;
   z-index: 100;
 }
 
@@ -144,7 +144,7 @@ button {
   white-space: nowrap;
 }
 
-.nav-spacer {
+.ops-spacer {
   flex: 1;
 }
 
@@ -238,31 +238,53 @@ button {
 }
 
 /* =========================================================
-   MOTIVATION BANNER
+   OPERATIONAL HEADER — identity + MOTD + metrics
    ========================================================= */
-#motive-banner {
+#ops-header {
   position: fixed;
   top: var(--nav-h);
   left: 0;
   right: 0;
-  height: var(--banner-h);
+  height: var(--ops-h);
+  display: flex;
+  flex-direction: column;
+  z-index: 95;
+  overflow: hidden;
+}
+
+/* Row 1: app identity */
+.ops-identity {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  height: 30px;
+  flex-shrink: 0;
+  background: var(--surface);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  transition: opacity 0.35s ease;
+}
+
+/* Row 2: MOTD broadcast */
+.ops-motd {
+  display: flex;
+  align-items: center;
+  padding: 0 16px;
+  gap: 12px;
+  height: 30px;
+  flex-shrink: 0;
+  position: relative;
+  overflow: hidden;
   background: linear-gradient(90deg,
     rgba(0,210,150,0.10) 0%,
     rgba(0,180,255,0.07) 50%,
     rgba(0,210,150,0.10) 100%);
-  border-bottom: 1px solid rgba(0, 210, 150, 0.28);
-  box-shadow: 0 2px 20px rgba(0, 210, 150, 0.10), inset 0 0 40px rgba(0,210,150,0.04);
-  display: flex;
-  align-items: center;
-  padding: 0 20px;
-  gap: 12px;
-  z-index: 95;
-  overflow: hidden;
+  border-bottom: 1px solid rgba(0, 210, 150, 0.20);
+  box-shadow: 0 2px 14px rgba(0, 210, 150, 0.08);
   transition: opacity 0.35s ease;
 }
 
-/* Sweep animation — light passes across the banner */
-#motive-banner::after {
+.ops-motd::after {
   content: "";
   position: absolute;
   top: 0;
@@ -280,57 +302,50 @@ button {
 }
 
 .motive-dot {
-  width: 8px;
-  height: 8px;
+  width: 7px;
+  height: 7px;
   border-radius: 50%;
   background: #00d296;
   flex-shrink: 0;
-  box-shadow: 0 0 10px rgba(0, 210, 150, 0.9), 0 0 20px rgba(0, 210, 150, 0.4);
+  box-shadow: 0 0 8px rgba(0, 210, 150, 0.9), 0 0 18px rgba(0, 210, 150, 0.4);
   animation: motiveDot 2s ease-in-out infinite;
 }
 
 @keyframes motiveDot {
-  0%, 100% { opacity: 1; box-shadow: 0 0 10px rgba(0,210,150,0.9), 0 0 20px rgba(0,210,150,0.4); }
-  50%       { opacity: 0.55; box-shadow: 0 0 4px rgba(0,210,150,0.5), 0 0 0 rgba(0,210,150,0); }
+  0%, 100% { opacity: 1; box-shadow: 0 0 8px rgba(0,210,150,0.9), 0 0 18px rgba(0,210,150,0.4); }
+  50%       { opacity: 0.55; box-shadow: 0 0 3px rgba(0,210,150,0.5), 0 0 0 rgba(0,210,150,0); }
 }
 
 #motive-text {
-  font-family: 'Rajdhani', 'Orbitron', 'Share Tech Mono', monospace;
-  font-size: 15px;
-  font-weight: 600;
+  font-family: 'Orbitron', monospace;
+  font-size: 11px;
+  font-weight: 700;
   color: rgba(0, 236, 178, 0.98);
-  letter-spacing: 1.1px;
+  letter-spacing: 2.5px;
   text-transform: uppercase;
-  text-shadow: 0 0 16px rgba(0, 210, 150, 0.80), 0 0 40px rgba(0, 210, 150, 0.35), 0 0 70px rgba(0, 210, 150, 0.15);
+  text-shadow: 0 0 14px rgba(0, 210, 150, 0.90), 0 0 36px rgba(0, 210, 150, 0.50), 0 0 60px rgba(0, 210, 150, 0.20);
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  transition: opacity 0.4s;
 }
 #motive-text::before {
   content: "▶  ";
-  font-size: 10px;
+  font-size: 9px;
   opacity: 0.65;
   letter-spacing: 0;
   vertical-align: middle;
 }
 
-/* =========================================================
-   STATS BAR
-   ========================================================= */
-#statsbar {
-  position: fixed;
-  top: calc(var(--nav-h) + var(--banner-h));
-  left: 0;
-  right: 0;
-  height: var(--stats-h);
-  background: var(--surface-2);
-  border-bottom: 1px solid var(--border);
+/* Row 3: metrics */
+.ops-metrics {
   display: flex;
   align-items: center;
   padding: 0 16px;
-  gap: 24px;
-  z-index: 90;
+  gap: 20px;
+  height: 30px;
+  flex-shrink: 0;
+  background: var(--surface-2);
+  border-bottom: 1px solid var(--border);
   overflow: hidden;
   transition: opacity 0.35s ease;
 }
@@ -384,7 +399,7 @@ button {
    ========================================================= */
 #app-body {
   position: fixed;
-  top: calc(var(--nav-h) + var(--banner-h) + var(--stats-h));
+  top: calc(var(--nav-h) + var(--ops-h));
   left: 0;
   right: 0;
   bottom: 0;
@@ -1053,7 +1068,7 @@ button {
 
 #error-banner {
   position: fixed;
-  top: calc(var(--nav-h) + var(--banner-h) + var(--stats-h) + 8px);
+  top: calc(var(--nav-h) + var(--ops-h) + 8px);
   left: 50%;
   transform: translateX(-50%);
   background: var(--high-bg);
@@ -1533,56 +1548,71 @@ button {
    RISK ICONS — column headers + detail panel
    ========================================================= */
 
-/* ---- Column header icon — backing plate ----------------------- */
-/* .col-icon-slot is the circular dark disc that creates contrast
-   so icons (especially purple needs-review) read against any
-   column background. The img sits centered inside it.           */
+/* ---- Column header icon — holographic / floating -------------- */
 .col-icon-slot {
   display: flex;
   align-items: center;
   justify-content: center;
   flex-shrink: 0;
-  width: 36px;
-  height: 36px;
-  border-radius: 50%;
-  background: rgba(0, 0, 0, 0.32);
-  transition: box-shadow 0.2s ease;
+  transition: transform 0.2s ease;
 }
 .col-icon-slot:empty { display: none; }
 
-/* Resting ring + ambient glow per risk column */
-#col-high   .col-icon-slot { box-shadow: 0 0 0 1px rgba(245,101,101,0.28), 0 0 12px rgba(245,101,101,0.28); }
-#col-medium .col-icon-slot { box-shadow: 0 0 0 1px rgba(246,173,85,0.28),  0 0 12px rgba(246,173,85,0.28);  }
-#col-low    .col-icon-slot { box-shadow: 0 0 0 1px rgba(104,211,145,0.28), 0 0 12px rgba(104,211,145,0.28); }
-#col-review .col-icon-slot { box-shadow: 0 0 0 1px rgba(99,179,237,0.28),  0 0 12px rgba(99,179,237,0.28);  }
+.col-icon-slot:hover { transform: scale(1.10); }
 
-/* Hover: ring sharpens, glow expands */
-#col-high   .col-icon-slot:hover { box-shadow: 0 0 0 1px rgba(245,101,101,0.55), 0 0 20px rgba(245,101,101,0.50); }
-#col-medium .col-icon-slot:hover { box-shadow: 0 0 0 1px rgba(246,173,85,0.55),  0 0 20px rgba(246,173,85,0.50);  }
-#col-low    .col-icon-slot:hover { box-shadow: 0 0 0 1px rgba(104,211,145,0.55), 0 0 20px rgba(104,211,145,0.50); }
-#col-review .col-icon-slot:hover { box-shadow: 0 0 0 1px rgba(99,179,237,0.55),  0 0 20px rgba(99,179,237,0.50);  }
-
-/* Icon image: 24px inside the 36px disc (6px all-around padding) */
+/* Icon image: 30px, floating — no backing plate */
 .col-risk-icon {
-  width: 24px;
-  height: 24px;
+  width: 30px;
+  height: 30px;
   object-fit: contain;
   display: block;
   flex-shrink: 0;
   transition: filter 0.2s ease;
 }
 
-/* Resting drop-shadow glow per icon */
-.col-risk-icon.risk-icon-high   { filter: drop-shadow(0 0 4px rgba(245,101,101,0.90)); }
-.col-risk-icon.risk-icon-medium { filter: drop-shadow(0 0 4px rgba(246,173,85,0.90));  }
-.col-risk-icon.risk-icon-low    { filter: drop-shadow(0 0 4px rgba(104,211,145,0.90)); }
-.col-risk-icon.risk-icon-review { filter: drop-shadow(0 0 4px rgba(99,179,237,0.90));  }
+/* Holographic multi-layer drop-shadow — resting state */
+.col-risk-icon.risk-icon-high   {
+  filter: drop-shadow(0 0 3px rgba(245,101,101,1.0))
+          drop-shadow(0 0 10px rgba(245,101,101,0.55))
+          drop-shadow(0 0 22px rgba(245,101,101,0.25));
+}
+.col-risk-icon.risk-icon-medium {
+  filter: drop-shadow(0 0 3px rgba(246,173,85,1.0))
+          drop-shadow(0 0 10px rgba(246,173,85,0.55))
+          drop-shadow(0 0 22px rgba(246,173,85,0.25));
+}
+.col-risk-icon.risk-icon-low {
+  filter: drop-shadow(0 0 3px rgba(104,211,145,1.0))
+          drop-shadow(0 0 10px rgba(104,211,145,0.55))
+          drop-shadow(0 0 22px rgba(104,211,145,0.25));
+}
+.col-risk-icon.risk-icon-review {
+  filter: drop-shadow(0 0 3px rgba(183,148,244,1.0))
+          drop-shadow(0 0 10px rgba(183,148,244,0.55))
+          drop-shadow(0 0 22px rgba(183,148,244,0.25));
+}
 
-/* Hover: icon glow doubles */
-.col-icon-slot:hover .col-risk-icon.risk-icon-high   { filter: drop-shadow(0 0 6px rgba(245,101,101,1.0)) drop-shadow(0 0 12px rgba(245,101,101,0.55)); }
-.col-icon-slot:hover .col-risk-icon.risk-icon-medium { filter: drop-shadow(0 0 6px rgba(246,173,85,1.0))  drop-shadow(0 0 12px rgba(246,173,85,0.55));  }
-.col-icon-slot:hover .col-risk-icon.risk-icon-low    { filter: drop-shadow(0 0 6px rgba(104,211,145,1.0)) drop-shadow(0 0 12px rgba(104,211,145,0.55)); }
-.col-icon-slot:hover .col-risk-icon.risk-icon-review { filter: drop-shadow(0 0 6px rgba(99,179,237,1.0))  drop-shadow(0 0 12px rgba(99,179,237,0.55));  }
+/* Hover: expand outer glow layers */
+.col-icon-slot:hover .col-risk-icon.risk-icon-high   {
+  filter: drop-shadow(0 0 4px rgba(245,101,101,1.0))
+          drop-shadow(0 0 14px rgba(245,101,101,0.72))
+          drop-shadow(0 0 30px rgba(245,101,101,0.38));
+}
+.col-icon-slot:hover .col-risk-icon.risk-icon-medium {
+  filter: drop-shadow(0 0 4px rgba(246,173,85,1.0))
+          drop-shadow(0 0 14px rgba(246,173,85,0.72))
+          drop-shadow(0 0 30px rgba(246,173,85,0.38));
+}
+.col-icon-slot:hover .col-risk-icon.risk-icon-low {
+  filter: drop-shadow(0 0 4px rgba(104,211,145,1.0))
+          drop-shadow(0 0 14px rgba(104,211,145,0.72))
+          drop-shadow(0 0 30px rgba(104,211,145,0.38));
+}
+.col-icon-slot:hover .col-risk-icon.risk-icon-review {
+  filter: drop-shadow(0 0 4px rgba(183,148,244,1.0))
+          drop-shadow(0 0 14px rgba(183,148,244,0.72))
+          drop-shadow(0 0 30px rgba(183,148,244,0.38));
+}
 
 /* ---- Detail panel risk icon ----------------------------------- */
 /* .breakdown-value.{high|medium|...} already sets color: var(--risk),
@@ -1638,13 +1668,15 @@ button {
    MOBILE — bottom sheet panel + horizontal-scroll grid
    ========================================================= */
 @media (max-width: 767px) {
-  /* Collapse banner to single line on mobile */
-  #motive-banner { height: 32px; padding: 0 12px; }
-  #motive-text   { font-size: 12px; letter-spacing: 0.5px; }
+  /* Collapse ops-header rows on mobile */
+  #ops-header      { height: 72px; }
+  .ops-identity    { height: 24px; padding: 0 12px; gap: 8px; }
+  .ops-motd        { height: 24px; padding: 0 12px; }
+  #motive-text     { font-size: 9px; letter-spacing: 1.2px; }
+  .ops-metrics     { height: 24px; gap: 12px; padding: 0 12px; }
+  .stat-value      { font-size: 14px; }
 
-  /* Re-anchor based on collapsed banner */
-  #statsbar { top: calc(var(--nav-h) + 32px); }
-  #app-body  { top: calc(var(--nav-h) + 32px + var(--stats-h)); }
+  #app-body { top: calc(var(--nav-h) + 72px); }
 
   /* Grid scrolls horizontally so all 4 columns are reachable */
   #queue-grid {
@@ -1775,18 +1807,13 @@ body.focus-mode .threat-meter.high .threat-meter-fill {
 }
 
 /* --- Chrome elements dim out ---                            */
-body.focus-mode #motive-banner              { opacity: 0.30; }
-body.focus-mode #motive-banner:hover        { opacity: 0.85; }
-body.focus-mode #statsbar                   { opacity: 0.55; }
-body.focus-mode #statsbar:hover             { opacity: 1; }
-body.focus-mode .nav-logo                   { opacity: 0.40; }
-body.focus-mode .nav-subreddit              { opacity: 0.40; }
-body.focus-mode .nav-ai-chip                { opacity: 0.40; }
+body.focus-mode .ops-identity               { opacity: 0.35; }
+body.focus-mode .ops-identity:hover         { opacity: 1; }
+body.focus-mode .ops-motd                   { opacity: 0.28; }
+body.focus-mode .ops-motd:hover             { opacity: 0.88; }
+body.focus-mode .ops-metrics                { opacity: 0.50; }
+body.focus-mode .ops-metrics:hover          { opacity: 1; }
 body.focus-mode #nav-refresh                { opacity: 0.40; }
-
-body.focus-mode .nav-logo:hover,
-body.focus-mode .nav-subreddit:hover,
-body.focus-mode .nav-ai-chip:hover,
 body.focus-mode #nav-refresh:hover          { opacity: 1; }
 
 /* --- Detail panel: stronger depth shadow when open ---      */
