@@ -36,10 +36,10 @@
   --low-glow:   rgba(104, 211, 145, 0.18);
 
   /* Risk — Needs Review */
-  --review:        #63b3ed;
-  --review-bg:     rgba(99, 179, 237, 0.10);
-  --review-border: rgba(99, 179, 237, 0.30);
-  --review-glow:   rgba(99, 179, 237, 0.18);
+  --review:        #a78bfa;
+  --review-bg:     rgba(167, 139, 250, 0.10);
+  --review-border: rgba(167, 139, 250, 0.30);
+  --review-glow:   rgba(167, 139, 250, 0.18);
 
   /* AI / accent */
   --ai:        #b794f4;
@@ -440,7 +440,7 @@ button {
 #col-high    .col-header { border-bottom-color: var(--high);   background: rgba(245,101,101,0.08); box-shadow: 0 3px 22px rgba(245,101,101,0.28); }
 #col-medium  .col-header { border-bottom-color: var(--medium); background: rgba(246,173,85,0.08);  box-shadow: 0 3px 22px rgba(246,173,85,0.28);  }
 #col-low     .col-header { border-bottom-color: var(--low);    background: rgba(104,211,145,0.08); box-shadow: 0 3px 22px rgba(104,211,145,0.28); }
-#col-review  .col-header { border-bottom-color: var(--review); background: rgba(99,179,237,0.08);  box-shadow: 0 3px 22px rgba(99,179,237,0.28);  }
+#col-review  .col-header { border-bottom-color: var(--review); background: rgba(167,139,250,0.08);  box-shadow: 0 3px 22px rgba(167,139,250,0.28);  }
 
 .col-title {
   font-size: 13px;
@@ -455,7 +455,7 @@ button {
 #col-high   .col-title { color: var(--high);   text-shadow: 0 0 12px rgba(245,101,101,0.90), 0 0 28px rgba(245,101,101,0.45); }
 #col-medium .col-title { color: var(--medium); text-shadow: 0 0 12px rgba(246,173,85,0.90),  0 0 28px rgba(246,173,85,0.45);  }
 #col-low    .col-title { color: var(--low);    text-shadow: 0 0 12px rgba(104,211,145,0.90), 0 0 28px rgba(104,211,145,0.45); }
-#col-review .col-title { color: var(--review); text-shadow: 0 0 12px rgba(99,179,237,0.90),  0 0 28px rgba(99,179,237,0.45);  }
+#col-review .col-title { color: var(--review); text-shadow: 0 0 12px rgba(167,139,250,0.90),  0 0 28px rgba(167,139,250,0.45);  }
 
 .col-badge {
   display: inline-flex;
@@ -470,10 +470,10 @@ button {
   color: #fff;
 }
 
-#col-high   .col-badge { background: var(--high);   box-shadow: 0 0 14px rgba(245,101,101,0.70); }
-#col-medium .col-badge { background: var(--medium); box-shadow: 0 0 14px rgba(246,173,85,0.70);  }
-#col-low    .col-badge { background: var(--low);    box-shadow: 0 0 14px rgba(104,211,145,0.70); }
-#col-review .col-badge { background: var(--review); box-shadow: 0 0 14px rgba(99,179,237,0.70);  }
+#col-high   .col-badge { background: var(--high);   box-shadow: 0 0 6px rgba(245,101,101,0.35); }
+#col-medium .col-badge { background: var(--medium); box-shadow: 0 0 6px rgba(246,173,85,0.35);  }
+#col-low    .col-badge { background: var(--low);    box-shadow: 0 0 6px rgba(104,211,145,0.35); }
+#col-review .col-badge { background: var(--review); box-shadow: 0 0 6px rgba(167,139,250,0.35); }
 
 /* Card scroll area */
 .col-cards {
@@ -1555,10 +1555,10 @@ button {
 
 .col-icon-slot:hover { transform: scale(1.10); }
 
-/* Icon image: 48px, floating — no backing plate */
+/* Icon image: 56px, floating — no backing plate */
 .col-risk-icon {
-  width: 48px;
-  height: 48px;
+  width: 56px;
+  height: 56px;
   object-fit: contain;
   display: block;
   flex-shrink: 0;
@@ -1567,46 +1567,46 @@ button {
 
 /* Holographic multi-layer drop-shadow — resting state */
 .col-risk-icon.risk-icon-high   {
-  filter: drop-shadow(0 0 6px rgba(245,101,101,1.0))
-          drop-shadow(0 0 18px rgba(245,101,101,0.80))
-          drop-shadow(0 0 40px rgba(245,101,101,0.45));
+  filter: drop-shadow(0 0 3px rgba(245,101,101,0.85))
+          drop-shadow(0 0 10px rgba(245,101,101,0.38))
+          drop-shadow(0 0 22px rgba(245,101,101,0.15));
 }
 .col-risk-icon.risk-icon-medium {
-  filter: drop-shadow(0 0 6px rgba(246,173,85,1.0))
-          drop-shadow(0 0 18px rgba(246,173,85,0.80))
-          drop-shadow(0 0 40px rgba(246,173,85,0.45));
+  filter: drop-shadow(0 0 3px rgba(246,173,85,0.85))
+          drop-shadow(0 0 10px rgba(246,173,85,0.38))
+          drop-shadow(0 0 22px rgba(246,173,85,0.15));
 }
 .col-risk-icon.risk-icon-low {
-  filter: drop-shadow(0 0 6px rgba(104,211,145,1.0))
-          drop-shadow(0 0 18px rgba(104,211,145,0.80))
-          drop-shadow(0 0 40px rgba(104,211,145,0.45));
+  filter: drop-shadow(0 0 3px rgba(104,211,145,0.85))
+          drop-shadow(0 0 10px rgba(104,211,145,0.38))
+          drop-shadow(0 0 22px rgba(104,211,145,0.15));
 }
 .col-risk-icon.risk-icon-review {
-  filter: drop-shadow(0 0 6px rgba(183,148,244,1.0))
-          drop-shadow(0 0 18px rgba(183,148,244,0.80))
-          drop-shadow(0 0 40px rgba(183,148,244,0.45));
+  filter: drop-shadow(0 0 3px rgba(167,139,250,0.85))
+          drop-shadow(0 0 10px rgba(167,139,250,0.38))
+          drop-shadow(0 0 22px rgba(167,139,250,0.15));
 }
 
 /* Hover: expand outer glow layers */
 .col-icon-slot:hover .col-risk-icon.risk-icon-high   {
-  filter: drop-shadow(0 0 8px rgba(245,101,101,1.0))
-          drop-shadow(0 0 24px rgba(245,101,101,0.92))
-          drop-shadow(0 0 56px rgba(245,101,101,0.58));
+  filter: drop-shadow(0 0 4px rgba(245,101,101,0.90))
+          drop-shadow(0 0 14px rgba(245,101,101,0.52))
+          drop-shadow(0 0 32px rgba(245,101,101,0.25));
 }
 .col-icon-slot:hover .col-risk-icon.risk-icon-medium {
-  filter: drop-shadow(0 0 8px rgba(246,173,85,1.0))
-          drop-shadow(0 0 24px rgba(246,173,85,0.92))
-          drop-shadow(0 0 56px rgba(246,173,85,0.58));
+  filter: drop-shadow(0 0 4px rgba(246,173,85,0.90))
+          drop-shadow(0 0 14px rgba(246,173,85,0.52))
+          drop-shadow(0 0 32px rgba(246,173,85,0.25));
 }
 .col-icon-slot:hover .col-risk-icon.risk-icon-low {
-  filter: drop-shadow(0 0 8px rgba(104,211,145,1.0))
-          drop-shadow(0 0 24px rgba(104,211,145,0.92))
-          drop-shadow(0 0 56px rgba(104,211,145,0.58));
+  filter: drop-shadow(0 0 4px rgba(104,211,145,0.90))
+          drop-shadow(0 0 14px rgba(104,211,145,0.52))
+          drop-shadow(0 0 32px rgba(104,211,145,0.25));
 }
 .col-icon-slot:hover .col-risk-icon.risk-icon-review {
-  filter: drop-shadow(0 0 8px rgba(183,148,244,1.0))
-          drop-shadow(0 0 24px rgba(183,148,244,0.92))
-          drop-shadow(0 0 56px rgba(183,148,244,0.58));
+  filter: drop-shadow(0 0 4px rgba(167,139,250,0.90))
+          drop-shadow(0 0 14px rgba(167,139,250,0.52))
+          drop-shadow(0 0 32px rgba(167,139,250,0.25));
 }
 
 /* ---- Detail panel risk icon ----------------------------------- */
@@ -1745,13 +1745,13 @@ body.focus-mode {
   --high-glow:   rgba(245, 101, 101, 0.48);
   --medium-glow: rgba(246, 173, 85,  0.32);
   --low-glow:    rgba(104, 211, 145, 0.30);
-  --review-glow: rgba(99,  179, 237, 0.30);
+  --review-glow: rgba(167, 139, 250, 0.30);
 
   /* Slightly richer risk borders */
   --high-border:   rgba(245, 101, 101, 0.55);
   --medium-border: rgba(246, 173, 85,  0.42);
   --low-border:    rgba(104, 211, 145, 0.42);
-  --review-border: rgba(99,  179, 237, 0.42);
+  --review-border: rgba(167, 139, 250, 0.42);
 }
 
 /* --- Vignette: inset shadow on the content area ---
@@ -1774,12 +1774,12 @@ body.focus-mode .column {
 body.focus-mode #col-high   .col-header { box-shadow: 0 3px 32px rgba(245,101,101,0.44); }
 body.focus-mode #col-medium .col-header { box-shadow: 0 3px 32px rgba(246,173,85,0.44);  }
 body.focus-mode #col-low    .col-header { box-shadow: 0 3px 32px rgba(104,211,145,0.44); }
-body.focus-mode #col-review .col-header { box-shadow: 0 3px 32px rgba(99,179,237,0.44);  }
+body.focus-mode #col-review .col-header { box-shadow: 0 3px 32px rgba(167,139,250,0.44);  }
 
 body.focus-mode #col-high   .col-title { text-shadow: 0 0 16px rgba(245,101,101,1.0), 0 0 36px rgba(245,101,101,0.55); }
 body.focus-mode #col-medium .col-title { text-shadow: 0 0 16px rgba(246,173,85,1.0),  0 0 36px rgba(246,173,85,0.55);  }
 body.focus-mode #col-low    .col-title { text-shadow: 0 0 16px rgba(104,211,145,1.0), 0 0 36px rgba(104,211,145,0.55); }
-body.focus-mode #col-review .col-title { text-shadow: 0 0 16px rgba(99,179,237,1.0),  0 0 36px rgba(99,179,237,0.55);  }
+body.focus-mode #col-review .col-title { text-shadow: 0 0 16px rgba(167,139,250,1.0),  0 0 36px rgba(167,139,250,0.55);  }
 
 /* --- Card resting state: tighten left-border glow ---       */
 body.focus-mode .card.risk-high {
