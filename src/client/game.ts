@@ -56,7 +56,35 @@ async function init(): Promise<void> {
     }
   });
 
+  // Wire focus mode toggle
+  initFocusMode();
+
   await Promise.all([loadQueue(), loadStats()]);
+}
+
+// =========================================================
+// FOCUS MODE
+// =========================================================
+
+function initFocusMode(): void {
+  const btn = document.getElementById("nav-focus");
+  if (!btn) return;
+
+  const stored = localStorage.getItem("modpilot-focus-mode");
+  if (stored === "1") applyFocusMode(true, btn);
+
+  btn.addEventListener("click", () => {
+    const isActive = document.body.classList.contains("focus-mode");
+    applyFocusMode(!isActive, btn);
+  });
+}
+
+function applyFocusMode(on: boolean, btn: HTMLElement): void {
+  document.body.classList.toggle("focus-mode", on);
+  btn.classList.toggle("active", on);
+  btn.setAttribute("aria-pressed", String(on));
+  btn.title = on ? "Focus Mode — On (click to exit)" : "Focus Mode — Night Ops";
+  localStorage.setItem("modpilot-focus-mode", on ? "1" : "0");
 }
 
 // =========================================================
