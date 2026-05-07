@@ -7,10 +7,10 @@ import { selectCard, removeCard } from "./card.ts";
 type ActionCallback = (postId: string, action: string, accepted: boolean) => void;
 
 const PANEL_RISK_ICONS: Record<string, string> = {
-  high:         "assets/risk-icons/high-risk.png",
-  medium:       "assets/risk-icons/medium.png",
-  low:          "assets/risk-icons/low-risk.png",
-  needs_review: "assets/risk-icons/needs-review.png",
+  high:         "assets/icons/high-risk.png",
+  medium:       "assets/icons/medium.png",
+  low:          "assets/icons/low-risk.png",
+  needs_review: "assets/icons/needs-review.png",
 };
 
 let currentItem: TriageItem | null = null;

@@ -1533,15 +1533,15 @@ button {
    RISK ICONS — column headers + detail panel
    ========================================================= */
 
-/* Column header icon slot — collapses automatically when img is hidden by JS */
+/* ---- Column header icon slot ---------------------------------- */
 .col-icon-slot {
   display: flex;
   align-items: center;
   flex-shrink: 0;
-  overflow: hidden;
 }
 .col-icon-slot:empty { display: none; }
 
+/* Column header icons: 28px, RGBA-transparent PNG, risk-colored glow */
 .col-risk-icon {
   width: 28px;
   height: 28px;
@@ -1549,21 +1549,24 @@ button {
   display: block;
   flex-shrink: 0;
 }
-.col-risk-icon.risk-icon-high   { filter: drop-shadow(0 0 5px rgba(245,101,101,0.75)); }
-.col-risk-icon.risk-icon-medium { filter: drop-shadow(0 0 5px rgba(246,173,85,0.75));  }
-.col-risk-icon.risk-icon-low    { filter: drop-shadow(0 0 5px rgba(104,211,145,0.75)); }
-.col-risk-icon.risk-icon-review { filter: drop-shadow(0 0 5px rgba(99,179,237,0.75));  }
+.col-risk-icon.risk-icon-high   { filter: drop-shadow(0 0 6px rgba(245,101,101,0.80)); }
+.col-risk-icon.risk-icon-medium { filter: drop-shadow(0 0 6px rgba(246,173,85,0.80));  }
+.col-risk-icon.risk-icon-low    { filter: drop-shadow(0 0 6px rgba(104,211,145,0.80)); }
+.col-risk-icon.risk-icon-review { filter: drop-shadow(0 0 6px rgba(99,179,237,0.80));  }
 
-/* Detail panel risk icon (sits inside .breakdown-value) */
+/* ---- Detail panel risk icon ----------------------------------- */
+/* Sits inside .breakdown-value which already carries the risk color,
+   so currentColor resolves to the correct risk tint automatically. */
 .panel-risk-icon {
   width: 18px;
   height: 18px;
   object-fit: contain;
   display: block;
   flex-shrink: 0;
+  filter: drop-shadow(0 0 6px currentColor);
 }
 
-/* Risk label in panel breakdown uses flex to seat the icon */
+/* ---- Risk breakdown value row — flex to seat the icon --------- */
 .breakdown-value {
   display: flex;
   align-items: center;
