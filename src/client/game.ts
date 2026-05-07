@@ -242,6 +242,26 @@ function onActionComplete(postId: string, action: string, _accepted: boolean): v
   updateBadges();
   showActionToast(action);
   void loadStats();
+  selectNextCard();
+}
+
+const RISK_PRIORITY = ["high", "medium", "low", "needs_review"] as const;
+
+function selectNextCard(): void {
+  for (const level of RISK_PRIORITY) {
+    const next = allItems.find(
+      (i) => i.status === "pending" && i.scoringResult.riskLevel === level,
+    );
+    if (next) {
+      setTimeout(() => {
+        // Only advance if the user hasn't manually selected something else
+        if (!document.querySelector(".card.selected")) {
+          openPanel(next, onActionComplete);
+        }
+      }, 500);
+      return;
+    }
+  }
 }
 
 function updateBadges(): void {

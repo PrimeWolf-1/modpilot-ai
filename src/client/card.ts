@@ -114,16 +114,31 @@ export function clearCardFocus(): void {
 
 /**
  * Removes a card from the DOM with an exit animation matching the action taken.
+ * Phase 1: visual fade/pulse (approve 380ms, remove 220ms).
+ * Phase 2: height collapse so surrounding cards shift up smoothly (180ms).
  */
 export function removeCard(postId: string, action?: string): void {
   const card = document.querySelector<HTMLElement>(
     `.card[data-post-id="${postId}"]`,
   );
   if (!card) return;
+
   const cls = action === "approve" ? "card-exit-approve" : "card-exit-remove";
-  const delay = action === "approve" ? 420 : 220;
+  const visualMs = action === "approve" ? 380 : 220;
+
   card.classList.add(cls);
-  setTimeout(() => card.remove(), delay);
+
+  setTimeout(() => {
+    const h = card.offsetHeight;
+    card.style.height = `${h}px`;
+    card.style.overflow = "hidden";
+    card.style.transition = "height 0.18s ease, padding-top 0.18s ease, padding-bottom 0.18s ease";
+    void card.offsetHeight; // force reflow before starting transition
+    card.style.height = "0";
+    card.style.paddingTop = "0";
+    card.style.paddingBottom = "0";
+    setTimeout(() => card.remove(), 190);
+  }, visualMs);
 }
 
 // ---------------------------------------------------------------------------
