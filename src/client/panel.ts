@@ -279,13 +279,28 @@ function moveCardToReview(postId: string): void {
   const target = document.getElementById("cards-review");
   if (!card || !target) return;
 
-  // Swap risk class to needs_review
-  card.classList.forEach((cls) => {
-    if (cls.startsWith("risk-")) card.classList.remove(cls);
-  });
-  card.classList.add("risk-needs_review");
+  // Freeze height so the collapse can be measured
+  const h = card.offsetHeight;
+  card.style.height = `${h}px`;
+  card.style.overflow = "hidden";
+  card.style.pointerEvents = "none";
 
-  target.appendChild(card);
+  // Fade + collapse simultaneously
+  card.style.transition = "opacity 0.18s ease, height 0.22s ease, padding-top 0.22s ease, padding-bottom 0.22s ease";
+  void card.offsetHeight; // force reflow
+  card.style.opacity = "0";
+  card.style.height = "0";
+  card.style.paddingTop = "0";
+  card.style.paddingBottom = "0";
+
+  setTimeout(() => {
+    card.removeAttribute("style");
+    const riskClasses = Array.from(card.classList).filter((c) => c.startsWith("risk-"));
+    riskClasses.forEach((c) => card.classList.remove(c));
+    card.classList.add("risk-needs_review", "card-enter");
+    target.appendChild(card);
+    card.addEventListener("animationend", () => card.classList.remove("card-enter"), { once: true });
+  }, 230);
 }
 
 // ---------------------------------------------------------------------------

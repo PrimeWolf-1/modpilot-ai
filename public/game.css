@@ -556,12 +556,20 @@ button {
 }
 
 .card.card-exit-approve {
-  animation: cardApproveExit 0.38s ease forwards;
+  animation: cardApproveExit 0.26s ease forwards;
   pointer-events: none;
 }
 .card.card-exit-remove {
   animation: cardRemoveExit 0.22s ease forwards;
   pointer-events: none;
+}
+
+@keyframes cardEnter {
+  0%   { opacity: 0; transform: translateY(6px); }
+  100% { opacity: 1; transform: translateY(0); }
+}
+.card.card-enter {
+  animation: cardEnter 0.2s ease forwards;
 }
 
 /* Card header row */

@@ -125,7 +125,7 @@ export function removeCard(postId: string, action?: string): void {
   if (!card) return;
 
   const cls = action === "approve" ? "card-exit-approve" : "card-exit-remove";
-  const visualMs = action === "approve" ? 380 : 220;
+  const visualMs = action === "approve" ? 260 : 220;
 
   card.classList.add(cls);
 
