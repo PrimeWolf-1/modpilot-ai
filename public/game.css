@@ -533,12 +533,14 @@ button {
   background: var(--surface-2);
 }
 
-/* Pending removal: border-color only pulses between two shades of red — box-shadow unchanged */
+/* Pending removal: outline pulses red independently — border/box-shadow from .selected untouched */
 @keyframes pendingRemoval {
-  0%, 100% { border-color: rgba(245, 101, 101, 0.45); }
-  50%       { border-color: rgba(245, 101, 101, 0.90); }
+  0%, 100% { outline-color: rgba(245, 101, 101, 0.35); }
+  50%       { outline-color: rgba(245, 101, 101, 0.75); }
 }
 .card.pending-removal {
+  outline: 2px solid rgba(245, 101, 101, 0.35);
+  outline-offset: 1px;
   animation: pendingRemoval 1.5s ease-in-out infinite;
 }
 
