@@ -438,7 +438,7 @@ button {
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  gap: 10px;
+  gap: 14px;
   padding: 10px 12px 8px;
   border-bottom: 2px solid transparent;
   flex-shrink: 0;
@@ -1562,10 +1562,10 @@ button {
 
 .col-icon-slot:hover { transform: scale(1.10); }
 
-/* Icon image: 30px, floating — no backing plate */
+/* Icon image: 36px, floating — no backing plate */
 .col-risk-icon {
-  width: 30px;
-  height: 30px;
+  width: 36px;
+  height: 36px;
   object-fit: contain;
   display: block;
   flex-shrink: 0;
@@ -1574,46 +1574,46 @@ button {
 
 /* Holographic multi-layer drop-shadow — resting state */
 .col-risk-icon.risk-icon-high   {
-  filter: drop-shadow(0 0 3px rgba(245,101,101,1.0))
-          drop-shadow(0 0 10px rgba(245,101,101,0.55))
-          drop-shadow(0 0 22px rgba(245,101,101,0.25));
+  filter: drop-shadow(0 0 5px rgba(245,101,101,1.0))
+          drop-shadow(0 0 14px rgba(245,101,101,0.75))
+          drop-shadow(0 0 32px rgba(245,101,101,0.40));
 }
 .col-risk-icon.risk-icon-medium {
-  filter: drop-shadow(0 0 3px rgba(246,173,85,1.0))
-          drop-shadow(0 0 10px rgba(246,173,85,0.55))
-          drop-shadow(0 0 22px rgba(246,173,85,0.25));
+  filter: drop-shadow(0 0 5px rgba(246,173,85,1.0))
+          drop-shadow(0 0 14px rgba(246,173,85,0.75))
+          drop-shadow(0 0 32px rgba(246,173,85,0.40));
 }
 .col-risk-icon.risk-icon-low {
-  filter: drop-shadow(0 0 3px rgba(104,211,145,1.0))
-          drop-shadow(0 0 10px rgba(104,211,145,0.55))
-          drop-shadow(0 0 22px rgba(104,211,145,0.25));
+  filter: drop-shadow(0 0 5px rgba(104,211,145,1.0))
+          drop-shadow(0 0 14px rgba(104,211,145,0.75))
+          drop-shadow(0 0 32px rgba(104,211,145,0.40));
 }
 .col-risk-icon.risk-icon-review {
-  filter: drop-shadow(0 0 3px rgba(183,148,244,1.0))
-          drop-shadow(0 0 10px rgba(183,148,244,0.55))
-          drop-shadow(0 0 22px rgba(183,148,244,0.25));
+  filter: drop-shadow(0 0 5px rgba(183,148,244,1.0))
+          drop-shadow(0 0 14px rgba(183,148,244,0.75))
+          drop-shadow(0 0 32px rgba(183,148,244,0.40));
 }
 
 /* Hover: expand outer glow layers */
 .col-icon-slot:hover .col-risk-icon.risk-icon-high   {
-  filter: drop-shadow(0 0 4px rgba(245,101,101,1.0))
-          drop-shadow(0 0 14px rgba(245,101,101,0.72))
-          drop-shadow(0 0 30px rgba(245,101,101,0.38));
+  filter: drop-shadow(0 0 6px rgba(245,101,101,1.0))
+          drop-shadow(0 0 18px rgba(245,101,101,0.88))
+          drop-shadow(0 0 42px rgba(245,101,101,0.52));
 }
 .col-icon-slot:hover .col-risk-icon.risk-icon-medium {
-  filter: drop-shadow(0 0 4px rgba(246,173,85,1.0))
-          drop-shadow(0 0 14px rgba(246,173,85,0.72))
-          drop-shadow(0 0 30px rgba(246,173,85,0.38));
+  filter: drop-shadow(0 0 6px rgba(246,173,85,1.0))
+          drop-shadow(0 0 18px rgba(246,173,85,0.88))
+          drop-shadow(0 0 42px rgba(246,173,85,0.52));
 }
 .col-icon-slot:hover .col-risk-icon.risk-icon-low {
-  filter: drop-shadow(0 0 4px rgba(104,211,145,1.0))
-          drop-shadow(0 0 14px rgba(104,211,145,0.72))
-          drop-shadow(0 0 30px rgba(104,211,145,0.38));
+  filter: drop-shadow(0 0 6px rgba(104,211,145,1.0))
+          drop-shadow(0 0 18px rgba(104,211,145,0.88))
+          drop-shadow(0 0 42px rgba(104,211,145,0.52));
 }
 .col-icon-slot:hover .col-risk-icon.risk-icon-review {
-  filter: drop-shadow(0 0 4px rgba(183,148,244,1.0))
-          drop-shadow(0 0 14px rgba(183,148,244,0.72))
-          drop-shadow(0 0 30px rgba(183,148,244,0.38));
+  filter: drop-shadow(0 0 6px rgba(183,148,244,1.0))
+          drop-shadow(0 0 18px rgba(183,148,244,0.88))
+          drop-shadow(0 0 42px rgba(183,148,244,0.52));
 }
 
 /* ---- Detail panel risk icon ----------------------------------- */
