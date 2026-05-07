@@ -220,7 +220,7 @@ async function sendAction(
       console.error("Action failed:", data.error);
     }
 
-    removeCard(item.id);
+    removeCard(item.id, action);
     onActionComplete?.(item.id, action, accepted_suggestion);
   } catch (err) {
     console.error("sendAction error:", err);
@@ -256,7 +256,7 @@ async function confirmRemoveWithNote(): Promise<void> {
 
     const data = await resp.json() as { success: boolean };
     if (data.success) {
-      removeCard(item.id);
+      removeCard(item.id, "remove");
       onActionComplete?.(item.id, "remove", true);
     }
   } catch (err) {

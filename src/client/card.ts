@@ -94,17 +94,17 @@ export function selectCard(postId: string): void {
 }
 
 /**
- * Removes a card from the DOM (after an action is taken).
+ * Removes a card from the DOM with an exit animation matching the action taken.
  */
-export function removeCard(postId: string): void {
+export function removeCard(postId: string, action?: string): void {
   const card = document.querySelector<HTMLElement>(
     `.card[data-post-id="${postId}"]`,
   );
   if (!card) return;
-  card.style.transition = "opacity 0.2s, transform 0.2s";
-  card.style.opacity = "0";
-  card.style.transform = "scale(0.95)";
-  setTimeout(() => card.remove(), 220);
+  const cls = action === "approve" ? "card-exit-approve" : "card-exit-remove";
+  const delay = action === "approve" ? 420 : 220;
+  card.classList.add(cls);
+  setTimeout(() => card.remove(), delay);
 }
 
 // ---------------------------------------------------------------------------

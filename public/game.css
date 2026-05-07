@@ -521,11 +521,30 @@ button {
 .card.risk-high:hover    { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(245,101,101,0.40), 0 0 0 1px rgba(245,101,101,0.25); border-color: var(--high-border); }
 .card.risk-medium:hover  { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(246,173,85,0.40),  0 0 0 1px rgba(246,173,85,0.25);  border-color: var(--medium-border); }
 .card.risk-low:hover     { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(104,211,145,0.40), 0 0 0 1px rgba(104,211,145,0.25); border-color: var(--low-border); }
-.card.risk-needs_review:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(99,179,237,0.40), 0 0 0 1px rgba(99,179,237,0.25); border-color: var(--review-border); }
+.card.risk-needs_review:hover { transform: translateY(-2px); box-shadow: 0 6px 28px rgba(167,139,250,0.40), 0 0 0 1px rgba(167,139,250,0.25); border-color: var(--review-border); }
 
 .card.selected {
-  border-color: var(--ai-border);
-  box-shadow: 0 0 10px var(--ai-bg);
+  border-color: var(--ai);
+  box-shadow: 0 0 0 1px var(--ai-border), 0 0 16px rgba(183,148,244,0.22);
+}
+
+@keyframes cardApproveExit {
+  0%   { opacity: 1; box-shadow: none; }
+  30%  { opacity: 1; box-shadow: 0 0 0 2px var(--low), 0 0 14px rgba(104,211,145,0.45); }
+  100% { opacity: 0; transform: translateY(-3px); }
+}
+@keyframes cardRemoveExit {
+  from { opacity: 1; transform: scale(1); }
+  to   { opacity: 0; transform: scale(0.95); }
+}
+
+.card.card-exit-approve {
+  animation: cardApproveExit 0.4s ease forwards;
+  pointer-events: none;
+}
+.card.card-exit-remove {
+  animation: cardRemoveExit 0.2s ease forwards;
+  pointer-events: none;
 }
 
 /* Card header row */
