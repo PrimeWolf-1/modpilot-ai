@@ -533,6 +533,15 @@ button {
   background: var(--surface-2);
 }
 
+/* Pending removal: slow pulse from selected glow toward a muted red — tactical, not alarming */
+@keyframes pendingRemoval {
+  0%, 100% { box-shadow: 0 0 0 1px var(--ai-border), 0 0 14px rgba(183,148,244,0.18); }
+  50%       { box-shadow: 0 0 0 1px rgba(245,101,101,0.40), 0 0 10px rgba(245,101,101,0.14); }
+}
+.card.pending-removal {
+  animation: pendingRemoval 2.5s ease-in-out infinite;
+}
+
 @keyframes cardApproveExit {
   0%   { opacity: 1; }
   25%  { opacity: 1; box-shadow: 0 0 0 1px rgba(104,211,145,0.55), 0 0 12px rgba(104,211,145,0.35); background: rgba(104,211,145,0.06); }

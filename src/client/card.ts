@@ -106,6 +106,7 @@ export function selectCard(postId: string, riskLevel?: string): void {
  */
 export function clearCardFocus(): void {
   document.querySelectorAll(".card.selected").forEach((el) => el.classList.remove("selected"));
+  document.querySelectorAll(".card.pending-removal").forEach((el) => el.classList.remove("pending-removal"));
   document.querySelectorAll<HTMLElement>(".column.col-focused").forEach((el) => el.classList.remove("col-focused"));
   document.getElementById("queue-grid")?.classList.remove("has-selection");
   const panel = document.getElementById("detail-panel");

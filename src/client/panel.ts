@@ -267,13 +267,18 @@ async function confirmRemoveWithNote(): Promise<void> {
 // ---------------------------------------------------------------------------
 
 function showRemoveConfirm(): void {
-  const el = document.getElementById("remove-confirm");
-  el?.classList.add("visible");
+  document.getElementById("remove-confirm")?.classList.add("visible");
+  if (currentItem) {
+    document.querySelector(`.card[data-post-id="${currentItem.id}"]`)
+      ?.classList.add("pending-removal");
+  }
 }
 
 function hideRemoveConfirm(): void {
-  const el = document.getElementById("remove-confirm");
-  el?.classList.remove("visible");
+  document.getElementById("remove-confirm")?.classList.remove("visible");
+  document.querySelectorAll(".card.pending-removal").forEach((el) =>
+    el.classList.remove("pending-removal"),
+  );
 }
 
 // ---------------------------------------------------------------------------
