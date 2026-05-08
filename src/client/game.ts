@@ -246,6 +246,11 @@ function onActionComplete(postId: string, action: string, _accepted: boolean): v
   showActionToast(action);
   void loadStats();
   selectNextCard();
+
+  // Sync empty-state placeholders after card animations complete.
+  // Escalate: DOM move happens at 230ms. Others: card fully gone ~460ms.
+  const emptyStateDelay = action === "escalate" ? 260 : 460;
+  setTimeout(syncColumnEmptyStates, emptyStateDelay);
 }
 
 const RISK_PRIORITY = ["high", "medium", "low", "needs_review"] as const;
@@ -263,6 +268,32 @@ function selectNextCard(): void {
         }
       }, 500);
       return;
+    }
+  }
+}
+
+function syncColumnEmptyStates(): void {
+  const pendingByRisk: Record<string, number> = { high: 0, medium: 0, low: 0, needs_review: 0 };
+  for (const item of allItems) {
+    if (item.status === "pending") {
+      const k = item.scoringResult.riskLevel;
+      if (k in pendingByRisk) pendingByRisk[k]!++;
+    }
+  }
+
+  for (const [riskLevel, colId] of Object.entries(COLUMN_IDS)) {
+    const colEl = document.getElementById(colId);
+    if (!colEl) continue;
+    const count = pendingByRisk[riskLevel] ?? 0;
+    const emptyEl = colEl.querySelector<HTMLElement>(".col-empty");
+
+    if (count > 0 && emptyEl) {
+      emptyEl.remove();
+    } else if (count === 0 && !emptyEl) {
+      const div = document.createElement("div");
+      div.className = "col-empty";
+      div.innerHTML = `<div class="col-empty-icon">✓</div><span>No ${riskLevel.replace("_", " ")} items</span>`;
+      colEl.appendChild(div);
     }
   }
 }

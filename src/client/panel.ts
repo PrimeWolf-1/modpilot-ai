@@ -299,6 +299,7 @@ function moveCardToReview(postId: string): void {
     riskClasses.forEach((c) => card.classList.remove(c));
     card.classList.add("risk-needs_review", "card-enter");
     target.appendChild(card);
+    target.querySelector(".col-empty")?.remove();
     card.addEventListener("animationend", () => card.classList.remove("card-enter"), { once: true });
   }, 230);
 }
