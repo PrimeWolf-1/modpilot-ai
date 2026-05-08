@@ -58,7 +58,7 @@
 
   /* Layout */
   --nav-h: 44px;
-  --ops-h: 92px;
+  --ops-h: 60px;
 }
 
 /* =========================================================
@@ -250,7 +250,6 @@ button {
   flex-direction: column;
   z-index: 95;
   overflow: hidden;
-  transition: height 0.25s ease-out;
 }
 
 /* Row 1: app identity */
@@ -333,22 +332,40 @@ button {
 }
 
 /* =========================================================
-   ACTIVITY BAR — collapsible recent actions
+   FLOATING ACTIVITY PANEL — top-right tactical overlay
    ========================================================= */
-#ops-activity-bar {
-  background: var(--surface-2);
-  border-top: 1px solid var(--border);
-  flex-shrink: 0;
-  transition: opacity 0.35s ease;
+#activity-panel {
+  position: fixed;
+  top: 52px;
+  right: 12px;
+  width: 300px;
+  z-index: 99;
+  background: rgba(11, 17, 32, 0.88);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid var(--border-2);
+  border-radius: 10px;
+  box-shadow:
+    0 4px 24px rgba(0, 0, 0, 0.50),
+    0 0 0 1px rgba(183, 148, 244, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.05);
+  overflow: hidden;
+  transition: box-shadow 0.25s ease-out, opacity 0.35s ease;
+}
+#activity-panel.expanded {
+  box-shadow:
+    0 8px 36px rgba(0, 0, 0, 0.60),
+    0 0 0 1px rgba(183, 148, 244, 0.14),
+    inset 0 1px 0 rgba(255, 255, 255, 0.07);
 }
 
-#ops-activity-toggle {
+#activity-panel-toggle {
   display: flex;
   align-items: center;
   width: 100%;
-  height: 30px;
-  padding: 0 16px;
-  gap: 10px;
+  height: 32px;
+  padding: 0 12px;
+  gap: 8px;
   cursor: pointer;
   user-select: none;
   background: none;
@@ -356,23 +373,23 @@ button {
   text-align: left;
   color: inherit;
 }
-#ops-activity-toggle:hover {
-  background: rgba(255, 255, 255, 0.03);
+#activity-panel-toggle:hover {
+  background: rgba(255, 255, 255, 0.04);
 }
 
-.activity-bar-label {
+.activity-panel-label {
   font-size: 11px;
   font-weight: 600;
   text-transform: uppercase;
   letter-spacing: 0.7px;
-  color: var(--text-dim);
+  color: var(--text-muted);
   flex-shrink: 0;
 }
 
-.activity-bar-latest {
+.activity-panel-latest {
   font-size: 10px;
   color: var(--text-dim);
-  opacity: 0.55;
+  opacity: 0.60;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -380,40 +397,40 @@ button {
   min-width: 0;
 }
 
-.activity-bar-chevron {
+.activity-panel-chevron {
   flex-shrink: 0;
   color: var(--text-dim);
   opacity: 0.5;
   display: flex;
   align-items: center;
 }
-.activity-bar-chevron svg {
+.activity-panel-chevron svg {
   transition: transform 0.25s ease-out;
 }
-#ops-activity-bar.expanded .activity-bar-chevron svg {
+#activity-panel.expanded .activity-panel-chevron svg {
   transform: rotate(180deg);
 }
 
-#ops-activity-entries {
+#activity-panel-entries {
   max-height: 0;
   overflow: hidden;
-  transition: max-height 0.25s ease-out, padding 0.25s ease-out;
-  display: flex;
-  flex-direction: column;
-  gap: 2px;
-  padding: 0 16px;
+  transition: max-height 0.28s ease-out;
 }
-#ops-activity-bar.expanded #ops-activity-entries {
-  max-height: 96px;
-  padding-top: 5px;
-  padding-bottom: 7px;
+#activity-panel.expanded #activity-panel-entries {
+  max-height: 180px;
+  overflow-y: auto;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
 }
+#activity-panel-entries::-webkit-scrollbar { width: 3px; }
+#activity-panel-entries::-webkit-scrollbar-track { background: transparent; }
+#activity-panel-entries::-webkit-scrollbar-thumb { background: var(--border-2); border-radius: 2px; }
 
 .ops-log-empty {
   font-size: 10px;
   color: var(--text-dim);
   opacity: 0.4;
   font-style: italic;
+  padding: 10px 12px;
 }
 
 .ops-log-entry {
@@ -425,6 +442,7 @@ button {
   color: var(--text-dim);
   white-space: nowrap;
   overflow: hidden;
+  padding: 4px 12px;
 }
 
 .ops-log-dot {
@@ -480,7 +498,7 @@ button {
   bottom: 0;
   display: flex;
   overflow: hidden;
-  transition: box-shadow 0.5s ease, top 0.25s ease-out;
+  transition: box-shadow 0.5s ease;
 }
 
 /* =========================================================
@@ -1752,13 +1770,13 @@ button {
    MOBILE — bottom sheet panel + horizontal-scroll grid
    ========================================================= */
 @media (max-width: 767px) {
-  /* Collapse ops-header rows on mobile */
-  #ops-header        { height: 56px; }
-  .ops-motd          { height: 56px; padding: 0 12px; }
+  /* Collapse ops-header on mobile */
+  #ops-header        { height: 32px; }
+  .ops-motd          { height: 32px; padding: 0 12px; }
   #motive-text       { font-size: 10px; letter-spacing: 1.2px; }
-  #ops-activity-bar  { display: none; }
+  #activity-panel    { display: none; }
 
-  #app-body { top: calc(var(--nav-h) + 56px); }
+  #app-body { top: calc(var(--nav-h) + 32px); }
 
   /* Grid scrolls horizontally so all 4 columns are reachable */
   #queue-grid {
@@ -1891,8 +1909,8 @@ body.focus-mode .threat-meter.high .threat-meter-fill {
 /* --- Chrome elements dim out ---                            */
 body.focus-mode .ops-motd                    { opacity: 0.28; }
 body.focus-mode .ops-motd:hover              { opacity: 0.88; }
-body.focus-mode #ops-activity-bar            { opacity: 0.35; }
-body.focus-mode #ops-activity-bar:hover      { opacity: 0.85; }
+body.focus-mode #activity-panel              { opacity: 0.30; }
+body.focus-mode #activity-panel:hover        { opacity: 0.90; }
 body.focus-mode #nav-refresh                { opacity: 0.40; }
 body.focus-mode #nav-refresh:hover          { opacity: 1; }
 

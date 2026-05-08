@@ -33,16 +33,6 @@
         <span class="motive-dot"></span>
         <span id="motive-text">Loading…</span>
       </div>
-      <div id="ops-activity-bar">
-        <button id="ops-activity-toggle" aria-expanded="false">
-          <span class="activity-bar-label">Recent Moderator Activity</span>
-          <span class="activity-bar-latest" id="activity-bar-latest"></span>
-          <span class="activity-bar-chevron" id="activity-bar-chevron">
-            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
-          </span>
-        </button>
-        <div id="ops-activity-entries" aria-hidden="true"></div>
-      </div>
     </div>
 
     <!-- ===== APP BODY (grid + panel side-by-side) ===== -->
@@ -240,6 +230,18 @@
 
     <!-- ===== ACTION TOAST ===== -->
     <div id="action-toast"></div>
+
+    <!-- ===== FLOATING ACTIVITY PANEL ===== -->
+    <div id="activity-panel">
+      <button id="activity-panel-toggle" aria-expanded="false">
+        <span class="activity-panel-label">Recent Activity</span>
+        <span class="activity-panel-latest" id="activity-panel-latest"></span>
+        <span class="activity-panel-chevron">
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
+        </span>
+      </button>
+      <div id="activity-panel-entries" aria-hidden="true"></div>
+    </div>
 
     <script type="module" src="game.js" defer></script>
   </body>

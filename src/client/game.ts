@@ -15,11 +15,7 @@ import { openSummary } from "./summary.ts";
 let allItems: TriageItem[] = [];
 let currentUsername = "";
 let latestStats: SessionStats | null = null;
-let activityBarExpanded = false;
-
-const OPS_H_COLLAPSED = 92;
-const OPS_H_EXPANDED = 188;
-const NAV_H = 44;
+let activityPanelExpanded = false;
 
 // ---------------------------------------------------------------------------
 // Recent Actions log state
@@ -57,7 +53,7 @@ function addRecentAction(entry: RecentActionEntry): void {
 }
 
 function updateActivityBarLatest(): void {
-  const el = document.getElementById("activity-bar-latest");
+  const el = document.getElementById("activity-panel-latest");
   if (!el) return;
   if (recentActions.length === 0) {
     el.textContent = "";
@@ -73,7 +69,7 @@ function updateActivityBarLatest(): void {
 }
 
 function renderRecentActions(): void {
-  const log = document.getElementById("ops-activity-entries");
+  const log = document.getElementById("activity-panel-entries");
   if (!log) return;
 
   if (recentActions.length === 0) {
@@ -174,26 +170,19 @@ function applyFocusMode(on: boolean, btn: HTMLElement): void {
 // =========================================================
 
 function initActivityBar(): void {
-  document.getElementById("ops-activity-toggle")?.addEventListener("click", toggleActivityBar);
+  document.getElementById("activity-panel-toggle")?.addEventListener("click", toggleActivityBar);
 }
 
 function toggleActivityBar(): void {
-  activityBarExpanded = !activityBarExpanded;
+  activityPanelExpanded = !activityPanelExpanded;
 
-  const bar     = document.getElementById("ops-activity-bar");
-  const entries = document.getElementById("ops-activity-entries");
-  const toggle  = document.getElementById("ops-activity-toggle");
-  const header  = document.getElementById("ops-header");
-  const body    = document.getElementById("app-body");
+  const panel   = document.getElementById("activity-panel");
+  const entries = document.getElementById("activity-panel-entries");
+  const toggle  = document.getElementById("activity-panel-toggle");
 
-  bar?.classList.toggle("expanded", activityBarExpanded);
-  toggle?.setAttribute("aria-expanded", String(activityBarExpanded));
-  entries?.setAttribute("aria-hidden", String(!activityBarExpanded));
-
-  const newH = activityBarExpanded ? OPS_H_EXPANDED : OPS_H_COLLAPSED;
-  if (header) header.style.height = `${newH}px`;
-  if (body)   body.style.top      = `${NAV_H + newH}px`;
-  document.documentElement.style.setProperty("--ops-h", `${newH}px`);
+  panel?.classList.toggle("expanded", activityPanelExpanded);
+  toggle?.setAttribute("aria-expanded", String(activityPanelExpanded));
+  entries?.setAttribute("aria-hidden", String(!activityPanelExpanded));
 }
 
 // =========================================================
