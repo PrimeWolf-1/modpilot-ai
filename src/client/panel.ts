@@ -286,7 +286,7 @@ function moveCardToReview(postId: string): void {
   card.style.pointerEvents = "none";
 
   // Fade + collapse simultaneously
-  card.style.transition = "opacity 0.18s ease, height 0.22s ease, padding-top 0.22s ease, padding-bottom 0.22s ease";
+  card.style.transition = "opacity 0.18s ease-out, height 0.22s ease-out, padding-top 0.22s ease-out, padding-bottom 0.22s ease-out";
   void card.offsetHeight; // force reflow
   card.style.opacity = "0";
   card.style.height = "0";

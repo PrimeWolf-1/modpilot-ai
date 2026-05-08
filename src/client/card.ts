@@ -125,7 +125,7 @@ export function removeCard(postId: string, action?: string): void {
   if (!card) return;
 
   const cls = action === "approve" ? "card-exit-approve" : "card-exit-remove";
-  const visualMs = action === "approve" ? 260 : 220;
+  const visualMs = action === "approve" ? 250 : 200;
 
   card.classList.add(cls);
 
@@ -133,7 +133,7 @@ export function removeCard(postId: string, action?: string): void {
     const h = card.offsetHeight;
     card.style.height = `${h}px`;
     card.style.overflow = "hidden";
-    card.style.transition = "height 0.18s ease, padding-top 0.18s ease, padding-bottom 0.18s ease";
+    card.style.transition = "height 0.18s ease-out, padding-top 0.18s ease-out, padding-bottom 0.18s ease-out";
     void card.offsetHeight; // force reflow before starting transition
     card.style.height = "0";
     card.style.paddingTop = "0";

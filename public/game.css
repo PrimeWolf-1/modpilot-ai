@@ -545,22 +545,21 @@ button {
 }
 
 @keyframes cardApproveExit {
-  0%   { opacity: 1; }
-  25%  { opacity: 1; box-shadow: 0 0 0 1px rgba(104,211,145,0.55), 0 0 12px rgba(104,211,145,0.35); background: rgba(104,211,145,0.06); }
-  100% { opacity: 0; transform: translateY(-3px); }
+  0%   { opacity: 1; background: transparent; }
+  20%  { opacity: 1; background: rgba(104, 211, 145, 0.09); }
+  100% { opacity: 0; background: rgba(104, 211, 145, 0.03); }
 }
 @keyframes cardRemoveExit {
   0%   { opacity: 1; }
-  20%  { opacity: 1; box-shadow: 0 0 0 1px rgba(245,101,101,0.45), 0 0 10px rgba(245,101,101,0.20); }
-  100% { opacity: 0; transform: scale(0.97); }
+  100% { opacity: 0; transform: scale(0.98); }
 }
 
 .card.card-exit-approve {
-  animation: cardApproveExit 0.26s ease forwards;
+  animation: cardApproveExit 0.25s ease-out forwards;
   pointer-events: none;
 }
 .card.card-exit-remove {
-  animation: cardRemoveExit 0.22s ease forwards;
+  animation: cardRemoveExit 0.2s ease-out forwards;
   pointer-events: none;
 }
 
@@ -569,7 +568,7 @@ button {
   100% { opacity: 1; transform: translateY(0); }
 }
 .card.card-enter {
-  animation: cardEnter 0.2s ease forwards;
+  animation: cardEnter 0.2s ease-out forwards;
 }
 
 /* Card header row */
