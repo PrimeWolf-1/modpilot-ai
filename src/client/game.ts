@@ -16,6 +16,60 @@ let allItems: TriageItem[] = [];
 let currentUsername = "";
 let latestStats: SessionStats | null = null;
 
+// ---------------------------------------------------------------------------
+// Recent Actions log state
+// ---------------------------------------------------------------------------
+
+interface RecentActionEntry {
+  action: string;
+  author: string;
+  riskLevel: string;
+  timestamp: number;
+}
+
+let recentActions: RecentActionEntry[] = [];
+
+const ACTION_LOG_LABELS: Record<string, string> = {
+  approve:  "Approved",
+  remove:   "Removed",
+  warn:     "Warned",
+  escalate: "→ Needs Review",
+  ignore:   "Ignored",
+};
+
+const RISK_LOG_LABELS: Record<string, string> = {
+  high:         "High Risk",
+  medium:       "Medium",
+  low:          "Low Risk",
+  needs_review: "Needs Review",
+};
+
+function addRecentAction(entry: RecentActionEntry): void {
+  recentActions.unshift(entry);
+  if (recentActions.length > 5) recentActions.length = 5;
+  renderRecentActions();
+}
+
+function renderRecentActions(): void {
+  const log = document.getElementById("recent-actions-log");
+  if (!log) return;
+
+  if (recentActions.length === 0) {
+    log.innerHTML = `<span class="ops-log-empty">No actions yet this session</span>`;
+    return;
+  }
+
+  log.innerHTML = recentActions.map((entry) => {
+    const label    = ACTION_LOG_LABELS[entry.action]    ?? entry.action;
+    const riskLbl  = RISK_LOG_LABELS[entry.riskLevel]   ?? entry.riskLevel;
+    const time     = new Date(entry.timestamp).toLocaleTimeString("en-US", {
+      hour: "numeric", minute: "2-digit", hour12: true,
+    });
+    const author   = entry.author.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+    return `<div class="ops-log-entry ${entry.riskLevel}"><span class="ops-log-dot"></span><span class="ops-log-action">${label}</span><span class="ops-log-author"> u/${author}</span><span class="ops-log-sep"> · </span><span class="ops-log-risk">${riskLbl}</span><span class="ops-log-time">${time}</span></div>`;
+  }).join("");
+}
+
 // =========================================================
 // COLUMN MAPPING
 // =========================================================
@@ -41,6 +95,8 @@ const BADGE_IDS: Record<string, string> = {
 async function init(): Promise<void> {
   // Wire panel close + action callbacks
   initPanel(() => { /* no-op after close */ });
+
+  renderRecentActions(); // show empty-state placeholder immediately
 
   // Wire refresh button
   document.getElementById("nav-refresh")?.addEventListener("click", () => {
@@ -158,12 +214,24 @@ async function loadStats(): Promise<void> {
     updateStatsBar(
       {
         ...data.stats,
-        highRisk: pendingHighRiskCount(),
-        timeSaved: data.stats.reviewed * 30,
+        reviewed:  data.stats.actions,          // Actions Taken = all actions
+        highRisk:  pendingHighRiskCount(),
+        timeSaved: data.stats.reviewed * 30,    // Time Saved = completed resolutions × 30s
       },
       currentUsername,
     );
     updateMotivationBanner(data.stats);
+
+    // Seed log from server history on first load (before any local actions)
+    if (recentActions.length === 0 && data.stats.history.length > 0) {
+      recentActions = data.stats.history.slice(0, 5).map((h) => ({
+        action:    h.action,
+        author:    h.author,
+        riskLevel: h.riskLevel,
+        timestamp: h.timestamp,
+      }));
+      renderRecentActions();
+    }
   } catch (err) {
     console.error("loadStats error:", err);
   }
@@ -235,6 +303,17 @@ function renderQueue(items: TriageItem[]): void {
 
 function onActionComplete(postId: string, action: string, _accepted: boolean): void {
   const item = allItems.find((i) => i.id === postId);
+
+  // Log BEFORE mutating state so we capture the original risk level
+  if (item) {
+    addRecentAction({
+      action,
+      author:    item.author,
+      riskLevel: item.scoringResult.riskLevel,
+      timestamp: Date.now(),
+    });
+  }
+
   if (item) {
     if (action === "escalate") {
       item.scoringResult.riskLevel = "needs_review";

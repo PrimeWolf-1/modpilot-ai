@@ -58,7 +58,7 @@
 
   /* Layout */
   --nav-h: 44px;
-  --ops-h: 90px;
+  --ops-h: 174px;
 }
 
 /* =========================================================
@@ -387,6 +387,81 @@ button {
   font-style: italic;
   flex: 1;
   text-align: right;
+}
+
+/* =========================================================
+   RECENT ACTIONS LOG — inside ops-header, below metrics
+   ========================================================= */
+.ops-log {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  padding: 5px 16px 5px;
+  overflow: hidden;
+  transition: opacity 0.35s ease;
+}
+
+.ops-log-empty {
+  font-size: 10px;
+  color: var(--text-dim);
+  opacity: 0.4;
+  font-style: italic;
+  padding-top: 2px;
+}
+
+.ops-log-entry {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 10px;
+  line-height: 14px;
+  color: var(--text-dim);
+  white-space: nowrap;
+  overflow: hidden;
+}
+
+.ops-log-dot {
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  flex-shrink: 0;
+  opacity: 0.85;
+}
+.ops-log-entry.high         .ops-log-dot { background: var(--high); }
+.ops-log-entry.medium       .ops-log-dot { background: var(--medium); }
+.ops-log-entry.low          .ops-log-dot { background: var(--low); }
+.ops-log-entry.needs_review .ops-log-dot { background: var(--review); }
+
+.ops-log-action {
+  color: var(--text-muted);
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.ops-log-author {
+  color: var(--text-dim);
+  flex-shrink: 0;
+}
+
+.ops-log-sep {
+  opacity: 0.35;
+  flex-shrink: 0;
+}
+
+.ops-log-risk {
+  opacity: 0.55;
+  font-size: 9px;
+  flex-shrink: 0;
+}
+
+.ops-log-time {
+  margin-left: auto;
+  font-size: 9px;
+  opacity: 0.4;
+  flex-shrink: 0;
+  padding-left: 8px;
 }
 
 /* =========================================================
@@ -1677,6 +1752,7 @@ button {
   .ops-motd        { height: 32px; padding: 0 12px; }
   #motive-text     { font-size: 10px; letter-spacing: 1.2px; }
   .ops-metrics     { height: 24px; gap: 12px; padding: 0 12px; }
+  .ops-log         { display: none; }
   .stat-value      { font-size: 14px; }
 
   #app-body { top: calc(var(--nav-h) + 56px); }
@@ -1814,6 +1890,8 @@ body.focus-mode .ops-motd                   { opacity: 0.28; }
 body.focus-mode .ops-motd:hover             { opacity: 0.88; }
 body.focus-mode .ops-metrics                { opacity: 0.50; }
 body.focus-mode .ops-metrics:hover          { opacity: 1; }
+body.focus-mode .ops-log                    { opacity: 0.35; }
+body.focus-mode .ops-log:hover              { opacity: 0.85; }
 body.focus-mode #nav-refresh                { opacity: 0.40; }
 body.focus-mode #nav-refresh:hover          { opacity: 1; }
 
