@@ -1,6 +1,6 @@
 // ModPilot AI — Detail Panel (item 11)
 
-import type { TriageItem, TakeActionRequest } from "../shared/types.ts";
+import type { TriageItem, TakeActionRequest, ScoringResult } from "../shared/types.ts";
 import { ApiEndpoint } from "../shared/api.ts";
 import { selectCard, removeCard, clearCardFocus } from "./card.ts";
 
@@ -126,16 +126,10 @@ function populatePanel(item: TriageItem): void {
     }
   }
 
-  // Threat analysis (formerly AI summary)
+  // Threat analysis
   const summaryEl = document.getElementById("panel-ai-summary");
   if (summaryEl) {
-    if (sr.aiSummary) {
-      summaryEl.textContent = sr.aiSummary;
-    } else if (sr.riskLevel === "high" || sr.riskLevel === "medium") {
-      summaryEl.innerHTML = `<span class="panel-ai-loading">Analyzing threat vectors…</span>`;
-    } else {
-      summaryEl.innerHTML = `<span class="panel-ai-loading">No threat vectors detected.</span>`;
-    }
+    summaryEl.textContent = sr.aiSummary ?? buildThreatSummary(sr);
   }
 
   // Threat meter
@@ -374,6 +368,26 @@ function formatAge(days: number): string {
   if (days < 30) return `${Math.floor(days / 7)} weeks`;
   if (days < 365) return `${Math.floor(days / 30)} months`;
   return `${Math.floor(days / 365)} years`;
+}
+
+function buildThreatSummary(sr: ScoringResult): string {
+  const count = sr.signals.length;
+
+  if (count === 0) {
+    return `No risk signals detected. Pattern consistent with ${sr.category}. Confidence: ${sr.confidence}%.`;
+  }
+
+  const top = [...sr.signals]
+    .sort((a, b) => b.weight - a.weight)
+    .slice(0, 3)
+    .map((s) => s.label);
+
+  const signalList =
+    top.length === 1 ? top[0]! :
+    top.length === 2 ? `${top[0]} and ${top[1]}` :
+    `${top[0]}, ${top[1]}, and ${top[2]}`;
+
+  return `Post exhibits ${count} risk signal${count !== 1 ? "s" : ""} including ${signalList}. Pattern consistent with ${sr.category}. Confidence: ${sr.confidence}%.`;
 }
 
 function formatRiskLabel(risk: string): string {
