@@ -5,7 +5,7 @@ import { ApiEndpoint } from "../shared/api.ts";
 import type { GetQueueResponse, GetStatsResponse, SessionStats, TriageItem } from "../shared/types.ts";
 import { createCard } from "./card.ts";
 import { openPanel, initPanel } from "./panel.ts";
-import { updateStatsBar, updateQueueCount, setStatus, updateMotivationBanner } from "./statsbar.ts";
+import { updateStatsBar, updateQueueCount, setStatus, updateMotivationBanner, setHighRiskStat } from "./statsbar.ts";
 import { openSummary } from "./summary.ts";
 
 // ---------------------------------------------------------------------------
@@ -137,6 +137,7 @@ async function loadQueue(): Promise<void> {
 
     renderQueue(allItems);
     updateQueueCount(allItems.length);
+    setHighRiskStat(pendingHighRiskCount());
     setStatus("analysis complete", 4000);
   } catch (err) {
     console.error("loadQueue error:", err);
@@ -154,7 +155,14 @@ async function loadStats(): Promise<void> {
     if (!resp.ok) return;
     const data = (await resp.json()) as GetStatsResponse;
     latestStats = data.stats;
-    updateStatsBar(data.stats, currentUsername);
+    updateStatsBar(
+      {
+        ...data.stats,
+        highRisk: pendingHighRiskCount(),
+        timeSaved: data.stats.reviewed * 30,
+      },
+      currentUsername,
+    );
     updateMotivationBanner(data.stats);
   } catch (err) {
     console.error("loadStats error:", err);
@@ -243,6 +251,7 @@ function onActionComplete(postId: string, action: string, _accepted: boolean): v
   }
 
   updateBadges();
+  setHighRiskStat(pendingHighRiskCount());
   showActionToast(action);
   void loadStats();
   selectNextCard();
@@ -270,6 +279,12 @@ function selectNextCard(): void {
       return;
     }
   }
+}
+
+function pendingHighRiskCount(): number {
+  return allItems.filter(
+    (i) => i.status === "pending" && i.scoringResult.riskLevel === "high",
+  ).length;
 }
 
 function syncColumnEmptyStates(): void {

@@ -142,12 +142,11 @@ async function onTakeAction(req: IncomingMessage): Promise<TakeActionResponse> {
     }
 
     // Update stats (all in parallel for speed)
-    const statsOps: Promise<void>[] = [
-      incrementReviewed(),
-      incrementActions(),
-    ];
+    // "warn" is not a final moderation decision — excluded from reviewed count
+    const statsOps: Promise<void>[] = [incrementActions()];
+    if (action !== "warn") statsOps.push(incrementReviewed());
     if (action === "escalate") statsOps.push(incrementEscalated());
-    if (riskLevel === "high")   statsOps.push(incrementHighRisk());
+    if (riskLevel === "high")  statsOps.push(incrementHighRisk());
     await Promise.all(statsOps);
 
     // Append full decision record to 50-item history
