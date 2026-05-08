@@ -27,35 +27,22 @@
       </button>
     </nav>
 
-    <!-- ===== OPERATIONAL HEADER (MOTD + metrics) ===== -->
+    <!-- ===== OPERATIONAL HEADER (MOTD + activity bar) ===== -->
     <div id="ops-header">
       <div class="ops-motd">
         <span class="motive-dot"></span>
         <span id="motive-text">Loading…</span>
       </div>
-      <div class="ops-metrics">
-        <div class="stat-item">
-          <span class="stat-value" id="stat-reviewed">0</span>
-          <span class="stat-label">Actions Taken</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-          <span class="stat-value" id="stat-high-risk">0</span>
-          <span class="stat-label">High Risk</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-          <span class="stat-value" id="stat-time-saved">—</span>
-          <span class="stat-label">Time Saved</span>
-        </div>
-        <div class="stat-divider"></div>
-        <div class="stat-item">
-          <span class="stat-value" id="stat-queue-count">0</span>
-          <span class="stat-label">In Queue</span>
-        </div>
-        <div class="stat-status" id="stat-status">loading queue…</div>
+      <div id="ops-activity-bar">
+        <button id="ops-activity-toggle" aria-expanded="false">
+          <span class="activity-bar-label">Recent Moderator Activity</span>
+          <span class="activity-bar-latest" id="activity-bar-latest"></span>
+          <span class="activity-bar-chevron" id="activity-bar-chevron">
+            <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
+          </span>
+        </button>
+        <div id="ops-activity-entries" aria-hidden="true"></div>
       </div>
-      <div class="ops-log" id="recent-actions-log"></div>
     </div>
 
     <!-- ===== APP BODY (grid + panel side-by-side) ===== -->

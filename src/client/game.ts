@@ -5,7 +5,7 @@ import { ApiEndpoint } from "../shared/api.ts";
 import type { GetQueueResponse, GetStatsResponse, SessionStats, TriageItem } from "../shared/types.ts";
 import { createCard } from "./card.ts";
 import { openPanel, initPanel } from "./panel.ts";
-import { updateStatsBar, updateQueueCount, setStatus, updateMotivationBanner, setHighRiskStat } from "./statsbar.ts";
+import { updateMotivationBanner } from "./statsbar.ts";
 import { openSummary } from "./summary.ts";
 
 // ---------------------------------------------------------------------------
@@ -15,6 +15,11 @@ import { openSummary } from "./summary.ts";
 let allItems: TriageItem[] = [];
 let currentUsername = "";
 let latestStats: SessionStats | null = null;
+let activityBarExpanded = false;
+
+const OPS_H_COLLAPSED = 92;
+const OPS_H_EXPANDED = 188;
+const NAV_H = 44;
 
 // ---------------------------------------------------------------------------
 // Recent Actions log state
@@ -48,10 +53,27 @@ function addRecentAction(entry: RecentActionEntry): void {
   recentActions.unshift(entry);
   if (recentActions.length > 5) recentActions.length = 5;
   renderRecentActions();
+  updateActivityBarLatest();
+}
+
+function updateActivityBarLatest(): void {
+  const el = document.getElementById("activity-bar-latest");
+  if (!el) return;
+  if (recentActions.length === 0) {
+    el.textContent = "";
+    return;
+  }
+  const entry = recentActions[0]!;
+  const label = ACTION_LOG_LABELS[entry.action] ?? entry.action;
+  const author = entry.author.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const time = new Date(entry.timestamp).toLocaleTimeString("en-US", {
+    hour: "numeric", minute: "2-digit", hour12: true,
+  });
+  el.textContent = `· ${label} u/${author} · ${time}`;
 }
 
 function renderRecentActions(): void {
-  const log = document.getElementById("recent-actions-log");
+  const log = document.getElementById("ops-activity-entries");
   if (!log) return;
 
   if (recentActions.length === 0) {
@@ -107,13 +129,14 @@ async function init(): Promise<void> {
   document.getElementById("nav-ai-chip")?.addEventListener("click", () => {
     if (latestStats) {
       openSummary(latestStats, currentUsername);
-    } else {
-      setStatus("Loading stats…", 2000);
     }
   });
 
   // Wire focus mode toggle
   initFocusMode();
+
+  // Wire activity bar toggle
+  initActivityBar();
 
   // Hide risk icon img elements that fail to load (CSP-safe, no inline handlers)
   initRiskIconFallbacks();
@@ -147,6 +170,33 @@ function applyFocusMode(on: boolean, btn: HTMLElement): void {
 }
 
 // =========================================================
+// ACTIVITY BAR
+// =========================================================
+
+function initActivityBar(): void {
+  document.getElementById("ops-activity-toggle")?.addEventListener("click", toggleActivityBar);
+}
+
+function toggleActivityBar(): void {
+  activityBarExpanded = !activityBarExpanded;
+
+  const bar     = document.getElementById("ops-activity-bar");
+  const entries = document.getElementById("ops-activity-entries");
+  const toggle  = document.getElementById("ops-activity-toggle");
+  const header  = document.getElementById("ops-header");
+  const body    = document.getElementById("app-body");
+
+  bar?.classList.toggle("expanded", activityBarExpanded);
+  toggle?.setAttribute("aria-expanded", String(activityBarExpanded));
+  entries?.setAttribute("aria-hidden", String(!activityBarExpanded));
+
+  const newH = activityBarExpanded ? OPS_H_EXPANDED : OPS_H_COLLAPSED;
+  if (header) header.style.height = `${newH}px`;
+  if (body)   body.style.top      = `${NAV_H + newH}px`;
+  document.documentElement.style.setProperty("--ops-h", `${newH}px`);
+}
+
+// =========================================================
 // RISK ICON FALLBACKS
 // =========================================================
 
@@ -169,7 +219,6 @@ function initRiskIconFallbacks(): void {
 
 async function loadQueue(): Promise<void> {
   showLoading("Loading mod queue…");
-  setStatus("reviewing signals…");
   setRefreshSpinning(true);
 
   try {
@@ -192,13 +241,9 @@ async function loadQueue(): Promise<void> {
     }
 
     renderQueue(allItems);
-    updateQueueCount(allItems.length);
-    setHighRiskStat(pendingHighRiskCount());
-    setStatus("analysis complete", 4000);
   } catch (err) {
     console.error("loadQueue error:", err);
     showError("Failed to load queue. Check your connection.");
-    setStatus("queue load failed");
   } finally {
     hideLoading();
     setRefreshSpinning(false);
@@ -211,15 +256,6 @@ async function loadStats(): Promise<void> {
     if (!resp.ok) return;
     const data = (await resp.json()) as GetStatsResponse;
     latestStats = data.stats;
-    updateStatsBar(
-      {
-        ...data.stats,
-        reviewed:  data.stats.actions,          // Actions Taken = all actions
-        highRisk:  pendingHighRiskCount(),
-        timeSaved: data.stats.reviewed * 30,    // Time Saved = completed resolutions × 30s
-      },
-      currentUsername,
-    );
     updateMotivationBanner(data.stats);
 
     // Seed log from server history on first load (before any local actions)
@@ -231,6 +267,7 @@ async function loadStats(): Promise<void> {
         timestamp: h.timestamp,
       }));
       renderRecentActions();
+      updateActivityBarLatest();
     }
   } catch (err) {
     console.error("loadStats error:", err);
@@ -328,7 +365,6 @@ function onActionComplete(postId: string, action: string, _accepted: boolean): v
   }
 
   updateBadges();
-  setHighRiskStat(pendingHighRiskCount());
   showActionToast(action);
   void loadStats();
 
@@ -410,7 +446,6 @@ function updateBadges(): void {
     }
   }
 
-  updateQueueCount(allItems.filter((i) => i.status === "pending").length);
 }
 
 // =========================================================
