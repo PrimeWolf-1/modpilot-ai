@@ -26,6 +26,8 @@ interface RecentActionEntry {
   author: string;
   riskLevel: string;
   timestamp: number;
+  postId: string;
+  title: string;
 }
 
 let recentActions: RecentActionEntry[] = [];
@@ -84,8 +86,22 @@ function renderRecentActions(): void {
       hour: "numeric", minute: "2-digit", hour12: true,
     });
     const author   = entry.author.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    return `<div class="ops-log-entry ${entry.riskLevel}"><span class="ops-log-dot"></span><span class="ops-log-action">${label}</span><span class="ops-log-author"> u/${author}</span><span class="ops-log-sep"> · </span><span class="ops-log-risk">${riskLbl}</span><span class="ops-log-time">${time}</span></div>`;
+    const postId   = entry.postId.replace(/"/g, "&quot;");
+    return `<div class="ops-log-entry ${entry.riskLevel}" data-post-id="${postId}" role="button" tabindex="0"><span class="ops-log-dot"></span><span class="ops-log-action">${label}</span><span class="ops-log-author"> u/${author}</span><span class="ops-log-sep"> · </span><span class="ops-log-risk">${riskLbl}</span><span class="ops-log-time">${time}</span></div>`;
   }).join("");
+
+  // Wire click handlers — re-open detail panel for the actioned item
+  log.querySelectorAll<HTMLElement>(".ops-log-entry[data-post-id]").forEach((el) => {
+    el.addEventListener("click", () => {
+      const postId = el.dataset.postId;
+      if (!postId) return;
+      const item = allItems.find((i) => i.id === postId);
+      if (item) {
+        if (activityPanelExpanded) toggleActivityBar();
+        openPanel(item, onActionComplete);
+      }
+    });
+  });
 }
 
 // =========================================================
@@ -254,6 +270,8 @@ async function loadStats(): Promise<void> {
         author:    h.author,
         riskLevel: h.riskLevel,
         timestamp: h.timestamp,
+        postId:    h.postId,
+        title:     h.title,
       }));
       renderRecentActions();
       updateActivityBarLatest();
@@ -337,6 +355,8 @@ function onActionComplete(postId: string, action: string, _accepted: boolean): v
       author:    item.author,
       riskLevel: item.scoringResult.riskLevel,
       timestamp: Date.now(),
+      postId:    item.id,
+      title:     item.title,
     });
   }
 
@@ -354,7 +374,7 @@ function onActionComplete(postId: string, action: string, _accepted: boolean): v
   }
 
   updateBadges();
-  showActionToast(action);
+  showActionToast(action, item);
   void loadStats();
 
   // Warn keeps the card in the queue — no auto-advance, no empty-state sync
@@ -463,26 +483,29 @@ function showError(msg: string): void {
 
 let toastTimer: ReturnType<typeof setTimeout> | null = null;
 
-function showActionToast(action: string): void {
+function showActionToast(action: string, item?: TriageItem): void {
   const toast = document.getElementById("action-toast");
   if (!toast) return;
 
-  const labels: Record<string, string> = {
-    approve:  "✓ Approved",
-    remove:   "✕ Removed",
-    warn:     "⚠ Warning sent",
-    escalate: "⬆ Escalated for review",
-    ignore:   "— Ignored",
+  const u = item ? ` — u/${item.author}` : "";
+  const cat = item?.scoringResult.category ?? "";
+
+  const text: Record<string, string> = {
+    approve:  `✓ Approved${u}`,
+    remove:   `✓ Removed${u}${cat ? ` — ${cat}` : ""}`,
+    warn:     `✓ Warning sent${u}`,
+    escalate: `✓ Escalated to Needs Review${u}`,
+    ignore:   `— Ignored${u}`,
   };
 
-  toast.textContent = labels[action] ?? `✓ ${action}`;
+  toast.textContent = text[action] ?? `✓ ${action}`;
   toast.className = `toast-${action} visible`;
 
   if (toastTimer) clearTimeout(toastTimer);
   toastTimer = setTimeout(() => {
     toast.classList.remove("visible");
     toastTimer = null;
-  }, 2200);
+  }, 3000);
 }
 
 function setRefreshSpinning(spinning: boolean): void {
