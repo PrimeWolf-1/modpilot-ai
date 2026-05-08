@@ -712,15 +712,16 @@ button {
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  padding: 24px 12px;
+  padding: 12px 12px 48px;
   color: var(--text-dim);
   font-size: 11px;
   gap: 6px;
   text-align: center;
+  opacity: 0.45;
 }
 .col-empty-icon {
-  font-size: 22px;
-  opacity: 0.4;
+  font-size: 18px;
+  opacity: 0.5;
 }
 
 /* =========================================================
