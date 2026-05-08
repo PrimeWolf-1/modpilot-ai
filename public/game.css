@@ -437,12 +437,17 @@ button {
   display: flex;
   align-items: center;
   gap: 6px;
-  font-size: 10px;
-  line-height: 16px;
-  color: var(--text-dim);
+  font-size: 11px;
+  line-height: 17px;
+  color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
-  padding: 4px 12px;
+  padding: 4px 10px;
+  border-radius: 5px;
+  transition: background 0.15s ease;
+}
+.ops-log-entry:hover {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .ops-log-dot {
@@ -458,13 +463,13 @@ button {
 .ops-log-entry.needs_review .ops-log-dot { background: var(--review); }
 
 .ops-log-action {
-  color: var(--text-muted);
+  color: var(--text);
   font-weight: 600;
   flex-shrink: 0;
 }
 
 .ops-log-author {
-  color: var(--text-dim);
+  color: var(--text-muted);
   flex-shrink: 0;
 }
 
@@ -474,15 +479,15 @@ button {
 }
 
 .ops-log-risk {
-  opacity: 0.55;
-  font-size: 9px;
+  opacity: 0.65;
+  font-size: 10px;
   flex-shrink: 0;
 }
 
 .ops-log-time {
   margin-left: auto;
-  font-size: 9px;
-  opacity: 0.4;
+  font-size: 10px;
+  opacity: 0.50;
   flex-shrink: 0;
   padding-left: 8px;
 }
@@ -539,10 +544,10 @@ button {
   flex-shrink: 0;
 }
 
-#col-high    .col-header { border-bottom-color: var(--high);   background: rgba(245,101,101,0.08); box-shadow: 0 3px 22px rgba(245,101,101,0.28); }
-#col-medium  .col-header { border-bottom-color: var(--medium); background: rgba(246,173,85,0.08);  box-shadow: 0 3px 22px rgba(246,173,85,0.28);  }
-#col-low     .col-header { border-bottom-color: var(--low);    background: rgba(104,211,145,0.08); box-shadow: 0 3px 22px rgba(104,211,145,0.28); }
-#col-review  .col-header { border-bottom-color: var(--review); background: rgba(167,139,250,0.08);  box-shadow: 0 3px 22px rgba(167,139,250,0.28);  }
+#col-high    .col-header { border-bottom-color: var(--high);   background: rgba(245,101,101,0.07); box-shadow: 0 2px 10px rgba(245,101,101,0.12); }
+#col-medium  .col-header { border-bottom-color: var(--medium); background: rgba(246,173,85,0.07);  box-shadow: 0 2px 10px rgba(246,173,85,0.10);  }
+#col-low     .col-header { border-bottom-color: var(--low);    background: rgba(104,211,145,0.07); box-shadow: 0 2px 10px rgba(104,211,145,0.10); }
+#col-review  .col-header { border-bottom-color: var(--review); background: rgba(167,139,250,0.07);  box-shadow: 0 2px 10px rgba(167,139,250,0.10);  }
 
 .col-title {
   font-size: 13px;
@@ -554,10 +559,10 @@ button {
   min-width: 0;
 }
 
-#col-high   .col-title { color: var(--high);   text-shadow: 0 0 12px rgba(245,101,101,0.90), 0 0 28px rgba(245,101,101,0.45); }
-#col-medium .col-title { color: var(--medium); text-shadow: 0 0 12px rgba(246,173,85,0.90),  0 0 28px rgba(246,173,85,0.45);  }
-#col-low    .col-title { color: var(--low);    text-shadow: 0 0 12px rgba(104,211,145,0.90), 0 0 28px rgba(104,211,145,0.45); }
-#col-review .col-title { color: var(--review); text-shadow: 0 0 12px rgba(167,139,250,0.90),  0 0 28px rgba(167,139,250,0.45);  }
+#col-high   .col-title { color: var(--high); }
+#col-medium .col-title { color: var(--medium); }
+#col-low    .col-title { color: var(--low); }
+#col-review .col-title { color: var(--review); }
 
 .col-badge {
   display: inline-flex;
@@ -572,10 +577,10 @@ button {
   color: #fff;
 }
 
-#col-high   .col-badge { background: var(--high);   box-shadow: 0 0 6px rgba(245,101,101,0.35); }
-#col-medium .col-badge { background: var(--medium); box-shadow: 0 0 6px rgba(246,173,85,0.35);  }
-#col-low    .col-badge { background: var(--low);    box-shadow: 0 0 6px rgba(104,211,145,0.35); }
-#col-review .col-badge { background: var(--review); box-shadow: 0 0 6px rgba(167,139,250,0.35); }
+#col-high   .col-badge { background: var(--high); }
+#col-medium .col-badge { background: var(--medium); }
+#col-low    .col-badge { background: var(--low); }
+#col-review .col-badge { background: var(--review); }
 
 /* Card scroll area */
 .col-cards {
@@ -811,15 +816,15 @@ button {
   align-items: center;
   justify-content: center;
   padding: 12px 12px 48px;
-  color: var(--text-dim);
+  color: var(--text-muted);
   font-size: 11px;
   gap: 6px;
   text-align: center;
-  opacity: 0.45;
+  opacity: 0.55;
 }
 .col-empty-icon {
-  font-size: 18px;
-  opacity: 0.5;
+  font-size: 16px;
+  opacity: 0.45;
 }
 
 /* =========================================================
@@ -1725,7 +1730,6 @@ button {
   object-fit: contain;
   display: block;
   flex-shrink: 0;
-  filter: drop-shadow(0 0 5px currentColor);
 }
 
 /* ---- Risk breakdown value row — flex to seat the icon --------- */
@@ -1876,16 +1880,16 @@ body.focus-mode .column {
   border-right-color: var(--border-2);
 }
 
-/* --- Column headers: stronger neon emanation ---            */
-body.focus-mode #col-high   .col-header { box-shadow: 0 3px 32px rgba(245,101,101,0.44); }
-body.focus-mode #col-medium .col-header { box-shadow: 0 3px 32px rgba(246,173,85,0.44);  }
-body.focus-mode #col-low    .col-header { box-shadow: 0 3px 32px rgba(104,211,145,0.44); }
-body.focus-mode #col-review .col-header { box-shadow: 0 3px 32px rgba(167,139,250,0.44);  }
+/* --- Column headers: modest accent lift in focus mode ---   */
+body.focus-mode #col-high   .col-header { box-shadow: 0 2px 16px rgba(245,101,101,0.20); }
+body.focus-mode #col-medium .col-header { box-shadow: 0 2px 16px rgba(246,173,85,0.18);  }
+body.focus-mode #col-low    .col-header { box-shadow: 0 2px 16px rgba(104,211,145,0.18); }
+body.focus-mode #col-review .col-header { box-shadow: 0 2px 16px rgba(167,139,250,0.18);  }
 
-body.focus-mode #col-high   .col-title { text-shadow: 0 0 16px rgba(245,101,101,1.0), 0 0 36px rgba(245,101,101,0.55); }
-body.focus-mode #col-medium .col-title { text-shadow: 0 0 16px rgba(246,173,85,1.0),  0 0 36px rgba(246,173,85,0.55);  }
-body.focus-mode #col-low    .col-title { text-shadow: 0 0 16px rgba(104,211,145,1.0), 0 0 36px rgba(104,211,145,0.55); }
-body.focus-mode #col-review .col-title { text-shadow: 0 0 16px rgba(167,139,250,1.0),  0 0 36px rgba(167,139,250,0.55);  }
+body.focus-mode #col-high   .col-title { text-shadow: 0 0 10px rgba(245,101,101,0.50); }
+body.focus-mode #col-medium .col-title { text-shadow: 0 0 10px rgba(246,173,85,0.45);  }
+body.focus-mode #col-low    .col-title { text-shadow: 0 0 10px rgba(104,211,145,0.45); }
+body.focus-mode #col-review .col-title { text-shadow: 0 0 10px rgba(167,139,250,0.45);  }
 
 /* --- Card resting state: tighten left-border glow ---       */
 body.focus-mode .card.risk-high {
