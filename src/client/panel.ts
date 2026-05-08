@@ -221,9 +221,10 @@ async function sendAction(
 
     if (action === "escalate") {
       moveCardToReview(item.id);
-    } else {
+    } else if (action !== "warn") {
       removeCard(item.id, action);
     }
+    // "warn": panel closes, card stays in its column for follow-up action
     onActionComplete?.(item.id, action, accepted_suggestion);
   } catch (err) {
     console.error("sendAction error:", err);

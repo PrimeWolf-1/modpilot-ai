@@ -238,14 +238,12 @@ function onActionComplete(postId: string, action: string, _accepted: boolean): v
   if (item) {
     if (action === "escalate") {
       item.scoringResult.riskLevel = "needs_review";
-      // status stays "pending" so updateBadges() counts it in needs_review
+      // status stays "pending" — counted in needs_review column
+    } else if (action === "warn") {
+      // status stays "pending" — item remains in queue for follow-up
     } else {
-      item.status = action === "approve"
-        ? "approved"
-        : action === "remove"
-        ? "removed"
-        : action === "warn"
-        ? "warned"
+      item.status = action === "approve" ? "approved"
+        : action === "remove"  ? "removed"
         : "ignored";
     }
   }
@@ -254,12 +252,13 @@ function onActionComplete(postId: string, action: string, _accepted: boolean): v
   setHighRiskStat(pendingHighRiskCount());
   showActionToast(action);
   void loadStats();
-  selectNextCard();
 
-  // Sync empty-state placeholders after card animations complete.
-  // Escalate: DOM move happens at 230ms. Others: card fully gone ~460ms.
-  const emptyStateDelay = action === "escalate" ? 260 : 460;
-  setTimeout(syncColumnEmptyStates, emptyStateDelay);
+  // Warn keeps the card in the queue — no auto-advance, no empty-state sync
+  if (action !== "warn") {
+    selectNextCard();
+    const emptyStateDelay = action === "escalate" ? 260 : 460;
+    setTimeout(syncColumnEmptyStates, emptyStateDelay);
+  }
 }
 
 const RISK_PRIORITY = ["high", "medium", "low", "needs_review"] as const;
