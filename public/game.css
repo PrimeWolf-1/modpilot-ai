@@ -818,7 +818,10 @@ button {
 /* Panel scrollable body */
 .panel-body {
   flex: 1;
+  min-height: 0;                      /* allows flex child to shrink and scroll */
   overflow-y: auto;
+  -webkit-overflow-scrolling: touch;  /* momentum scroll on iOS */
+  overscroll-behavior: contain;       /* stop scroll chaining to background */
   padding: 14px;
   display: flex;
   flex-direction: column;
