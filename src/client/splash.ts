@@ -1,20 +1,18 @@
-// ModPilot AI — Splash / Launcher
-// Always shown in embedded mode (mobile + desktop).
-// Fullscreen dashboard opens only when the user clicks "Open Dashboard".
+// ModPilot AI — Embedded launch card.
+// Shown in inline (embedded) mode on both mobile and desktop.
+// The full 4-column dashboard only loads after requestExpandedMode succeeds.
 
 import { context, requestExpandedMode } from "@devvit/web/client";
 
-const startButton = document.getElementById("start-button") as HTMLButtonElement;
-const greeting = document.getElementById("greeting") as HTMLDivElement;
-
 function init(): void {
-  const username = context.username;
-  if (username && greeting) {
-    greeting.textContent = `Welcome, u/${username}`;
+  const subredditEl = document.getElementById("launch-subreddit");
+  if (subredditEl && context.subredditName) {
+    subredditEl.textContent = `r/${context.subredditName}`;
   }
 
-  startButton?.addEventListener("click", (e) => {
-    requestExpandedMode(e, "game");
+  const openBtn = document.getElementById("open-btn");
+  openBtn?.addEventListener("click", (e) => {
+    requestExpandedMode(e as MouseEvent, "game");
   });
 }
 
