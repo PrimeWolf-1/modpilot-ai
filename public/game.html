@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" data-theme="cyber">
   <head>
     <link rel="stylesheet" type="text/css" href="game.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -27,12 +27,28 @@
       </button>
     </nav>
 
-    <!-- ===== OPERATIONAL HEADER (MOTD + activity bar) ===== -->
+    <!-- ===== OPERATIONAL HEADER (MOTD) ===== -->
     <div id="ops-header">
       <div class="ops-motd">
         <span class="motive-dot"></span>
         <span id="motive-text">Loading…</span>
+        <div class="motd-controls">
+          <span class="motd-badge-manual hidden" id="motd-manual-badge">Manual</span>
+          <button class="motd-auto-btn hidden" id="motd-auto-btn" title="Return to auto rotation">↺ Auto</button>
+          <button class="motd-picker-btn" id="motd-picker-btn" title="Choose message" aria-expanded="false" aria-haspopup="listbox">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+          </button>
+        </div>
       </div>
+    </div>
+
+    <!-- ===== MOTD MESSAGE PICKER (floating) ===== -->
+    <div id="motd-picker" role="dialog" aria-label="Choose daily message" aria-hidden="true">
+      <div class="motd-picker-header">
+        <span class="motd-picker-title">Daily Message</span>
+        <span class="motd-picker-hint">Rotates every 12 hours</span>
+      </div>
+      <div class="motd-picker-list" id="motd-picker-list" role="listbox"></div>
     </div>
 
     <!-- ===== APP BODY (grid + panel side-by-side) ===== -->

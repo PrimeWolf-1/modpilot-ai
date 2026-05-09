@@ -5,7 +5,7 @@ import { ApiEndpoint } from "../shared/api.ts";
 import type { GetQueueResponse, GetStatsResponse, SessionStats, TriageItem } from "../shared/types.ts";
 import { createCard } from "./card.ts";
 import { openPanel, initPanel } from "./panel.ts";
-import { updateMotivationBanner } from "./statsbar.ts";
+import { initMotd } from "./motd.ts";
 import { openSummary } from "./summary.ts";
 
 // ---------------------------------------------------------------------------
@@ -134,6 +134,9 @@ const BADGE_IDS: Record<string, string> = {
 async function init(): Promise<void> {
   // Wire panel close + action callbacks
   initPanel(() => { /* no-op after close */ });
+
+  // Initialize MOTD rotation and picker
+  initMotd();
 
   renderRecentActions(); // show empty-state placeholder immediately
 
@@ -266,7 +269,6 @@ async function loadStats(): Promise<void> {
     if (!resp.ok) return;
     const data = (await resp.json()) as GetStatsResponse;
     latestStats = data.stats;
-    updateMotivationBanner(data.stats);
 
     // Seed log from server history on first load (before any local actions)
     if (recentActions.length === 0 && data.stats.history.length > 0) {

@@ -1,46 +1,8 @@
-// ModPilot AI — Stats Bar (item 12)
+// ModPilot AI — Stats Bar
 
 import type { SessionStats } from "../shared/types.ts";
 
 let statusTimeout: ReturnType<typeof setTimeout> | null = null;
-
-// ---------------------------------------------------------------------------
-// Motivation banner messages (one per day-of-week, 0=Sun … 6=Sat)
-// ---------------------------------------------------------------------------
-
-const MOTIVE_MESSAGES: Array<(weeklyReviewed: number) => string> = [
-  (n) => n > 0
-    ? `You reviewed ${n} posts this week. The community is safer because of you.`
-    : "Every decision you make protects a real person. Keep going.",
-  () => "New week, fresh queue. Your community is counting on you.",
-  (n) => n > 0
-    ? `${n} posts reviewed this week. Consistent moderation is what quality communities are built on.`
-    : "Great moderation builds great communities. Keep going.",
-  () => "Queue pressure is temporary. Community trust is permanent.",
-  () => "Every removed spam post protected a real person today.",
-  (n) => n > 0
-    ? `${n} posts reviewed this week. Wrapping up strong — your work keeps this place fair.`
-    : "Your decisions keep this subreddit clean, fair, and human.",
-  () => "Behind every great subreddit is a mod who didn't quit.",
-];
-
-/**
- * Updates the motivation banner with a day-of-week message + optional stat.
- */
-export function updateMotivationBanner(stats: SessionStats): void {
-  const el = document.getElementById("motive-text");
-  if (!el) return;
-
-  const weeklyReviewed = Object.values(stats.dailyReviewed).reduce((sum, v) => sum + v, 0);
-  const dayIndex = new Date().getDay();
-  const messageFn = MOTIVE_MESSAGES[dayIndex] ?? MOTIVE_MESSAGES[0]!;
-
-  el.style.opacity = "0";
-  setTimeout(() => {
-    el.textContent = messageFn(weeklyReviewed);
-    el.style.opacity = "1";
-  }, 200);
-}
 
 /**
  * Updates the stats bar DOM with current session stats.
