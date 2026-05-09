@@ -1,4 +1,6 @@
 // ModPilot AI — Splash / Launcher
+// Always shown in embedded mode (mobile + desktop).
+// Fullscreen dashboard opens only when the user clicks "Open Dashboard".
 
 import { context, requestExpandedMode } from "@devvit/web/client";
 
@@ -14,11 +16,6 @@ function init(): void {
   startButton?.addEventListener("click", (e) => {
     requestExpandedMode(e, "game");
   });
-
-  // On desktop skip the splash and open the dashboard directly
-  if (window.innerWidth >= 768) {
-    startButton?.click();
-  }
 }
 
 init();

@@ -45,6 +45,13 @@ body.app {
   margin-top: 2px;
 }
 
+.subtitle {
+  font-size: 11px;
+  color: #3a4a62;
+  margin-top: 10px;
+  text-align: center;
+}
+
 .launch-btn {
   background: rgba(183, 148, 244, 0.15);
   border: 1px solid rgba(183, 148, 244, 0.4);
