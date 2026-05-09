@@ -265,38 +265,19 @@ button {
   transition: opacity 0.35s ease;
 }
 
-/* Row 1: MOTD operator directive */
+/* Row 1: MOTD operator directive — floats cleanly, no visible container */
 .ops-motd {
   display: flex;
   align-items: center;
-  justify-content: flex-start;
-  padding: 0 12px 0 16px;
+  justify-content: center;
+  padding: 0 44px;        /* reserve room for absolute-positioned controls */
   gap: 10px;
   height: 60px;
   flex-shrink: 0;
   position: relative;
-  overflow: hidden;
-  background: linear-gradient(180deg, rgba(18,191,208,0.05) 0%, rgba(18,191,208,0.02) 100%);
-  border-bottom: 1px solid rgba(18,191,208,0.13);
+  background: transparent;
+  border-bottom: none;
   transition: opacity 0.35s ease;
-}
-
-/* Very subtle sweep */
-.ops-motd::after {
-  content: "";
-  position: absolute;
-  top: 0;
-  left: -60%;
-  width: 60%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(18,191,208,0.04), transparent);
-  animation: bannerSweep 16s linear infinite;
-  pointer-events: none;
-}
-
-@keyframes bannerSweep {
-  from { left: -60%; }
-  to   { left: 140%; }
 }
 
 /* Signal indicator dot — calm slow pulse */
@@ -328,12 +309,15 @@ button {
   transition: opacity 0.25s ease;
 }
 
-/* ---- MOTD Controls (right side of banner) ---- */
+/* ---- MOTD Controls — pinned to right edge of banner ---- */
 .motd-controls {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
   display: flex;
   align-items: center;
   gap: 6px;
-  flex-shrink: 0;
 }
 
 .motd-badge-manual {
@@ -374,24 +358,31 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 26px;
-  height: 26px;
-  border-radius: 6px;
-  color: var(--text-dim);
-  background: transparent;
-  border: 1px solid transparent;
+  width: 24px;
+  height: 24px;
+  border-radius: 5px;
+  color: rgba(18,191,208,0.55);
+  background: rgba(18,191,208,0.07);
+  border: 1px solid rgba(18,191,208,0.20);
   flex-shrink: 0;
+  cursor: pointer;
   transition: background 0.15s, border-color 0.15s, color 0.15s;
 }
+.motd-picker-btn svg {
+  transition: transform 0.2s ease;
+}
 .motd-picker-btn:hover {
-  background: rgba(255,255,255,0.07);
-  border-color: var(--border);
-  color: var(--text-muted);
+  background: rgba(18,191,208,0.13);
+  border-color: rgba(18,191,208,0.38);
+  color: rgba(18,191,208,0.85);
 }
 .motd-picker-btn.active {
-  background: rgba(255,255,255,0.09);
-  border-color: var(--border-2);
-  color: var(--text);
+  background: rgba(18,191,208,0.14);
+  border-color: rgba(18,191,208,0.40);
+  color: #12bfd0;
+}
+.motd-picker-btn.active svg {
+  transform: rotate(180deg);
 }
 
 /* ---- MOTD Message Picker (floating panel) ---- */
@@ -1989,8 +1980,8 @@ button {
 @media (max-width: 767px) {
   /* Collapse ops-header on mobile */
   #ops-header        { height: 32px; }
-  .ops-motd          { height: 32px; padding: 0 12px; }
-  #motive-text       { font-size: 10px; letter-spacing: 1.2px; }
+  .ops-motd          { height: 32px; padding: 0 36px 0 12px; }
+  #motive-text       { font-size: 11px; }
   #activity-panel    { display: none; }
 
   #app-body { top: calc(var(--nav-h) + 32px); }
