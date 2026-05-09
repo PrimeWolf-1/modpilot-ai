@@ -22,7 +22,7 @@
         <div class="motd-controls">
           <span class="motd-badge-manual hidden" id="motd-manual-badge">Manual</span>
           <button class="motd-auto-btn hidden" id="motd-auto-btn" title="Return to auto rotation">↺ Auto</button>
-          <button class="motd-next-btn" id="motd-picker-btn" title="Next message" aria-label="Next message">›</button>
+          <button class="motd-picker-btn" id="motd-picker-btn" title="Choose message" aria-expanded="false" aria-haspopup="listbox">Change</button>
         </div>
       </div>
       <div class="ops-spacer"></div>
@@ -36,6 +36,15 @@
         Refresh
       </button>
     </nav>
+
+    <!-- ===== MOTD MESSAGE PICKER (floating) ===== -->
+    <div id="motd-picker" role="dialog" aria-label="Choose daily message" aria-hidden="true">
+      <div class="motd-picker-header">
+        <span class="motd-picker-title">Daily Message</span>
+        <span class="motd-picker-hint">Rotates every 12 hours</span>
+      </div>
+      <div class="motd-picker-list" id="motd-picker-list" role="listbox"></div>
+    </div>
 
     <!-- ===== APP BODY (grid + panel side-by-side) ===== -->
     <div id="app-body">
