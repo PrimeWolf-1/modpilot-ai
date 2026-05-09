@@ -33,6 +33,8 @@ let pendingReverseAction: string | null = null;
  * @param historyEntry - when opened from Recent Activity, shows the Action History section
  */
 export function openPanel(item: TriageItem, callback: ActionCallback, historyEntry?: PanelHistoryEntry): void {
+  const wasOpen = document.getElementById("detail-panel")?.classList.contains("open");
+  console.log(`[MPD] openPanel() id=${item.id} riskLevel=${item.scoringResult.riskLevel} status=${item.status} fromHistory=${!!historyEntry} panelWasOpen=${wasOpen}`);
   currentItem = item;
   onActionComplete = callback;
 
@@ -49,6 +51,7 @@ export function openPanel(item: TriageItem, callback: ActionCallback, historyEnt
 
 /** Closes the detail panel. */
 export function closePanel(): void {
+  console.log(`[MPD] closePanel() currentItem=${currentItem?.id ?? "none"}`, new Error("stack").stack?.split("\n").slice(1, 4).join(" | "));
   const panel = document.getElementById("detail-panel");
   panel?.classList.remove("open");
   document.getElementById("panel-backdrop")?.classList.remove("visible");
@@ -79,9 +82,15 @@ export function initPanel(onOutsideClick: () => void): void {
     const panel = document.getElementById("detail-panel");
     if (!panel?.classList.contains("open")) return;
     const target = e.target as Node;
-    if (!panel.contains(target) && !isCard(target)) {
+    const inPanel = panel.contains(target);
+    const isACard = isCard(target);
+    const targetId = (target instanceof Element) ? (target.id || target.className || target.nodeName) : String(target);
+    if (!inPanel && !isACard) {
+      console.warn(`[MPD] OUTSIDE-CLICK HANDLER closing panel — target="${targetId}" inPanel=${inPanel} isCard=${isACard} currentItem=${currentItem?.id ?? "none"}`);
       closePanel();
       onOutsideClick();
+    } else {
+      console.log(`[MPD] outside-click suppressed — target="${targetId}" inPanel=${inPanel} isCard=${isACard}`);
     }
   });
 
