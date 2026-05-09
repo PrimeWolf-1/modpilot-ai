@@ -4,7 +4,7 @@ import { requestExpandedMode } from "@devvit/web/client";
 import { ApiEndpoint } from "../shared/api.ts";
 import type { GetQueueResponse, GetStatsResponse, SessionStats, TriageItem } from "../shared/types.ts";
 import { createCard } from "./card.ts";
-import { openPanel, initPanel } from "./panel.ts";
+import { openPanel, initPanel, PanelHistoryEntry } from "./panel.ts";
 import { initMotd } from "./motd.ts";
 import { openSummary } from "./summary.ts";
 
@@ -92,10 +92,10 @@ function renderRecentActions(): void {
     const author   = entry.author.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const postId   = entry.postId.replace(/"/g, "&quot;");
     const newCls   = (i === 0 && pendingNewEntry) ? " new-entry" : "";
-    return `<div class="ops-log-entry ${entry.riskLevel}${newCls}" data-post-id="${postId}" role="button" tabindex="0"><span class="ops-log-dot"></span><span class="ops-log-action">${label}</span><span class="ops-log-author"> u/${author}</span><span class="ops-log-sep"> · </span><span class="ops-log-risk">${riskLbl}</span><span class="ops-log-time">${time}</span></div>`;
+    return `<div class="ops-log-entry ${entry.riskLevel}${newCls}" data-post-id="${postId}" role="button" tabindex="0"><span class="ops-log-dot"></span><span class="ops-log-action">${label}</span><span class="ops-log-author"> u/${author}</span><span class="ops-log-sep"> · </span><span class="ops-log-risk">${riskLbl}</span><span class="ops-log-time">${time}</span><span class="ops-log-open" aria-hidden="true">›</span></div>`;
   }).join("");
 
-  // Wire click handlers — re-open detail panel with reverse action option
+  // Wire click handlers — re-open detail panel with full action history
   log.querySelectorAll<HTMLElement>(".ops-log-entry[data-post-id]").forEach((el, idx) => {
     el.addEventListener("click", () => {
       const postId = el.dataset.postId;
@@ -104,7 +104,10 @@ function renderRecentActions(): void {
       if (item) {
         if (activityPanelExpanded) toggleActivityBar();
         const entry = recentActions[idx];
-        openPanel(item, onActionComplete, entry?.action);
+        const historyEntry: PanelHistoryEntry | undefined = entry
+          ? { action: entry.action, timestamp: entry.timestamp }
+          : undefined;
+        openPanel(item, onActionComplete, historyEntry);
       }
     });
   });

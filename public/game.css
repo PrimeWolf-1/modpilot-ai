@@ -582,13 +582,30 @@ button {
   color: var(--text-muted);
   white-space: nowrap;
   overflow: hidden;
-  padding: 4px 10px;
+  padding: 5px 10px;
   border-radius: 5px;
   cursor: pointer;
   transition: background 0.15s ease;
+  position: relative;
 }
 .ops-log-entry:hover {
-  background: rgba(255, 255, 255, 0.06);
+  background: rgba(255, 255, 255, 0.07);
+}
+.ops-log-entry:active {
+  background: rgba(255, 255, 255, 0.10);
+}
+
+.ops-log-open {
+  flex-shrink: 0;
+  font-size: 12px;
+  color: var(--text-dim);
+  opacity: 0;
+  margin-left: 2px;
+  transition: opacity 0.12s ease, transform 0.12s ease;
+}
+.ops-log-entry:hover .ops-log-open {
+  opacity: 0.55;
+  transform: translateX(1px);
 }
 
 .ops-log-dot {
@@ -1331,30 +1348,57 @@ button {
   gap: 5px;
 }
 
-/* ---- Reverse Last Action row ---- */
-.reverse-action-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  padding: 8px 12px;
-  background: rgba(255,255,255,0.03);
+/* ---- Action History card ---- */
+.action-history-card {
+  background: rgba(255,255,255,0.025);
   border: 1px solid var(--border);
   border-radius: 8px;
+  overflow: hidden;
 }
-.reverse-action-label {
+.action-history-row {
+  display: grid;
+  grid-template-columns: 76px 1fr;
+  gap: 8px;
+  padding: 7px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  align-items: baseline;
+}
+.action-history-row:last-child { border-bottom: none; }
+.action-history-key {
+  font-size: 10px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: var(--text-dim);
+  white-space: nowrap;
+}
+.action-history-value {
   font-size: 12px;
   color: var(--text-muted);
-  flex: 1;
-  min-width: 0;
+  line-height: 1.45;
+  word-break: break-word;
 }
+/* colour-code the action taken */
+.action-history-value.history-approved  { color: var(--low); }
+.action-history-value.history-removed   { color: var(--high); }
+.action-history-value.history-warned    { color: var(--medium); }
+.action-history-value.history-escalated { color: var(--review); }
+.action-history-value.history-ignored   { color: var(--text-dim); }
+
+.action-history-reverse {
+  padding: 8px 12px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.action-history-reverse.hidden { display: none; }
+
 .action-btn.reverse-btn {
+  width: 100%;
   background: rgba(167,139,250,0.08);
   border: 1px solid rgba(167,139,250,0.22);
   color: var(--review);
-  flex-shrink: 0;
   font-size: 12px;
-  padding: 5px 12px;
+  padding: 6px 12px;
+  text-align: center;
 }
 .action-btn.reverse-btn:hover:not(:disabled) {
   background: rgba(167,139,250,0.16);

@@ -193,12 +193,29 @@
           </div>
         </div>
 
-        <!-- Reverse Last Action -->
-        <div class="panel-section hidden" id="panel-reverse-section">
-          <div class="panel-section-label">Last Action</div>
-          <div class="reverse-action-row">
-            <span class="reverse-action-label" id="reverse-action-label">—</span>
-            <button class="action-btn reverse-btn" id="btn-reverse-action">↩ Reverse</button>
+        <!-- Action History (shown only when reopened from Recent Activity) -->
+        <div class="panel-section hidden" id="panel-history-section">
+          <div class="panel-section-label">Action History</div>
+          <div class="action-history-card">
+            <div class="action-history-row">
+              <span class="action-history-key">Action Taken</span>
+              <span class="action-history-value" id="history-action">—</span>
+            </div>
+            <div class="action-history-row">
+              <span class="action-history-key">Time</span>
+              <span class="action-history-value" id="history-time">—</span>
+            </div>
+            <div class="action-history-row">
+              <span class="action-history-key">Reason</span>
+              <span class="action-history-value" id="history-reason">—</span>
+            </div>
+            <div class="action-history-row" id="history-note-row">
+              <span class="action-history-key">Mod Note</span>
+              <span class="action-history-value" id="history-note">—</span>
+            </div>
+            <div class="action-history-reverse hidden" id="history-reverse-row">
+              <button class="action-btn reverse-btn" id="btn-reverse-action">↩ Reverse</button>
+            </div>
           </div>
         </div>
 
