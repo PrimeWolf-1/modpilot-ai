@@ -280,10 +280,11 @@ function moveCardToReview(postId: string): void {
   card.style.overflow = "hidden";
   card.style.pointerEvents = "none";
 
-  // Fade + collapse simultaneously
-  card.style.transition = "opacity 0.18s ease-out, height 0.22s ease-out, padding-top 0.22s ease-out, padding-bottom 0.22s ease-out";
+  // Fade + slight rightward slide + collapse simultaneously
+  card.style.transition = "opacity 0.18s ease-out, transform 0.18s ease-out, height 0.22s ease-out, padding-top 0.22s ease-out, padding-bottom 0.22s ease-out";
   void card.offsetHeight; // force reflow
   card.style.opacity = "0";
+  card.style.transform = "translateX(8px)";
   card.style.height = "0";
   card.style.paddingTop = "0";
   card.style.paddingBottom = "0";
@@ -292,10 +293,10 @@ function moveCardToReview(postId: string): void {
     card.removeAttribute("style");
     const riskClasses = Array.from(card.classList).filter((c) => c.startsWith("risk-"));
     riskClasses.forEach((c) => card.classList.remove(c));
-    card.classList.add("risk-needs_review", "card-enter");
+    card.classList.add("risk-needs_review", "card-enter-review");
     target.appendChild(card);
     target.querySelector(".col-empty")?.remove();
-    card.addEventListener("animationend", () => card.classList.remove("card-enter"), { once: true });
+    card.addEventListener("animationend", () => card.classList.remove("card-enter-review"), { once: true });
   }, 230);
 }
 

@@ -16,6 +16,8 @@ let allItems: TriageItem[] = [];
 let currentUsername = "";
 let latestStats: SessionStats | null = null;
 let activityPanelExpanded = false;
+let pendingNewEntry = false;
+const prevBadgeValues: Record<string, number> = {};
 
 // ---------------------------------------------------------------------------
 // Recent Actions log state
@@ -50,7 +52,9 @@ const RISK_LOG_LABELS: Record<string, string> = {
 function addRecentAction(entry: RecentActionEntry): void {
   recentActions.unshift(entry);
   if (recentActions.length > 5) recentActions.length = 5;
+  pendingNewEntry = true;
   renderRecentActions();
+  pendingNewEntry = false;
   updateActivityBarLatest();
 }
 
@@ -79,7 +83,7 @@ function renderRecentActions(): void {
     return;
   }
 
-  log.innerHTML = recentActions.map((entry) => {
+  log.innerHTML = recentActions.map((entry, i) => {
     const label    = ACTION_LOG_LABELS[entry.action]    ?? entry.action;
     const riskLbl  = RISK_LOG_LABELS[entry.riskLevel]   ?? entry.riskLevel;
     const time     = new Date(entry.timestamp).toLocaleTimeString("en-US", {
@@ -87,7 +91,8 @@ function renderRecentActions(): void {
     });
     const author   = entry.author.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const postId   = entry.postId.replace(/"/g, "&quot;");
-    return `<div class="ops-log-entry ${entry.riskLevel}" data-post-id="${postId}" role="button" tabindex="0"><span class="ops-log-dot"></span><span class="ops-log-action">${label}</span><span class="ops-log-author"> u/${author}</span><span class="ops-log-sep"> · </span><span class="ops-log-risk">${riskLbl}</span><span class="ops-log-time">${time}</span></div>`;
+    const newCls   = (i === 0 && pendingNewEntry) ? " new-entry" : "";
+    return `<div class="ops-log-entry ${entry.riskLevel}${newCls}" data-post-id="${postId}" role="button" tabindex="0"><span class="ops-log-dot"></span><span class="ops-log-action">${label}</span><span class="ops-log-author"> u/${author}</span><span class="ops-log-sep"> · </span><span class="ops-log-risk">${riskLbl}</span><span class="ops-log-time">${time}</span></div>`;
   }).join("");
 
   // Wire click handlers — re-open detail panel for the actioned item
@@ -347,6 +352,7 @@ function renderQueue(items: TriageItem[]): void {
 
 function onActionComplete(postId: string, action: string, _accepted: boolean): void {
   const item = allItems.find((i) => i.id === postId);
+  const sourceRiskLevel = item?.scoringResult.riskLevel;
 
   // Log BEFORE mutating state so we capture the original risk level
   if (item) {
@@ -376,6 +382,13 @@ function onActionComplete(postId: string, action: string, _accepted: boolean): v
   updateBadges();
   showActionToast(action, item);
   void loadStats();
+
+  // Pulse destination or source column to confirm the action
+  if (action === "escalate") {
+    setTimeout(() => pulseColumn("needs_review"), 250);
+  } else if (action !== "warn" && sourceRiskLevel) {
+    setTimeout(() => pulseColumn(sourceRiskLevel), 220);
+  }
 
   // Warn keeps the card in the queue — no auto-advance, no empty-state sync
   if (action !== "warn") {
@@ -449,12 +462,36 @@ function updateBadges(): void {
 
   for (const [riskLevel, count] of Object.entries(groups)) {
     const badgeId = BADGE_IDS[riskLevel];
-    if (badgeId) {
-      const el = document.getElementById(badgeId);
-      if (el) el.textContent = String(count);
+    if (!badgeId) continue;
+    const el = document.getElementById(badgeId);
+    if (!el) continue;
+    if (prevBadgeValues[riskLevel] !== count) {
+      el.textContent = String(count);
+      el.classList.remove("pop");
+      void el.offsetWidth;
+      el.classList.add("pop");
+      el.addEventListener("animationend", () => el.classList.remove("pop"), { once: true });
+      prevBadgeValues[riskLevel] = count;
     }
   }
+}
 
+const COLUMN_WRAPPER_IDS: Record<string, string> = {
+  high: "col-high",
+  medium: "col-medium",
+  low: "col-low",
+  needs_review: "col-review",
+};
+
+function pulseColumn(riskLevel: string): void {
+  const colId = COLUMN_WRAPPER_IDS[riskLevel];
+  if (!colId) return;
+  const col = document.getElementById(colId);
+  if (!col) return;
+  col.classList.remove("col-dest-pulse");
+  void col.offsetWidth;
+  col.classList.add("col-dest-pulse");
+  setTimeout(() => col.classList.remove("col-dest-pulse"), 600);
 }
 
 // =========================================================
