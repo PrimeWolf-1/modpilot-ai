@@ -95,15 +95,16 @@ function renderRecentActions(): void {
     return `<div class="ops-log-entry ${entry.riskLevel}${newCls}" data-post-id="${postId}" role="button" tabindex="0"><span class="ops-log-dot"></span><span class="ops-log-action">${label}</span><span class="ops-log-author"> u/${author}</span><span class="ops-log-sep"> · </span><span class="ops-log-risk">${riskLbl}</span><span class="ops-log-time">${time}</span></div>`;
   }).join("");
 
-  // Wire click handlers — re-open detail panel for the actioned item
-  log.querySelectorAll<HTMLElement>(".ops-log-entry[data-post-id]").forEach((el) => {
+  // Wire click handlers — re-open detail panel with reverse action option
+  log.querySelectorAll<HTMLElement>(".ops-log-entry[data-post-id]").forEach((el, idx) => {
     el.addEventListener("click", () => {
       const postId = el.dataset.postId;
       if (!postId) return;
       const item = allItems.find((i) => i.id === postId);
       if (item) {
         if (activityPanelExpanded) toggleActivityBar();
-        openPanel(item, onActionComplete);
+        const entry = recentActions[idx];
+        openPanel(item, onActionComplete, entry?.action);
       }
     });
   });

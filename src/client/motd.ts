@@ -239,6 +239,13 @@ export function selectMessage(id: number): void {
   lsSet(STORE_MANUAL_ID, String(id));
 }
 
+export function advanceMessage(): void {
+  const current = getCurrentMessage();
+  const idx = MOTD_MESSAGES.findIndex((m) => m.id === current.id);
+  const next = MOTD_MESSAGES[(idx + 1) % MOTD_MESSAGES.length]!;
+  selectMessage(next.id);
+}
+
 export function resetToAuto(): void {
   lsSet(STORE_MODE, "auto");
   lsDel(STORE_MANUAL_ID);
@@ -273,110 +280,23 @@ function updateDisplay(): void {
   }
 }
 
-function renderPickerList(listEl: HTMLElement): void {
-  const currentId = getCurrentMessage().id;
-
-  const CATEGORY_LABELS: Record<string, string> = {
-    "appreciation":       "Appreciation",
-    "calm-focus":         "Calm Focus",
-    "community-trust":    "Community Trust",
-    "moderator-wellness": "Moderator Wellness",
-    "anti-burnout":       "Anti-Burnout",
-    "human-judgment":     "Human Judgment",
-    "safety":             "Safety",
-    "professionalism":    "Professionalism",
-  };
-
-  listEl.innerHTML = MOTD_MESSAGES.map((msg) => {
-    const active = msg.id === currentId ? " active" : "";
-    const catLabel = CATEGORY_LABELS[msg.category] ?? msg.category;
-    return `<div class="motd-picker-item${active}" data-id="${msg.id}" role="option" aria-selected="${msg.id === currentId}" tabindex="0">
-      <span class="motd-item-text">${escapeHtml(msg.text)}</span>
-      <span class="motd-item-meta">${escapeHtml(catLabel)}</span>
-    </div>`;
-  }).join("");
-
-  listEl.querySelectorAll<HTMLElement>(".motd-picker-item").forEach((el) => {
-    el.addEventListener("click", () => {
-      const id = parseInt(el.dataset["id"] ?? "1", 10);
-      selectMessage(id);
-      updateDisplay();
-      if (listEl.parentElement) renderPickerList(listEl);
-      closePicker();
-    });
-    el.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " ") {
-        e.preventDefault();
-        el.click();
-      }
-    });
-  });
-
-  // Scroll active item into view
-  setTimeout(() => {
-    const active = listEl.querySelector<HTMLElement>(".motd-picker-item.active");
-    active?.scrollIntoView({ block: "nearest" });
-  }, 0);
-}
-
-function closePicker(): void {
-  const picker    = document.getElementById("motd-picker");
-  const pickerBtn = document.getElementById("motd-picker-btn");
-  picker?.classList.remove("visible");
-  picker?.setAttribute("aria-hidden", "true");
-  pickerBtn?.classList.remove("active");
-  pickerBtn?.setAttribute("aria-expanded", "false");
-}
 
 export function initMotd(): void {
   updateDisplay();
 
-  const pickerBtn = document.getElementById("motd-picker-btn");
-  const picker    = document.getElementById("motd-picker");
-  const autoBtn   = document.getElementById("motd-auto-btn");
-  const listEl    = document.getElementById("motd-picker-list");
+  const nextBtn = document.getElementById("motd-picker-btn");
+  const autoBtn = document.getElementById("motd-auto-btn");
 
-  if (listEl) renderPickerList(listEl);
-
-  // Toggle picker open/close
-  pickerBtn?.addEventListener("click", (e) => {
-    e.stopPropagation();
-    const opening = !picker?.classList.contains("visible");
-    picker?.classList.toggle("visible", opening);
-    picker?.setAttribute("aria-hidden", String(!opening));
-    pickerBtn.classList.toggle("active", opening);
-    pickerBtn.setAttribute("aria-expanded", String(opening));
+  // Chevron cycles to next message
+  nextBtn?.addEventListener("click", () => {
+    advanceMessage();
+    updateDisplay();
   });
 
-  // Close when clicking outside
-  document.addEventListener("click", (e) => {
-    if (!picker?.classList.contains("visible")) return;
-    if (picker.contains(e.target as Node) || pickerBtn?.contains(e.target as Node)) return;
-    closePicker();
-  });
-
-  // Escape key
-  document.addEventListener("keydown", (e) => {
-    if (e.key === "Escape" && picker?.classList.contains("visible")) closePicker();
-  });
-
-  // Auto rotation button
+  // Auto rotation button returns to timed rotation
   autoBtn?.addEventListener("click", () => {
     resetToAuto();
     updateDisplay();
-    if (listEl) renderPickerList(listEl);
-    closePicker();
   });
 }
 
-// ---------------------------------------------------------------------------
-// Helpers
-// ---------------------------------------------------------------------------
-
-function escapeHtml(str: string): string {
-  return str
-    .replace(/&/g, "&amp;")
-    .replace(/</g, "&lt;")
-    .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
-}

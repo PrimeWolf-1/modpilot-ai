@@ -15,6 +15,7 @@ const PANEL_RISK_ICONS: Record<string, string> = {
 
 let currentItem: TriageItem | null = null;
 let onActionComplete: ActionCallback | null = null;
+let pendingReverseAction: string | null = null;
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -22,14 +23,16 @@ let onActionComplete: ActionCallback | null = null;
 
 /**
  * Opens the detail panel for a given TriageItem.
- * @param item - the item to display
- * @param callback - called when an action completes (postId, action, acceptedSuggestion)
+ * @param item       - the item to display
+ * @param callback   - called when an action completes (postId, action, acceptedSuggestion)
+ * @param lastAction - the action that was taken on this item (from activity log), enables Reverse button
  */
-export function openPanel(item: TriageItem, callback: ActionCallback): void {
+export function openPanel(item: TriageItem, callback: ActionCallback, lastAction?: string): void {
   currentItem = item;
   onActionComplete = callback;
 
   populatePanel(item);
+  populateReverseSection(lastAction);
   selectCard(item.id, item.scoringResult.riskLevel);
 
   const panel = document.getElementById("detail-panel");
@@ -48,6 +51,8 @@ export function closePanel(): void {
   clearCardFocus();
 
   currentItem = null;
+  pendingReverseAction = null;
+  document.getElementById("panel-reverse-section")?.classList.add("hidden");
   hideRemoveConfirm();
 }
 
@@ -88,6 +93,12 @@ export function initPanel(onOutsideClick: () => void): void {
 
   // Copy mod note on click
   document.getElementById("panel-suggest-note")?.addEventListener("click", copyModNote);
+
+  // Reverse last action
+  document.getElementById("btn-reverse-action")?.addEventListener("click", () => {
+    if (!pendingReverseAction) return;
+    void sendAction(pendingReverseAction as TakeActionRequest["action"], false);
+  });
 }
 
 // ---------------------------------------------------------------------------
@@ -174,6 +185,51 @@ function populatePanel(item: TriageItem): void {
   if (removeNote) removeNote.value = sr.modNote ?? "";
 
   enableButtons();
+}
+
+// ---------------------------------------------------------------------------
+// Reverse action section
+// ---------------------------------------------------------------------------
+
+const ACTION_DISPLAY_LABELS: Record<string, string> = {
+  approve:  "Approved",
+  remove:   "Removed",
+  warn:     "Sent Warning",
+  escalate: "Escalated to Review",
+  ignore:   "Ignored",
+};
+
+function getReverseAction(action: string): string | null {
+  const map: Record<string, string> = {
+    approve:  "remove",
+    remove:   "approve",
+    ignore:   "approve",
+  };
+  return map[action] ?? null;
+}
+
+function populateReverseSection(lastAction?: string): void {
+  const section = document.getElementById("panel-reverse-section");
+  const label   = document.getElementById("reverse-action-label");
+  const btn     = document.getElementById("btn-reverse-action") as HTMLButtonElement | null;
+
+  if (!section) return;
+
+  const reverseTarget = lastAction ? getReverseAction(lastAction) : null;
+
+  if (!lastAction || !reverseTarget) {
+    section.classList.add("hidden");
+    pendingReverseAction = null;
+    return;
+  }
+
+  section.classList.remove("hidden");
+  pendingReverseAction = reverseTarget;
+
+  const displayLabel = ACTION_DISPLAY_LABELS[lastAction] ?? lastAction;
+  const reverseLabel = ACTION_DISPLAY_LABELS[reverseTarget] ?? reverseTarget;
+  if (label) label.textContent = displayLabel;
+  if (btn)   btn.textContent   = `↩ ${reverseLabel}`;
 }
 
 // ---------------------------------------------------------------------------

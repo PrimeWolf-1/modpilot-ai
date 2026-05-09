@@ -15,6 +15,16 @@
     <nav id="nav">
       <div class="nav-logo">Mod<span>Pilot</span> AI</div>
       <div class="nav-subreddit" id="nav-subreddit">r/…</div>
+      <!-- MOTD — centered overlay, no layout impact -->
+      <div class="ops-motd">
+        <span class="motive-dot"></span>
+        <span id="motive-text">Loading…</span>
+        <div class="motd-controls">
+          <span class="motd-badge-manual hidden" id="motd-manual-badge">Manual</span>
+          <button class="motd-auto-btn hidden" id="motd-auto-btn" title="Return to auto rotation">↺ Auto</button>
+          <button class="motd-next-btn" id="motd-picker-btn" title="Next message" aria-label="Next message">›</button>
+        </div>
+      </div>
       <div class="ops-spacer"></div>
       <div class="nav-ai-chip" id="nav-ai-chip" title="Click for weekly summary">
         <span id="nav-ai-label">AI Active</span>
@@ -26,30 +36,6 @@
         Refresh
       </button>
     </nav>
-
-    <!-- ===== OPERATIONAL HEADER (MOTD) ===== -->
-    <div id="ops-header">
-      <div class="ops-motd">
-        <span class="motive-dot"></span>
-        <span id="motive-text">Loading…</span>
-        <div class="motd-controls">
-          <span class="motd-badge-manual hidden" id="motd-manual-badge">Manual</span>
-          <button class="motd-auto-btn hidden" id="motd-auto-btn" title="Return to auto rotation">↺ Auto</button>
-          <button class="motd-picker-btn" id="motd-picker-btn" title="Choose message" aria-expanded="false" aria-haspopup="listbox">
-            <svg width="11" height="7" viewBox="0 0 11 7" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1l4.5 4.5L10 1"/></svg>
-          </button>
-        </div>
-      </div>
-    </div>
-
-    <!-- ===== MOTD MESSAGE PICKER (floating) ===== -->
-    <div id="motd-picker" role="dialog" aria-label="Choose daily message" aria-hidden="true">
-      <div class="motd-picker-header">
-        <span class="motd-picker-title">Daily Message</span>
-        <span class="motd-picker-hint">Rotates every 12 hours</span>
-      </div>
-      <div class="motd-picker-list" id="motd-picker-list" role="listbox"></div>
-    </div>
 
     <!-- ===== APP BODY (grid + panel side-by-side) ===== -->
     <div id="app-body">
@@ -195,6 +181,15 @@
                 <div class="ai-rec-block-text" id="panel-note-text">—</div>
               </div>
             </div>
+          </div>
+        </div>
+
+        <!-- Reverse Last Action -->
+        <div class="panel-section hidden" id="panel-reverse-section">
+          <div class="panel-section-label">Last Action</div>
+          <div class="reverse-action-row">
+            <span class="reverse-action-label" id="reverse-action-label">—</span>
+            <button class="action-btn reverse-btn" id="btn-reverse-action">↩ Reverse</button>
           </div>
         </div>
 
