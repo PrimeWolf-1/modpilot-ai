@@ -753,24 +753,6 @@ button {
 #col-low    .col-title { color: var(--low); }
 #col-review .col-title { color: var(--review); }
 
-.col-badge {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-width: 28px;
-  height: 24px;
-  padding: 0 9px;
-  border-radius: 12px;
-  font-size: 13px;
-  font-weight: 700;
-  color: #fff;
-  flex-shrink: 0;
-}
-
-#col-high   .col-badge { background: var(--high); }
-#col-medium .col-badge { background: var(--medium); }
-#col-low    .col-badge { background: var(--low); }
-#col-review .col-badge { background: var(--review); }
 
 /* Card scroll area */
 .col-cards {
@@ -1827,16 +1809,6 @@ button {
 #col-low.col-dest-pulse     .col-header { animation: colLowPulse    0.55s ease-out; }
 #col-review.col-dest-pulse  .col-header { animation: colReviewPulse 0.55s ease-out; }
 
-/* Column badge counter pop on number change */
-@keyframes badgePop {
-  0%   { transform: scale(1); }
-  40%  { transform: scale(1.22); }
-  70%  { transform: scale(0.94); }
-  100% { transform: scale(1); }
-}
-.col-badge.pop {
-  animation: badgePop 0.28s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-}
 
 /* Activity panel newest entry slides in */
 @keyframes activityEntryIn {
