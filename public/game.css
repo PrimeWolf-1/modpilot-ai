@@ -59,6 +59,10 @@
   /* Layout */
   --nav-h: 44px;
   --ops-h: 0px;
+
+  /* Typography — HUD font system */
+  --font-hud: 'Rajdhani', 'Segoe UI', system-ui, sans-serif;
+  --font-display: 'Orbitron', 'Rajdhani', monospace;
 }
 
 /* =========================================================
@@ -2166,3 +2170,102 @@ body.focus-mode #detail-panel.open {
 [data-theme="minimal"] #motive-text { color: #4a5568; }
 [data-theme="minimal"] .motive-dot { background: #553c9a; box-shadow: none; animation: none; }
    ========================================================= */
+
+/* =========================================================
+   TYPOGRAPHY — Futuristic Cyber-HUD System
+
+   Rajdhani (--font-hud):    system labels, section headers,
+                              category titles, tactical UI text
+   Orbitron (--font-display): high risk title, critical labels
+   ========================================================= */
+
+/* ---- MOTD Banner — tactical readout ---- */
+#motive-text {
+  font-family: var(--font-hud);
+  letter-spacing: 0.6px;
+  font-weight: 500;
+}
+
+/* ---- Daily Message Picker — structural labels ---- */
+.motd-picker-title {
+  font-family: var(--font-hud);
+  letter-spacing: 1.4px;
+}
+.motd-item-meta {
+  font-family: var(--font-hud);
+  letter-spacing: 1px;
+}
+.motd-auto-item-label {
+  font-family: var(--font-hud);
+  letter-spacing: 0.5px;
+}
+
+/* ---- Recent Activity Header ---- */
+.activity-panel-label {
+  font-family: var(--font-hud);
+  letter-spacing: 1.6px;
+  text-shadow: 0 0 10px rgba(18, 191, 208, 0.22);
+}
+
+/* ---- Panel Section Headers ---- */
+.panel-section-label {
+  font-family: var(--font-hud);
+  letter-spacing: 1.4px;
+  text-shadow: 0 0 8px rgba(138, 160, 184, 0.18);
+}
+
+/* ---- Risk Category Column Titles — all columns ---- */
+.col-title {
+  font-family: var(--font-hud);
+  letter-spacing: 2px;
+}
+
+/* ---- HIGH RISK — Orbitron, more aggressive, red glow ---- */
+#col-high .col-title {
+  font-family: var(--font-display);
+  letter-spacing: 2.5px;
+  text-shadow: 0 0 14px rgba(245, 101, 101, 0.50);
+}
+
+/* ---- Risk Breakdown Field Keys ---- */
+.breakdown-key {
+  font-family: var(--font-hud);
+  letter-spacing: 0.8px;
+}
+
+/* ---- Threat Meter Labels ---- */
+.threat-meter-label {
+  font-family: var(--font-hud);
+  letter-spacing: 2.2px;
+}
+.threat-meter-zones {
+  font-family: var(--font-hud);
+  letter-spacing: 1px;
+}
+
+/* ---- Threat meter label shifts to red tint on HIGH ---- */
+.threat-meter.high .threat-meter-label {
+  color: rgba(245, 101, 101, 0.80);
+  text-shadow: 0 0 8px rgba(245, 101, 101, 0.28);
+}
+
+/* ---- AI Recommendation Card Micro-Labels ---- */
+.ai-rec-eyebrow {
+  font-family: var(--font-hud);
+  letter-spacing: 2px;
+}
+.ai-rec-block-label {
+  font-family: var(--font-hud);
+  letter-spacing: 1.4px;
+}
+
+/* ---- High Risk Badge — threat indicator glow ---- */
+.risk-badge.high {
+  letter-spacing: 1px;
+  text-shadow: 0 0 8px rgba(245, 101, 101, 0.40);
+}
+
+/* ---- Focus mode: column title glows inherit font system ---- */
+body.focus-mode #col-high .col-title {
+  text-shadow: 0 0 14px rgba(245, 101, 101, 0.65), 0 0 28px rgba(245, 101, 101, 0.25);
+}
