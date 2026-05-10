@@ -215,14 +215,14 @@ button {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 32px;
-  height: 32px;
+  width: 30px;
+  height: 30px;
   background: var(--surface-2);
   border: 1px solid var(--border);
   border-radius: 8px;
   color: var(--text-dim);
   flex-shrink: 0;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.2s, opacity 0.35s ease;
+  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.25s ease, opacity 0.35s ease;
 }
 #nav-focus:hover {
   background: var(--surface-3);
