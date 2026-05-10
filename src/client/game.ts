@@ -135,7 +135,6 @@ function renderRecentActions(): void {
         `col=${postId ? cardColumn(postId) : "—"}`,
         queueSnapshot());
       if (item) {
-        if (activityPanelExpanded) toggleActivityBar();
         const historyEntry: PanelHistoryEntry | undefined = entry
           ? { action: entry.action, timestamp: entry.timestamp }
           : undefined;
