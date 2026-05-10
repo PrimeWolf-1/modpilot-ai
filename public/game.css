@@ -211,34 +211,6 @@ button {
   animation: spin 0.7s linear infinite;
 }
 
-#nav-focus {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 30px;
-  height: 30px;
-  background: var(--surface-2);
-  border: 1px solid var(--border);
-  border-radius: 8px;
-  color: var(--text-dim);
-  flex-shrink: 0;
-  transition: background 0.2s, border-color 0.2s, color 0.2s, box-shadow 0.25s ease, opacity 0.35s ease;
-}
-#nav-focus:hover {
-  background: var(--surface-3);
-  border-color: var(--border-2);
-  color: var(--text-muted);
-  box-shadow: 0 0 8px rgba(18, 191, 208, 0.14);
-}
-#nav-focus.active {
-  background: rgba(18, 191, 208, 0.08);
-  border-color: rgba(18, 191, 208, 0.40);
-  color: #12bfd0;
-  box-shadow: 0 0 10px rgba(18, 191, 208, 0.22);
-}
-#nav-focus.active svg {
-  filter: drop-shadow(0 0 3px rgba(18, 191, 208, 0.55));
-}
 
 /* =========================================================
    MOTD — centered overlay inside #nav, no layout footprint
@@ -2035,96 +2007,6 @@ button {
   }
 }
 
-/* =========================================================
-   FOCUS MODE — Night Ops toggle
-   ========================================================= */
-
-/* --- Global atmosphere: CSS variable cascade ---
-   Redefining these on body causes every element using them to
-   automatically render with the deeper/more intense values.   */
-body.focus-mode {
-  /* Slightly deeper background and surfaces */
-  background-color:  #070d18;
-  background-image:  radial-gradient(ellipse at 50% 40%, #0d1623 0%, #070d18 55%, #030810 100%);
-  --surface:   #101826;
-  --surface-2: #162033;
-  --surface-3: #1c2840;
-
-  /* Boosted risk glows — cascade to confidence text-shadows,
-     intensity bar shadows, and threat meter fills */
-  --high-glow:   rgba(245, 101, 101, 0.48);
-  --medium-glow: rgba(246, 173, 85,  0.32);
-  --low-glow:    rgba(104, 211, 145, 0.30);
-  --review-glow: rgba(167, 139, 250, 0.30);
-
-  /* Slightly richer risk borders */
-  --high-border:   rgba(245, 101, 101, 0.55);
-  --medium-border: rgba(246, 173, 85,  0.42);
-  --low-border:    rgba(104, 211, 145, 0.42);
-  --review-border: rgba(167, 139, 250, 0.42);
-}
-
-/* --- Vignette: inset shadow on the content area ---
-   Creates an operational ambiance — edges of the grid recede,
-   drawing eye toward the center. Transitions smoothly.        */
-body.focus-mode #app-body {
-  box-shadow:
-    inset  60px 0   80px rgba(0,0,0,0.22),
-    inset -60px 0   80px rgba(0,0,0,0.22),
-    inset 0    60px 80px rgba(0,0,0,0.18),
-    inset 0  -40px  60px rgba(0,0,0,0.14);
-}
-
-/* --- Column separators feel crisper in focus mode ---       */
-body.focus-mode .column {
-  border-right-color: var(--border-2);
-}
-
-/* --- Column headers: modest accent lift in focus mode ---   */
-body.focus-mode #col-high   .col-header { box-shadow: 0 2px 16px rgba(245,101,101,0.20); }
-body.focus-mode #col-medium .col-header { box-shadow: 0 2px 16px rgba(246,173,85,0.18);  }
-body.focus-mode #col-low    .col-header { box-shadow: 0 2px 16px rgba(104,211,145,0.18); }
-body.focus-mode #col-review .col-header { box-shadow: 0 2px 16px rgba(167,139,250,0.18);  }
-
-body.focus-mode #col-high   .col-title { text-shadow: 0 0 10px rgba(245,101,101,0.50); }
-body.focus-mode #col-medium .col-title { text-shadow: 0 0 10px rgba(246,173,85,0.45);  }
-body.focus-mode #col-low    .col-title { text-shadow: 0 0 10px rgba(104,211,145,0.45); }
-body.focus-mode #col-review .col-title { text-shadow: 0 0 10px rgba(167,139,250,0.45);  }
-
-/* --- Card resting state: tighten left-border glow ---       */
-body.focus-mode .card.risk-high {
-  box-shadow: inset 4px 0 18px rgba(245,101,101,0.18);
-}
-body.focus-mode .card.risk-medium {
-  box-shadow: inset 3px 0 14px rgba(246,173,85,0.14);
-}
-
-/* --- Card hover: deeper glow in focus mode ---              */
-body.focus-mode .card.risk-high:hover    { box-shadow: 0 6px 24px rgba(245,101,101,0.34), 0 0 0 1px rgba(245,101,101,0.28); }
-body.focus-mode .card.risk-medium:hover  { box-shadow: 0 6px 24px rgba(246,173,85,0.34),  0 0 0 1px rgba(246,173,85,0.26);  }
-body.focus-mode .card.risk-low:hover     { box-shadow: 0 6px 24px rgba(104,211,145,0.34), 0 0 0 1px rgba(104,211,145,0.26); }
-body.focus-mode .card.risk-needs_review:hover { box-shadow: 0 6px 24px rgba(99,179,237,0.34), 0 0 0 1px rgba(99,179,237,0.26); }
-
-/* --- Threat meter slightly deeper in focus mode ---         */
-body.focus-mode .threat-meter.high .threat-meter-fill {
-  box-shadow: 0 0 14px rgba(245,101,101,0.58), 0 0 28px rgba(245,101,101,0.28);
-}
-
-/* --- Chrome elements dim out ---                            */
-body.focus-mode .ops-motd                    { opacity: 0.30; }
-body.focus-mode .ops-motd:hover              { opacity: 0.90; }
-body.focus-mode #motd-picker                 { opacity: 1 !important; }
-body.focus-mode .motd-controls               { opacity: 0.25; transition: opacity 0.35s ease; }
-body.focus-mode .motd-controls:hover         { opacity: 1; }
-body.focus-mode #nav-utility                 { opacity: 0.30; transition: opacity 0.35s ease; }
-body.focus-mode #nav-utility:hover           { opacity: 0.90; }
-body.focus-mode #nav-refresh                { opacity: 1; }
-
-/* --- Detail panel: stronger depth shadow when open ---      */
-body.focus-mode #detail-panel.open {
-  border-left-color: var(--border-2);
-  box-shadow: -6px 0 32px rgba(0, 0, 0, 0.50);
-}
 
 /* =========================================================
    THEME SYSTEM
@@ -2286,7 +2168,3 @@ body.focus-mode #detail-panel.open {
   text-shadow: 0 0 8px rgba(245, 101, 101, 0.40);
 }
 
-/* ---- Focus mode: column title glows inherit font system ---- */
-body.focus-mode #col-high .col-title {
-  text-shadow: 0 0 14px rgba(245, 101, 101, 0.65), 0 0 28px rgba(245, 101, 101, 0.25);
-}
