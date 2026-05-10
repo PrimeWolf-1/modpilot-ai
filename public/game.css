@@ -2237,7 +2237,7 @@ body.focus-mode #detail-panel.open {
 #motive-text {
   font-family: var(--font-hud);
   font-style: italic;
-  font-size: 19px;
+  font-size: 21px;
   font-weight: 600;
   letter-spacing: 1.8px;
   color: #cce6f8;
