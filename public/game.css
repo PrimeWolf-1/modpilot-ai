@@ -251,9 +251,10 @@ button {
   height: var(--nav-h);
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 8px;
-  max-width: 420px;
-  pointer-events: none;   /* let nav clicks pass through behind it */
+  max-width: min(680px, 52vw);
+  pointer-events: none;
   z-index: 0;
   overflow: hidden;
   transition: opacity 0.35s ease;
@@ -284,7 +285,7 @@ button {
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  max-width: 320px;
+  max-width: min(620px, 48vw);
   flex-shrink: 1;
   transition: opacity 0.25s ease;
 }
@@ -2114,6 +2115,8 @@ body.focus-mode .threat-meter.high .threat-meter-fill {
 body.focus-mode .ops-motd                    { opacity: 0.30; }
 body.focus-mode .ops-motd:hover              { opacity: 0.90; }
 body.focus-mode #motd-picker                 { opacity: 1 !important; }
+body.focus-mode .motd-controls               { opacity: 0.25; transition: opacity 0.35s ease; }
+body.focus-mode .motd-controls:hover         { opacity: 1; }
 body.focus-mode #activity-panel              { opacity: 0.30; }
 body.focus-mode #activity-panel:hover        { opacity: 0.90; }
 body.focus-mode #nav-refresh                { opacity: 0.40; }
@@ -2179,14 +2182,31 @@ body.focus-mode #detail-panel.open {
    Orbitron (--font-display): high risk title, critical labels
    ========================================================= */
 
-/* ---- MOTD Banner — tactical readout, subtle forward lean ---- */
+/* ---- MOTD Banner — cinematic HUD readout ---- */
 #motive-text {
   font-family: var(--font-hud);
   font-style: italic;
-  font-size: 14px;
-  font-weight: 500;
-  letter-spacing: 0.6px;
-  text-shadow: 0 0 12px rgba(18, 191, 208, 0.45), 0 0 24px rgba(18, 191, 208, 0.15);
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 1.8px;
+  color: #cce6f8;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  animation: motdGlow 4s ease-in-out infinite;
+}
+
+@keyframes motdGlow {
+  0%, 100% {
+    text-shadow:
+      0 0 10px rgba(18, 191, 208, 0.40),
+      0 0 22px rgba(18, 191, 208, 0.13);
+  }
+  50% {
+    text-shadow:
+      0 0 16px rgba(18, 191, 208, 0.65),
+      0 0 32px rgba(18, 191, 208, 0.22),
+      0 0 54px rgba(18, 191, 208, 0.07);
+  }
 }
 
 /* ---- Daily Message Picker — structural labels ---- */
