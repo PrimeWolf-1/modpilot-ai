@@ -122,7 +122,8 @@ function renderRecentActions(): void {
 
   // Wire click handlers — re-open detail panel with full action history
   log.querySelectorAll<HTMLElement>(".ops-log-entry[data-post-id]").forEach((el, idx) => {
-    el.addEventListener("click", () => {
+    el.addEventListener("click", (event) => {
+      event.stopPropagation(); // prevent bubbling to initPanel's outside-click handler
       const postId = el.dataset.postId;
       if (!postId) return;
       const item = allItems.find((i) => i.id === postId);
@@ -232,7 +233,10 @@ function applyFocusMode(on: boolean, btn: HTMLElement): void {
 // =========================================================
 
 function initActivityBar(): void {
-  document.getElementById("activity-panel-toggle")?.addEventListener("click", toggleActivityBar);
+  document.getElementById("activity-panel-toggle")?.addEventListener("click", (event) => {
+    event.stopPropagation(); // prevent bubbling to initPanel's outside-click handler
+    toggleActivityBar();
+  });
 }
 
 function toggleActivityBar(): void {
