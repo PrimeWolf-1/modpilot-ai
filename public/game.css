@@ -156,10 +156,11 @@ button {
   display: flex;
   align-items: center;
   gap: 6px;
+  height: 26px;
   background: var(--ai-bg);
   border: 1px solid var(--ai-border);
-  border-radius: 20px;
-  padding: 3px 10px;
+  border-radius: 8px;
+  padding: 0 10px;
   font-size: 11px;
   color: var(--ai);
   cursor: default;
@@ -193,11 +194,12 @@ button {
   display: flex;
   align-items: center;
   gap: 5px;
+  height: 26px;
   background: var(--surface-2);
   border: 1px solid var(--border);
-  border-radius: 6px;
-  padding: 5px 10px;
-  font-size: 12px;
+  border-radius: 8px;
+  padding: 0 10px;
+  font-size: 11px;
   color: var(--text-muted);
   transition: background 0.2s, color 0.2s, opacity 0.35s ease;
 }
@@ -313,13 +315,16 @@ button {
 .motd-badge-manual.hidden { display: none; }
 
 .motd-auto-btn {
+  display: inline-flex;
+  align-items: center;
+  height: 26px;
   font-size: 11px;
   font-weight: 600;
   color: #7a9ab8;
   background: transparent;
   border: 1px solid rgba(255,255,255,0.10);
-  border-radius: 5px;
-  padding: 3px 8px;
+  border-radius: 8px;
+  padding: 0 10px;
   cursor: pointer;
   font-family: inherit;
   transition: background 0.15s, color 0.15s, border-color 0.15s;
@@ -336,9 +341,9 @@ button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 2px 8px;
-  height: 20px;
-  border-radius: 4px;
+  padding: 0 10px;
+  height: 26px;
+  border-radius: 8px;
   font-size: 11px;
   font-weight: 600;
   letter-spacing: 0.2px;
@@ -2186,7 +2191,7 @@ body.focus-mode #detail-panel.open {
 #motive-text {
   font-family: var(--font-hud);
   font-style: italic;
-  font-size: 15px;
+  font-size: 17px;
   font-weight: 600;
   letter-spacing: 1.8px;
   color: #cce6f8;
