@@ -2179,11 +2179,14 @@ body.focus-mode #detail-panel.open {
    Orbitron (--font-display): high risk title, critical labels
    ========================================================= */
 
-/* ---- MOTD Banner — tactical readout ---- */
+/* ---- MOTD Banner — tactical readout, subtle forward lean ---- */
 #motive-text {
   font-family: var(--font-hud);
-  letter-spacing: 0.6px;
+  font-style: italic;
+  font-size: 14px;
   font-weight: 500;
+  letter-spacing: 0.6px;
+  text-shadow: 0 0 12px rgba(18, 191, 208, 0.45), 0 0 24px rgba(18, 191, 208, 0.15);
 }
 
 /* ---- Daily Message Picker — structural labels ---- */
