@@ -4,34 +4,9 @@ import { requestExpandedMode } from "@devvit/web/client";
 import { ApiEndpoint } from "../shared/api.ts";
 import type { GetQueueResponse, GetStatsResponse, SessionStats, TriageItem } from "../shared/types.ts";
 import { createCard } from "./card.ts";
-import { openPanel, initPanel, PanelHistoryEntry } from "./panel.ts";
+import { openPanel, initPanel } from "./panel.ts";
 import { initMotd } from "./motd.ts";
 import { openSummary } from "./summary.ts";
-
-// ---------------------------------------------------------------------------
-// Debug helpers
-// ---------------------------------------------------------------------------
-
-const MPD = "[MPD]"; // ModPilot Debug prefix — filter in DevTools with "MPD"
-
-function queueSnapshot(): string {
-  const counts: Record<string, number> = { high: 0, medium: 0, low: 0, needs_review: 0 };
-  for (const i of allItems) {
-    if (i.status === "pending") {
-      const k = i.scoringResult.riskLevel;
-      if (k in counts) counts[k]!++;
-    }
-  }
-  const total = allItems.filter((i) => i.status === "pending").length;
-  return `total=${total} hi=${counts.high} med=${counts.medium} lo=${counts.low} rev=${counts.needs_review}`;
-}
-
-function cardColumn(postId: string): string {
-  const card = document.querySelector<HTMLElement>(`.card[data-post-id="${postId}"]`);
-  if (!card) return "(no card in DOM)";
-  const col = card.closest<HTMLElement>(".column");
-  return col?.id ?? "(no column)";
-}
 
 // ---------------------------------------------------------------------------
 // State
@@ -117,34 +92,8 @@ function renderRecentActions(): void {
     const author   = entry.author.replace(/</g, "&lt;").replace(/>/g, "&gt;");
     const postId   = entry.postId.replace(/"/g, "&quot;");
     const newCls   = (i === 0 && pendingNewEntry) ? " new-entry" : "";
-    return `<div class="ops-log-entry ${entry.riskLevel}${newCls}" data-post-id="${postId}" role="button" tabindex="0"><span class="ops-log-dot"></span><span class="ops-log-action">${label}</span><span class="ops-log-author"> u/${author}</span><span class="ops-log-sep"> · </span><span class="ops-log-risk">${riskLbl}</span><span class="ops-log-time">${time}</span><span class="ops-log-open" aria-hidden="true">›</span></div>`;
+    return `<div class="ops-log-entry ${entry.riskLevel}${newCls}"><span class="ops-log-dot"></span><span class="ops-log-action">${label}</span><span class="ops-log-author"> u/${author}</span><span class="ops-log-sep"> · </span><span class="ops-log-risk">${riskLbl}</span><span class="ops-log-time">${time}</span></div>`;
   }).join("");
-
-  // Wire click handlers — re-open detail panel with full action history
-  log.querySelectorAll<HTMLElement>(".ops-log-entry[data-post-id]").forEach((el, idx) => {
-    el.addEventListener("click", (event) => {
-      event.stopPropagation(); // prevent bubbling to initPanel's outside-click handler
-      const postId = el.dataset.postId;
-      if (!postId) return;
-      const item = allItems.find((i) => i.id === postId);
-      const entry = recentActions[idx];
-      console.log(`${MPD} ACTIVITY CLICK idx=${idx} postId=${postId}`,
-        `status=${item?.status ?? "NOT FOUND"}`,
-        `riskLevel=${item?.scoringResult.riskLevel ?? "—"}`,
-        `action=${entry?.action ?? "—"}`,
-        `col=${postId ? cardColumn(postId) : "—"}`,
-        queueSnapshot());
-      if (item) {
-        const historyEntry: PanelHistoryEntry | undefined = entry
-          ? { action: entry.action, timestamp: entry.timestamp }
-          : undefined;
-        openPanel(item, onActionComplete, historyEntry);
-        console.log(`${MPD} ACTIVITY CLICK — openPanel() returned`, `queue still: ${queueSnapshot()}`);
-      } else {
-        console.warn(`${MPD} ACTIVITY CLICK — item not found in allItems for postId=${postId}`);
-      }
-    });
-  });
 }
 
 // =========================================================
@@ -272,7 +221,6 @@ function initRiskIconFallbacks(): void {
 // =========================================================
 
 async function loadQueue(): Promise<void> {
-  console.warn(`${MPD} loadQueue() CALLED`, new Error("stack").stack?.split("\n").slice(1, 4).join(" | "));
   showLoading("Loading mod queue…");
   setRefreshSpinning(true);
 
@@ -306,7 +254,6 @@ async function loadQueue(): Promise<void> {
 }
 
 async function loadStats(): Promise<void> {
-  console.log(`${MPD} loadStats() CALLED`, new Error("stack").stack?.split("\n").slice(1, 4).join(" | "));
   try {
     const resp = await fetch(ApiEndpoint.Stats);
     if (!resp.ok) return;
@@ -315,7 +262,6 @@ async function loadStats(): Promise<void> {
 
     // Seed log from server history on first load (before any local actions)
     if (recentActions.length === 0 && data.stats.history.length > 0) {
-      console.log(`${MPD} loadStats() seeding recentActions from server (${data.stats.history.length} entries)`);
       recentActions = data.stats.history.slice(0, 5).map((h) => ({
         action:    h.action,
         author:    h.author,
@@ -337,7 +283,6 @@ async function loadStats(): Promise<void> {
 // =========================================================
 
 function renderQueue(items: TriageItem[]): void {
-  console.warn(`${MPD} renderQueue() CALLED — ${queueSnapshot()}`, new Error("stack").stack?.split("\n").slice(1, 4).join(" | "));
   // Clear all columns
   for (const colId of Object.values(COLUMN_IDS)) {
     const el = document.getElementById(colId);
@@ -400,10 +345,7 @@ function renderQueue(items: TriageItem[]): void {
 function onActionComplete(postId: string, action: string, _accepted: boolean): void {
   const item = allItems.find((i) => i.id === postId);
   const sourceRiskLevel = item?.scoringResult.riskLevel;
-  console.warn(`${MPD} onActionComplete() postId=${postId} action=${action} riskLevel=${sourceRiskLevel ?? "—"} col=${cardColumn(postId)} ${queueSnapshot()}`,
-    new Error("stack").stack?.split("\n").slice(1, 4).join(" | "));
 
-  // Log BEFORE mutating state so we capture the original risk level
   if (item) {
     addRecentAction({
       action,
@@ -417,15 +359,13 @@ function onActionComplete(postId: string, action: string, _accepted: boolean): v
 
   if (item) {
     if (action === "escalate") {
-      console.log(`${MPD} ITEM CLASSIFICATION CHANGE postId=${postId} riskLevel: ${item.scoringResult.riskLevel} → needs_review`);
       item.scoringResult.riskLevel = "needs_review";
-      // status stays "pending" — counted in needs_review column
     } else if (action === "warn") {
       // status stays "pending" — item remains in queue for follow-up
     } else {
-      const newStatus = action === "approve" ? "approved" : action === "remove" ? "removed" : "ignored";
-      console.log(`${MPD} ITEM STATUS CHANGE postId=${postId} status: ${item.status} → ${newStatus} (col=${cardColumn(postId)})`);
-      item.status = newStatus;
+      item.status = action === "approve" ? "approved"
+        : action === "remove"  ? "removed"
+        : "ignored";
     }
   }
 
@@ -456,18 +396,14 @@ function selectNextCard(): void {
       (i) => i.status === "pending" && i.scoringResult.riskLevel === level,
     );
     if (next) {
-      console.log(`${MPD} selectNextCard() scheduling auto-advance to postId=${next.id} in 500ms`);
       setTimeout(() => {
-        const sel = document.querySelector(".card.selected");
-        console.log(`${MPD} selectNextCard() 500ms fired — selected=${sel?.getAttribute("data-post-id") ?? "none"} → will${sel ? " NOT" : ""} advance to ${next.id}`);
-        if (!sel) {
+        if (!document.querySelector(".card.selected")) {
           openPanel(next, onActionComplete);
         }
       }, 500);
       return;
     }
   }
-  console.log(`${MPD} selectNextCard() — no pending cards found`);
 }
 
 function pendingHighRiskCount(): number {

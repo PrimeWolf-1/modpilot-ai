@@ -84,19 +84,11 @@ export function createCard(
  * Marks a card as selected and activates the selection focus overlay.
  */
 export function selectCard(postId: string, riskLevel?: string): void {
-  const prev = document.querySelector<HTMLElement>(".card.selected");
-  const prevId = prev?.dataset["postId"] ?? "none";
-  const cardEl = document.querySelector<HTMLElement>(`.card[data-post-id="${postId}"]`);
-  console.log(`[MPD] selectCard() postId=${postId} riskLevel=${riskLevel} cardInDOM=${!!cardEl} prevSelected=${prevId}`);
-
   document.querySelectorAll(".card.selected").forEach((el) => el.classList.remove("selected"));
   document.querySelectorAll<HTMLElement>(".column.col-focused").forEach((el) => el.classList.remove("col-focused"));
 
-  const card = cardEl;
-  if (!card) {
-    console.warn(`[MPD] selectCard() — card NOT found in DOM for postId=${postId} (already removed?)`);
-    return;
-  }
+  const card = document.querySelector<HTMLElement>(`.card[data-post-id="${postId}"]`);
+  if (!card) return;
 
   card.classList.add("selected");
   card.closest<HTMLElement>(".column")?.classList.add("col-focused");
@@ -113,8 +105,6 @@ export function selectCard(postId: string, riskLevel?: string): void {
  * Clears all card selection and focus overlay state.
  */
 export function clearCardFocus(): void {
-  const sel = document.querySelector<HTMLElement>(".card.selected");
-  console.log(`[MPD] clearCardFocus() — was selected: ${sel?.dataset["postId"] ?? "none"}`, new Error("stack").stack?.split("\n").slice(1, 4).join(" | "));
   document.querySelectorAll(".card.selected").forEach((el) => el.classList.remove("selected"));
   document.querySelectorAll(".card.pending-removal").forEach((el) => el.classList.remove("pending-removal"));
   document.querySelectorAll<HTMLElement>(".column.col-focused").forEach((el) => el.classList.remove("col-focused"));
@@ -129,14 +119,10 @@ export function clearCardFocus(): void {
  * Phase 2: height collapse so surrounding cards shift up smoothly (180ms).
  */
 export function removeCard(postId: string, action?: string): void {
-  console.warn(`[MPD] removeCard() postId=${postId} action=${action}`, new Error("stack").stack?.split("\n").slice(1, 4).join(" | "));
   const card = document.querySelector<HTMLElement>(
     `.card[data-post-id="${postId}"]`,
   );
-  if (!card) {
-    console.warn(`[MPD] removeCard() — card not found in DOM for postId=${postId}`);
-    return;
-  }
+  if (!card) return;
 
   const cls = action === "approve" ? "card-exit-approve" : "card-exit-remove";
   const visualMs = action === "approve" ? 250 : 200;

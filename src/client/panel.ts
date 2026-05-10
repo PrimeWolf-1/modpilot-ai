@@ -6,11 +6,6 @@ import { selectCard, removeCard, clearCardFocus } from "./card.ts";
 
 type ActionCallback = (postId: string, action: string, accepted: boolean) => void;
 
-export interface PanelHistoryEntry {
-  action: string;
-  timestamp: number;
-}
-
 const PANEL_RISK_ICONS: Record<string, string> = {
   high:         "assets/icons/high-risk.png",
   medium:       "assets/icons/medium.png",
@@ -20,7 +15,6 @@ const PANEL_RISK_ICONS: Record<string, string> = {
 
 let currentItem: TriageItem | null = null;
 let onActionComplete: ActionCallback | null = null;
-let pendingReverseAction: string | null = null;
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -28,18 +22,14 @@ let pendingReverseAction: string | null = null;
 
 /**
  * Opens the detail panel for a given TriageItem.
- * @param item         - the item to display
- * @param callback     - called when an action completes (postId, action, acceptedSuggestion)
- * @param historyEntry - when opened from Recent Activity, shows the Action History section
+ * @param item     - the item to display
+ * @param callback - called when an action completes (postId, action, acceptedSuggestion)
  */
-export function openPanel(item: TriageItem, callback: ActionCallback, historyEntry?: PanelHistoryEntry): void {
-  const wasOpen = document.getElementById("detail-panel")?.classList.contains("open");
-  console.log(`[MPD] openPanel() id=${item.id} riskLevel=${item.scoringResult.riskLevel} status=${item.status} fromHistory=${!!historyEntry} panelWasOpen=${wasOpen}`);
+export function openPanel(item: TriageItem, callback: ActionCallback): void {
   currentItem = item;
   onActionComplete = callback;
 
   populatePanel(item);
-  populateHistorySection(historyEntry);
   selectCard(item.id, item.scoringResult.riskLevel);
 
   const panel = document.getElementById("detail-panel");
@@ -51,7 +41,6 @@ export function openPanel(item: TriageItem, callback: ActionCallback, historyEnt
 
 /** Closes the detail panel. */
 export function closePanel(): void {
-  console.log(`[MPD] closePanel() currentItem=${currentItem?.id ?? "none"}`, new Error("stack").stack?.split("\n").slice(1, 4).join(" | "));
   const panel = document.getElementById("detail-panel");
   panel?.classList.remove("open");
   document.getElementById("panel-backdrop")?.classList.remove("visible");
@@ -59,9 +48,6 @@ export function closePanel(): void {
   clearCardFocus();
 
   currentItem = null;
-  pendingReverseAction = null;
-  document.getElementById("panel-history-section")?.classList.add("hidden");
-  document.getElementById("history-reverse-row")?.classList.add("hidden");
   hideRemoveConfirm();
 }
 
@@ -82,15 +68,9 @@ export function initPanel(onOutsideClick: () => void): void {
     const panel = document.getElementById("detail-panel");
     if (!panel?.classList.contains("open")) return;
     const target = e.target as Node;
-    const inPanel = panel.contains(target);
-    const isACard = isCard(target);
-    const targetId = (target instanceof Element) ? (target.id || target.className || target.nodeName) : String(target);
-    if (!inPanel && !isACard) {
-      console.warn(`[MPD] OUTSIDE-CLICK HANDLER closing panel — target="${targetId}" inPanel=${inPanel} isCard=${isACard} currentItem=${currentItem?.id ?? "none"}`);
+    if (!panel.contains(target) && !isCard(target)) {
       closePanel();
       onOutsideClick();
-    } else {
-      console.log(`[MPD] outside-click suppressed — target="${targetId}" inPanel=${inPanel} isCard=${isACard}`);
     }
   });
 
@@ -108,12 +88,6 @@ export function initPanel(onOutsideClick: () => void): void {
 
   // Copy mod note on click
   document.getElementById("panel-suggest-note")?.addEventListener("click", copyModNote);
-
-  // Reverse last action
-  document.getElementById("btn-reverse-action")?.addEventListener("click", () => {
-    if (!pendingReverseAction) return;
-    void sendAction(pendingReverseAction as TakeActionRequest["action"], false);
-  });
 }
 
 // ---------------------------------------------------------------------------
@@ -200,101 +174,6 @@ function populatePanel(item: TriageItem): void {
   if (removeNote) removeNote.value = sr.modNote ?? "";
 
   enableButtons();
-}
-
-// ---------------------------------------------------------------------------
-// Action History section
-// ---------------------------------------------------------------------------
-
-const ACTION_DISPLAY_LABELS: Record<string, string> = {
-  approve:  "Approved",
-  remove:   "Removed",
-  warn:     "Sent Warning",
-  escalate: "Escalated to Review",
-  ignore:   "Ignored",
-};
-
-const ACTION_CSS_CLASSES: Record<string, string> = {
-  approve:  "history-approved",
-  remove:   "history-removed",
-  warn:     "history-warned",
-  escalate: "history-escalated",
-  ignore:   "history-ignored",
-};
-
-function getReverseAction(action: string): string | null {
-  const map: Record<string, string> = {
-    approve: "remove",
-    remove:  "approve",
-    ignore:  "approve",
-  };
-  return map[action] ?? null;
-}
-
-function populateHistorySection(entry?: PanelHistoryEntry): void {
-  const section    = document.getElementById("panel-history-section");
-  const reverseRow = document.getElementById("history-reverse-row");
-
-  if (!section || !entry || !currentItem) {
-    section?.classList.add("hidden");
-    pendingReverseAction = null;
-    return;
-  }
-
-  section.classList.remove("hidden");
-
-  const sr = currentItem.scoringResult;
-
-  // Action Taken
-  const actionEl = document.getElementById("history-action");
-  if (actionEl) {
-    const label = ACTION_DISPLAY_LABELS[entry.action] ?? entry.action;
-    const cls   = ACTION_CSS_CLASSES[entry.action]   ?? "";
-    actionEl.textContent = label;
-    actionEl.className   = `action-history-value ${cls}`;
-  }
-
-  // Time
-  const timeEl = document.getElementById("history-time");
-  if (timeEl) {
-    timeEl.textContent = new Date(entry.timestamp).toLocaleTimeString("en-US", {
-      hour: "numeric", minute: "2-digit", hour12: true,
-    });
-  }
-
-  // Reason — category / risk label
-  const RISK_LABELS: Record<string, string> = {
-    high: "High Risk", medium: "Medium", low: "Low Risk", needs_review: "Needs Review",
-  };
-  const reasonEl = document.getElementById("history-reason");
-  if (reasonEl) {
-    const riskLabel = RISK_LABELS[sr.riskLevel] ?? sr.riskLevel;
-    reasonEl.textContent = `${sr.category} / ${riskLabel}`;
-  }
-
-  // Mod Note
-  const noteEl  = document.getElementById("history-note");
-  const noteRow = document.getElementById("history-note-row");
-  if (noteEl && noteRow) {
-    if (sr.modNote) {
-      noteEl.textContent = sr.modNote;
-      noteRow.style.display = "";
-    } else {
-      noteRow.style.display = "none";
-    }
-  }
-
-  // Reverse button — only for reversible actions
-  const reverseTarget = getReverseAction(entry.action);
-  if (reverseTarget && reverseRow) {
-    const btn = document.getElementById("btn-reverse-action") as HTMLButtonElement | null;
-    reverseRow.classList.remove("hidden");
-    pendingReverseAction = reverseTarget;
-    if (btn) btn.textContent = `↩ ${ACTION_DISPLAY_LABELS[reverseTarget] ?? reverseTarget}`;
-  } else {
-    reverseRow?.classList.add("hidden");
-    pendingReverseAction = null;
-  }
 }
 
 // ---------------------------------------------------------------------------
