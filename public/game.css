@@ -485,9 +485,9 @@ button {
    ========================================================= */
 #activity-panel {
   position: fixed;
-  top: 52px;
+  top: 46px;
   right: 12px;
-  width: 300px;
+  width: 240px;
   z-index: 99;
   background: rgba(11, 17, 32, 0.88);
   backdrop-filter: blur(14px);
@@ -2191,7 +2191,7 @@ body.focus-mode #detail-panel.open {
 #motive-text {
   font-family: var(--font-hud);
   font-style: italic;
-  font-size: 17px;
+  font-size: 18px;
   font-weight: 600;
   letter-spacing: 1.8px;
   color: #cce6f8;
