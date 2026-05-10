@@ -132,13 +132,6 @@ async function init(): Promise<void> {
     void loadQueue();
   });
 
-  // Wire AI chip click → weekly summary panel (item 14)
-  document.getElementById("nav-ai-chip")?.addEventListener("click", () => {
-    if (latestStats) {
-      openSummary(latestStats, currentUsername);
-    }
-  });
-
   // Wire focus mode toggle
   initFocusMode();
 

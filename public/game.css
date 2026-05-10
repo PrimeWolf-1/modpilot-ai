@@ -158,13 +158,10 @@ button {
   padding: 3px 10px;
   font-size: 11px;
   color: var(--ai);
-  cursor: pointer;
+  cursor: default;
   user-select: none;
   animation: chipGlow 2.5s ease-in-out infinite;
   transition: opacity 0.35s ease;
-}
-.nav-ai-chip:hover {
-  background: rgba(183, 148, 244, 0.25);
 }
 .nav-ai-chip::before {
   content: "";
