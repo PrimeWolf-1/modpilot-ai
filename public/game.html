@@ -21,21 +21,35 @@
         <span id="motive-text">Loading…</span>
       </div>
       <div class="ops-spacer"></div>
-      <!-- MOTD controls — right-rail, beside AI chip -->
-      <div class="motd-controls">
-        <span class="motd-badge-manual hidden" id="motd-manual-badge">Manual</span>
-        <button class="motd-auto-btn hidden" id="motd-auto-btn" title="Return to auto rotation">↺ Auto</button>
-        <button class="motd-picker-btn" id="motd-picker-btn" title="Choose message" aria-expanded="false" aria-haspopup="listbox">Change</button>
+      <!-- 2×2 utility stack — absolute below nav right, within nav stacking context -->
+      <div id="nav-utility">
+        <!-- Row 1: Recent Activity | AI chip -->
+        <div id="activity-panel">
+          <button id="activity-panel-toggle" aria-expanded="false">
+            <span class="activity-panel-label">Recent Activity</span>
+            <span class="activity-panel-latest" id="activity-panel-latest"></span>
+            <span class="activity-panel-chevron">
+              <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
+            </span>
+          </button>
+          <div id="activity-panel-entries" aria-hidden="true"></div>
+        </div>
+        <div class="nav-ai-chip" id="nav-ai-chip" title="Click for weekly summary">
+          <span id="nav-ai-label">AI Active</span>
+        </div>
+        <!-- Row 2: Change | Refresh -->
+        <div class="motd-controls">
+          <span class="motd-badge-manual hidden" id="motd-manual-badge">Manual</span>
+          <button class="motd-auto-btn hidden" id="motd-auto-btn" title="Return to auto rotation">↺ Auto</button>
+          <button class="motd-picker-btn" id="motd-picker-btn" title="Choose message" aria-expanded="false" aria-haspopup="listbox">Change</button>
+        </div>
+        <button id="nav-refresh" title="Refresh queue">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
+          </svg>
+          Refresh
+        </button>
       </div>
-      <div class="nav-ai-chip" id="nav-ai-chip" title="Click for weekly summary">
-        <span id="nav-ai-label">AI Active</span>
-      </div>
-      <button id="nav-refresh" title="Refresh queue">
-        <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/>
-        </svg>
-        Refresh
-      </button>
     </nav>
 
     <!-- ===== MOTD MESSAGE PICKER (floating) ===== -->
@@ -242,18 +256,6 @@
 
     <!-- ===== ACTION TOAST ===== -->
     <div id="action-toast"></div>
-
-    <!-- ===== FLOATING ACTIVITY PANEL ===== -->
-    <div id="activity-panel">
-      <button id="activity-panel-toggle" aria-expanded="false">
-        <span class="activity-panel-label">Recent Activity</span>
-        <span class="activity-panel-latest" id="activity-panel-latest"></span>
-        <span class="activity-panel-chevron">
-          <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
-        </span>
-      </button>
-      <div id="activity-panel-entries" aria-hidden="true"></div>
-    </div>
 
     <script type="module" src="game.js" defer></script>
   </body>
