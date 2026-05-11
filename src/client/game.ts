@@ -4,7 +4,8 @@ import { requestExpandedMode } from "@devvit/web/client";
 import { ApiEndpoint } from "../shared/api.ts";
 import type { GetQueueResponse, GetStatsResponse, SessionStats, TriageItem } from "../shared/types.ts";
 import { createCard } from "./card.ts";
-import { openPanel, initPanel } from "./panel.ts";
+import { openPanel, initPanel, openHistoryPanel } from "./panel.ts";
+import type { HistoryEntry } from "./panel.ts";
 import { initMotd } from "./motd.ts";
 import { openSummary } from "./summary.ts";
 
@@ -22,13 +23,10 @@ const prevBadgeValues: Record<string, number> = {};
 // Recent Actions log state
 // ---------------------------------------------------------------------------
 
-interface RecentActionEntry {
-  action: string;
-  author: string;
-  riskLevel: string;
-  timestamp: number;
-  postId: string;
-  title: string;
+interface RecentActionEntry extends HistoryEntry {
+  // HistoryEntry already covers: postId, title, author, action, timestamp, riskLevel
+  // plus optional: authorAge, confidence, category, signals, modNote, aiSummary,
+  //                suggestedAction, suggestedReason
 }
 
 let recentActions: RecentActionEntry[] = [];
@@ -66,6 +64,7 @@ function buildEntryEl(entry: RecentActionEntry, animate: boolean): HTMLElement {
   const el = document.createElement("div");
   el.className = `ops-log-entry ${entry.riskLevel}${animate ? " new-entry" : ""}`;
   el.innerHTML = `<span class="ops-log-dot"></span><span class="ops-log-action">${label}</span><span class="ops-log-author"> u/${author}</span><span class="ops-log-sep"> · </span><span class="ops-log-risk">${riskLbl}</span><span class="ops-log-time">${time}</span>`;
+  el.addEventListener("click", () => openHistoryPanel(entry));
   return el;
 }
 
@@ -208,6 +207,12 @@ async function loadStats(): Promise<void> {
         timestamp: h.timestamp,
         postId:    h.postId,
         title:     h.title,
+        category:  h.category,
+        signals:   h.signals.map((name) => ({
+          name,
+          label:  name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+          weight: 0,
+        })),
       }));
       renderRecentActions();
     }
@@ -287,11 +292,19 @@ function onActionComplete(postId: string, action: string, _accepted: boolean): v
   if (item) {
     addRecentAction({
       action,
-      author:    item.author,
-      riskLevel: item.scoringResult.riskLevel,
-      timestamp: Date.now(),
-      postId:    item.id,
-      title:     item.title,
+      author:          item.author,
+      riskLevel:       item.scoringResult.riskLevel,
+      timestamp:       Date.now(),
+      postId:          item.id,
+      title:           item.title,
+      authorAge:       item.authorAge,
+      confidence:      item.scoringResult.confidence,
+      category:        item.scoringResult.category,
+      signals:         item.scoringResult.signals,
+      modNote:         item.scoringResult.modNote,
+      aiSummary:       item.scoringResult.aiSummary,
+      suggestedAction: item.scoringResult.suggestedAction,
+      suggestedReason: item.scoringResult.suggestedReason,
     });
   }
 

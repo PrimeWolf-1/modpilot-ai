@@ -39,11 +39,145 @@ export function openPanel(item: TriageItem, callback: ActionCallback): void {
   hideRemoveConfirm();
 }
 
+// ---------------------------------------------------------------------------
+// History / audit panel
+// ---------------------------------------------------------------------------
+
+export interface HistoryEntry {
+  postId: string;
+  title: string;
+  author: string;
+  action: string;
+  timestamp: number;
+  riskLevel: string;
+  authorAge?: number;
+  confidence?: number;
+  category?: string;
+  signals?: Array<{ name: string; label: string; weight: number }>;
+  modNote?: string;
+  aiSummary?: string;
+  suggestedAction?: string;
+  suggestedReason?: string;
+}
+
+/** Opens the detail panel in read-only history/audit mode. */
+export function openHistoryPanel(entry: HistoryEntry): void {
+  currentItem = null;
+  onActionComplete = null;
+
+  populateHistoryPanel(entry);
+
+  const panel = document.getElementById("detail-panel");
+  if (!panel) return;
+  panel.dataset["mode"] = "history";
+  if (entry.riskLevel) panel.dataset["riskFocus"] = entry.riskLevel;
+  panel.classList.add("open");
+  document.getElementById("panel-backdrop")?.classList.add("visible");
+  hideRemoveConfirm();
+}
+
+function populateHistoryPanel(entry: HistoryEntry): void {
+  const ACTION_LABELS: Record<string, string> = {
+    approve:  "Approved",
+    remove:   "Removed",
+    warn:     "Warning Sent",
+    escalate: "Escalated",
+    ignore:   "Ignored",
+  };
+
+  setText("panel-title", entry.title);
+  setText("panel-author", `u/${entry.author}`);
+  setText("panel-age", entry.authorAge !== undefined ? formatAge(entry.authorAge) : "—");
+
+  // Risk level
+  const riskEl = document.getElementById("panel-risk");
+  if (riskEl) {
+    riskEl.className = `breakdown-value ${entry.riskLevel}`;
+    riskEl.innerHTML = "";
+    const iconSrc = PANEL_RISK_ICONS[entry.riskLevel];
+    if (iconSrc) {
+      const img = document.createElement("img");
+      img.src = iconSrc;
+      img.className = "panel-risk-icon";
+      img.alt = "";
+      img.setAttribute("aria-hidden", "true");
+      img.addEventListener("error", () => img.remove());
+      riskEl.appendChild(img);
+    }
+    riskEl.appendChild(document.createTextNode(formatRiskLabel(entry.riskLevel)));
+  }
+
+  // Confidence
+  const confEl = document.getElementById("panel-confidence");
+  if (confEl) {
+    confEl.textContent = entry.confidence !== undefined ? `${entry.confidence}%` : "—";
+    confEl.className = `breakdown-value ${entry.riskLevel}`;
+  }
+
+  setText("panel-category", entry.category ?? "—");
+
+  // History-only: action taken + reviewed at
+  const actionLabel = ACTION_LABELS[entry.action] ?? entry.action;
+  const actionEl = document.getElementById("panel-action-taken");
+  if (actionEl) {
+    actionEl.textContent = actionLabel;
+    actionEl.className = `breakdown-value history-action-${entry.action}`;
+  }
+  const reviewedEl = document.getElementById("panel-reviewed-at");
+  if (reviewedEl) {
+    reviewedEl.textContent = new Date(entry.timestamp).toLocaleString("en-US", {
+      month: "short", day: "numeric", hour: "numeric", minute: "2-digit", hour12: true,
+    });
+    reviewedEl.className = "breakdown-value";
+  }
+
+  // Detected signals
+  const signalsEl = document.getElementById("panel-signals");
+  if (signalsEl) {
+    if (!entry.signals || entry.signals.length === 0) {
+      signalsEl.innerHTML = `<span style="color:var(--text-dim);font-size:11px">No signals detected</span>`;
+    } else {
+      signalsEl.innerHTML = entry.signals
+        .map((s) => `<span class="panel-signal-tag">${escapeHtml(s.label)}</span>`)
+        .join("");
+    }
+  }
+
+  // Threat analysis
+  const summaryEl = document.getElementById("panel-ai-summary");
+  if (summaryEl) {
+    summaryEl.textContent = entry.aiSummary ?? "Analysis not available for past actions.";
+  }
+
+  // Threat meter
+  const conf = entry.confidence ?? 0;
+  const meterEl  = document.getElementById("threat-meter");
+  const meterFill = document.getElementById("threat-meter-fill");
+  const meterPct  = document.getElementById("threat-meter-pct");
+  if (meterEl)   meterEl.className = `threat-meter ${entry.riskLevel}`;
+  if (meterPct)  meterPct.textContent = entry.confidence !== undefined ? `${conf}%` : "—";
+  if (meterFill) {
+    meterFill.style.width = "0%";
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => {
+        if (meterFill) meterFill.style.width = `${conf}%`;
+      });
+    });
+  }
+
+  // AI recommendation
+  setText("panel-suggest-action", entry.suggestedAction ?? "—");
+  setText("panel-suggest-reason", entry.suggestedReason ?? "—");
+  setText("panel-note-text", entry.modNote || "No mod note");
+}
+
 /** Closes the detail panel. */
 export function closePanel(): void {
   const panel = document.getElementById("detail-panel");
   panel?.classList.remove("open");
   document.getElementById("panel-backdrop")?.classList.remove("visible");
+
+  if (panel) delete panel.dataset["mode"];
 
   clearCardFocus();
 
@@ -232,7 +366,7 @@ async function confirmRemoveWithNote(): Promise<void> {
   const item = currentItem;
   const note = (document.getElementById("remove-note") as HTMLTextAreaElement | null)?.value ?? "";
 
-  disableButtons();
+  disableConfirmButtons();
 
   try {
     const payload: TakeActionRequest = {
@@ -307,6 +441,7 @@ function moveCardToReview(postId: string): void {
 // ---------------------------------------------------------------------------
 
 function showRemoveConfirm(): void {
+  enableButtons(); // ensure confirm buttons are enabled regardless of prior state
   document.getElementById("remove-confirm")?.classList.add("visible");
   if (currentItem) {
     document.querySelector(`.card[data-post-id="${currentItem.id}"]`)
@@ -344,16 +479,29 @@ function copyModNote(): void {
 // Button state
 // ---------------------------------------------------------------------------
 
+const MAIN_ACTION_IDS = ["btn-approve", "btn-remove", "btn-warn", "btn-escalate", "btn-ignore"] as const;
+const CONFIRM_IDS = ["btn-remove-confirm", "btn-remove-no-note", "btn-remove-cancel"] as const;
+
 function disableButtons(): void {
-  document.querySelectorAll<HTMLButtonElement>(".action-btn").forEach((btn) => {
-    btn.disabled = true;
-  });
+  // Scoped to main action buttons only — never disables the confirm sub-panel buttons
+  for (const id of MAIN_ACTION_IDS) {
+    const el = document.getElementById(id) as HTMLButtonElement | null;
+    if (el) el.disabled = true;
+  }
 }
 
 function enableButtons(): void {
+  // Re-enables all buttons (full reset for panel open / action complete)
   document.querySelectorAll<HTMLButtonElement>(".action-btn").forEach((btn) => {
     btn.disabled = false;
   });
+}
+
+function disableConfirmButtons(): void {
+  for (const id of CONFIRM_IDS) {
+    const el = document.getElementById(id) as HTMLButtonElement | null;
+    if (el) el.disabled = true;
+  }
 }
 
 // ---------------------------------------------------------------------------

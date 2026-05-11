@@ -2068,3 +2068,41 @@ button {
   text-shadow: 0 0 8px rgba(245, 101, 101, 0.40);
 }
 
+
+/* =========================================================
+   RECENT ACTIONS — clickable entries
+   ========================================================= */
+.ops-log-entry {
+  cursor: pointer;
+  transition: background 0.12s;
+}
+.ops-log-entry:hover {
+  background: rgba(255, 255, 255, 0.045);
+}
+
+/* =========================================================
+   HISTORY / AUDIT MODE — panel in read-only review state
+   ========================================================= */
+
+/* History-only breakdown rows: hidden in live mode */
+.breakdown-item.history-only {
+  display: none;
+}
+
+/* Show history-only rows + hide action buttons in history mode */
+#detail-panel[data-mode="history"] .breakdown-item.history-only {
+  display: block;
+}
+#detail-panel[data-mode="history"] #panel-actions-section {
+  display: none;
+}
+#detail-panel[data-mode="history"] #remove-confirm {
+  display: none !important;
+}
+
+/* Action-taken color coding in history breakdown */
+.breakdown-value.history-action-approve  { color: #68d391; }
+.breakdown-value.history-action-remove   { color: var(--high); }
+.breakdown-value.history-action-warn     { color: var(--medium); }
+.breakdown-value.history-action-escalate { color: var(--review); }
+.breakdown-value.history-action-ignore   { color: var(--text-muted); }
