@@ -74,6 +74,19 @@ function updateActivityBarLatest(): void {
   el.textContent = `· ${label} u/${author} · ${time}`;
 }
 
+function buildEntryEl(entry: RecentActionEntry, animate: boolean): HTMLElement {
+  const label   = ACTION_LOG_LABELS[entry.action]  ?? entry.action;
+  const riskLbl = RISK_LOG_LABELS[entry.riskLevel] ?? entry.riskLevel;
+  const time    = new Date(entry.timestamp).toLocaleTimeString("en-US", {
+    hour: "numeric", minute: "2-digit", hour12: true,
+  });
+  const author = entry.author.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+  const el = document.createElement("div");
+  el.className = `ops-log-entry ${entry.riskLevel}${animate ? " new-entry" : ""}`;
+  el.innerHTML = `<span class="ops-log-dot"></span><span class="ops-log-action">${label}</span><span class="ops-log-author"> u/${author}</span><span class="ops-log-sep"> · </span><span class="ops-log-risk">${riskLbl}</span><span class="ops-log-time">${time}</span>`;
+  return el;
+}
+
 function renderRecentActions(): void {
   const log = document.getElementById("activity-panel-entries");
   if (!log) return;
@@ -83,17 +96,22 @@ function renderRecentActions(): void {
     return;
   }
 
-  log.innerHTML = recentActions.map((entry, i) => {
-    const label    = ACTION_LOG_LABELS[entry.action]    ?? entry.action;
-    const riskLbl  = RISK_LOG_LABELS[entry.riskLevel]   ?? entry.riskLevel;
-    const time     = new Date(entry.timestamp).toLocaleTimeString("en-US", {
-      hour: "numeric", minute: "2-digit", hour12: true,
-    });
-    const author   = entry.author.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-    const postId   = entry.postId.replace(/"/g, "&quot;");
-    const newCls   = (i === 0 && pendingNewEntry) ? " new-entry" : "";
-    return `<div class="ops-log-entry ${entry.riskLevel}${newCls}"><span class="ops-log-dot"></span><span class="ops-log-action">${label}</span><span class="ops-log-author"> u/${author}</span><span class="ops-log-sep"> · </span><span class="ops-log-risk">${riskLbl}</span><span class="ops-log-time">${time}</span></div>`;
-  }).join("");
+  if (pendingNewEntry) {
+    // Remove empty-state placeholder if present
+    log.querySelector(".ops-log-empty")?.remove();
+    // Prepend only the newest entry with its slide-in animation
+    log.prepend(buildEntryEl(recentActions[0]!, true));
+    // Trim any entries beyond the max
+    const entries = log.querySelectorAll(".ops-log-entry");
+    for (let i = 5; i < entries.length; i++) entries[i]!.remove();
+    return;
+  }
+
+  // Full render on first load / seed — no existing entries to repaint
+  log.innerHTML = "";
+  for (const entry of recentActions) {
+    log.appendChild(buildEntryEl(entry, false));
+  }
 }
 
 // =========================================================

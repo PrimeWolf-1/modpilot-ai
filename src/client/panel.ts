@@ -212,6 +212,7 @@ async function sendAction(
     }
 
     closePanel();
+    enableButtons();
 
     if (action === "escalate") {
       moveCardToReview(item.id);
@@ -254,6 +255,7 @@ async function confirmRemoveWithNote(): Promise<void> {
     const data = await resp.json() as { success: boolean };
     if (data.success) {
       closePanel();
+      enableButtons();
       removeCard(item.id, "remove");
       onActionComplete?.(item.id, "remove", true);
     } else {
