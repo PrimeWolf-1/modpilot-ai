@@ -82,6 +82,22 @@ export async function appendDecision(record: DecisionRecord): Promise<void> {
   await redis.set(KEYS.history, JSON.stringify(history));
 }
 
+/**
+ * Marks the most recent non-undone decision record for (postId, action) as undone.
+ */
+export async function markDecisionUndone(postId: string, originalAction: string): Promise<void> {
+  const raw = await redis.get(KEYS.history);
+  const history: DecisionRecord[] = raw ? (JSON.parse(raw) as DecisionRecord[]) : [];
+  const idx = history.findIndex(
+    (r) => r.postId === postId && r.action === originalAction && !r.undone,
+  );
+  if (idx >= 0) {
+    history[idx]!.undone = true;
+    history[idx]!.undoneAt = Date.now();
+    await redis.set(KEYS.history, JSON.stringify(history));
+  }
+}
+
 // ---------------------------------------------------------------------------
 // Read operations
 // ---------------------------------------------------------------------------

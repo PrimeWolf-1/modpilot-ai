@@ -15,6 +15,8 @@ const PANEL_RISK_ICONS: Record<string, string> = {
 
 let currentItem: TriageItem | null = null;
 let onActionComplete: ActionCallback | null = null;
+let currentHistoryEntry: HistoryEntry | null = null;
+let onHistoryUndoComplete: (() => void) | null = null;
 
 // ---------------------------------------------------------------------------
 // Public API
@@ -58,12 +60,16 @@ export interface HistoryEntry {
   aiSummary?: string;
   suggestedAction?: string;
   suggestedReason?: string;
+  undone?: boolean;
+  undoneAt?: number;
 }
 
 /** Opens the detail panel in read-only history/audit mode. */
-export function openHistoryPanel(entry: HistoryEntry): void {
+export function openHistoryPanel(entry: HistoryEntry, onUndone?: () => void): void {
   currentItem = null;
   onActionComplete = null;
+  currentHistoryEntry = entry;
+  onHistoryUndoComplete = onUndone ?? null;
 
   populateHistoryPanel(entry);
 
@@ -169,6 +175,8 @@ function populateHistoryPanel(entry: HistoryEntry): void {
   setText("panel-suggest-action", entry.suggestedAction ?? "—");
   setText("panel-suggest-reason", entry.suggestedReason ?? "—");
   setText("panel-note-text", entry.modNote || "No mod note");
+
+  populateUndoSection(entry);
 }
 
 /** Closes the detail panel. */
@@ -182,6 +190,8 @@ export function closePanel(): void {
   clearCardFocus();
 
   currentItem = null;
+  currentHistoryEntry = null;
+  onHistoryUndoComplete = null;
   hideRemoveConfirm();
 }
 
@@ -222,6 +232,9 @@ export function initPanel(onOutsideClick: () => void): void {
 
   // Copy mod note on click
   document.getElementById("panel-suggest-note")?.addEventListener("click", copyModNote);
+
+  // Undo/reinstate button (history mode only)
+  document.getElementById("btn-undo-action")?.addEventListener("click", () => void sendUndoAction());
 }
 
 // ---------------------------------------------------------------------------
@@ -473,6 +486,82 @@ function copyModNote(): void {
     noteEl.textContent = "Copied!";
     setTimeout(() => { noteEl.textContent = prev; }, 1200);
   }
+}
+
+// ---------------------------------------------------------------------------
+// Undo / reinstate
+// ---------------------------------------------------------------------------
+
+const UNDO_WINDOW_MS = 24 * 60 * 60 * 1000;
+
+const UNDO_BTN_LABELS: Record<string, string> = {
+  remove:  "Reinstate Post",
+  approve: "Undo Approval",
+};
+
+function populateUndoSection(entry: HistoryEntry): void {
+  const section  = document.getElementById("panel-undo-section");
+  const btn      = document.getElementById("btn-undo-action") as HTMLButtonElement | null;
+  const statusEl = document.getElementById("undo-status");
+  if (!section || !btn || !statusEl) return;
+
+  const btnLabel = UNDO_BTN_LABELS[entry.action];
+
+  if (entry.undone) {
+    section.style.display = "";
+    btn.style.display = "none";
+    const when = entry.undoneAt ? relativeTime(entry.undoneAt) : "";
+    statusEl.textContent = `↩ Undone${when ? " · " + when : ""}`;
+    statusEl.style.display = "";
+  } else if (btnLabel && !entry.undone && Date.now() - entry.timestamp <= UNDO_WINDOW_MS) {
+    section.style.display = "";
+    btn.textContent = btnLabel;
+    btn.disabled = false;
+    btn.style.display = "";
+    statusEl.style.display = "none";
+  } else {
+    // expired window or action type with no reversal (warn, escalate, ignore)
+    section.style.display = "none";
+  }
+}
+
+async function sendUndoAction(): Promise<void> {
+  if (!currentHistoryEntry) return;
+  const entry = currentHistoryEntry;
+
+  const btn = document.getElementById("btn-undo-action") as HTMLButtonElement | null;
+  if (btn) btn.disabled = true;
+
+  try {
+    const resp = await fetch(ApiEndpoint.Undo, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ postId: entry.postId, originalAction: entry.action }),
+    });
+    const data = await resp.json() as { success: boolean; error?: string };
+
+    if (data.success) {
+      entry.undone = true;
+      entry.undoneAt = Date.now();
+      populateUndoSection(entry);
+      onHistoryUndoComplete?.();
+    } else {
+      if (btn) btn.disabled = false;
+      console.error("sendUndoAction failed:", data.error);
+    }
+  } catch (err) {
+    console.error("sendUndoAction error:", err);
+    if (btn) btn.disabled = false;
+  }
+}
+
+function relativeTime(ts: number): string {
+  const diffMs = Date.now() - ts;
+  const m = Math.floor(diffMs / 60_000);
+  if (m < 1) return "just now";
+  if (m < 60) return `${m}m ago`;
+  const h = Math.floor(m / 60);
+  return `${h}h ago`;
 }
 
 // ---------------------------------------------------------------------------

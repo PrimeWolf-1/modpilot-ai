@@ -2106,3 +2106,41 @@ button {
 .breakdown-value.history-action-warn     { color: var(--medium); }
 .breakdown-value.history-action-escalate { color: var(--review); }
 .breakdown-value.history-action-ignore   { color: var(--text-muted); }
+
+/* =========================================================
+   UNDO / REINSTATE — 24-hour reversible action window
+   ========================================================= */
+
+.undo-btn {
+  width: 100%;
+  padding: 8px 10px;
+  border-radius: 6px;
+  font-size: 12px;
+  font-weight: 600;
+  border: 1px solid var(--border-2);
+  background: rgba(104, 211, 145, 0.10);
+  color: #68d391;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+.undo-btn:hover:not(:disabled) {
+  background: rgba(104, 211, 145, 0.18);
+}
+.undo-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.undo-status {
+  font-size: 12px;
+  color: #68d391;
+  padding: 6px 0 2px;
+}
+
+/* Undone entries in Recent Actions log */
+.ops-log-entry.undone {
+  opacity: 0.5;
+}
+.ops-log-entry.undone .ops-log-action {
+  text-decoration: line-through;
+}

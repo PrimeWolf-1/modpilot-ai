@@ -4,6 +4,7 @@ export const ApiEndpoint = {
   // ModPilot data endpoints
   Queue: "/api/queue",
   Action: "/api/action",
+  Undo: "/api/undo",
   Stats: "/api/stats",
 
   // Devvit internal triggers

@@ -68,6 +68,13 @@ export interface DecisionRecord {
   action: string;
   accepted_suggestion: boolean;
   timestamp: number;
+  undone?: boolean;
+  undoneAt?: number;
+}
+
+export interface UndoActionRequest {
+  postId: string;
+  originalAction: string;
 }
 
 export interface SessionStats {

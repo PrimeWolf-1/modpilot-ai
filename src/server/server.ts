@@ -11,6 +11,7 @@ import type {
   GetStatsResponse,
   TakeActionRequest,
   TakeActionResponse,
+  UndoActionRequest,
 } from "../shared/types.ts";
 import { fetchModQueue } from "./queueLoader.ts";
 import {
@@ -20,6 +21,7 @@ import {
   incrementEscalated,
   incrementHighRisk,
   incrementReviewed,
+  markDecisionUndone,
 } from "./stats.ts";
 
 // ---------------------------------------------------------------------------
@@ -58,6 +60,9 @@ async function onRequest(
       break;
     case ApiEndpoint.Action:
       writeJSON(200, await onTakeAction(req), rsp);
+      break;
+    case ApiEndpoint.Undo:
+      writeJSON(200, await onUndoAction(req), rsp);
       break;
     case ApiEndpoint.Stats:
       writeJSON(200, await onGetStats(), rsp);
@@ -169,6 +174,40 @@ async function onTakeAction(req: IncomingMessage): Promise<TakeActionResponse> {
     const error = err instanceof Error ? err.message : String(err);
     console.error(`onTakeAction error for ${postId}:`, error);
     return { type: "action_complete", postId, action, success: false, error };
+  }
+}
+
+/**
+ * POST /api/undo
+ * Reverses a previous moderation action within the 24-hour window.
+ * Only "remove" (→ approve) and "approve" (→ remove) have Reddit API reversals.
+ */
+async function onUndoAction(req: IncomingMessage): Promise<TakeActionResponse> {
+  const { postId, originalAction } = await readJSON<UndoActionRequest>(req);
+
+  try {
+    const post = await reddit.getPostById(`t3_${postId}`);
+
+    switch (originalAction) {
+      case "remove":
+        await post.approve();
+        break;
+      case "approve":
+        await post.remove(false);
+        break;
+      case "warn":
+        return { type: "action_complete", postId, action: "undo", success: false, error: "Warnings cannot be undone" };
+      default:
+        // escalate / ignore had no Reddit-side effect; just mark undone
+        break;
+    }
+
+    await markDecisionUndone(postId, originalAction);
+    return { type: "action_complete", postId, action: "undo", success: true };
+  } catch (err) {
+    const error = err instanceof Error ? err.message : String(err);
+    console.error(`onUndoAction error for ${postId}:`, error);
+    return { type: "action_complete", postId, action: "undo", success: false, error };
   }
 }
 

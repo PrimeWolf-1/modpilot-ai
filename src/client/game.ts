@@ -64,8 +64,14 @@ function buildEntryEl(entry: RecentActionEntry, animate: boolean): HTMLElement {
   const el = document.createElement("div");
   el.className = `ops-log-entry ${entry.riskLevel}${animate ? " new-entry" : ""}`;
   el.innerHTML = `<span class="ops-log-dot"></span><span class="ops-log-action">${label}</span><span class="ops-log-author"> u/${author}</span><span class="ops-log-sep"> · </span><span class="ops-log-risk">${riskLbl}</span><span class="ops-log-time">${time}</span>`;
-  el.addEventListener("click", () => openHistoryPanel(entry));
+  el.dataset["key"] = `${entry.postId}-${entry.timestamp}`;
+  if (entry.undone) el.classList.add("undone");
+  el.addEventListener("click", () => openHistoryPanel(entry, () => markLogEntryUndone(el)));
   return el;
+}
+
+function markLogEntryUndone(el: HTMLElement): void {
+  el.classList.add("undone");
 }
 
 function renderRecentActions(): void {
@@ -213,6 +219,8 @@ async function loadStats(): Promise<void> {
           label:  name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
           weight: 0,
         })),
+        undone:    h.undone,
+        undoneAt:  h.undoneAt,
       }));
       renderRecentActions();
     }
