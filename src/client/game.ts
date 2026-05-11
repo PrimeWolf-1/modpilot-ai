@@ -15,7 +15,6 @@ import { openSummary } from "./summary.ts";
 let allItems: TriageItem[] = [];
 let currentUsername = "";
 let latestStats: SessionStats | null = null;
-let activityPanelExpanded = false;
 let pendingNewEntry = false;
 const prevBadgeValues: Record<string, number> = {};
 
@@ -55,23 +54,6 @@ function addRecentAction(entry: RecentActionEntry): void {
   pendingNewEntry = true;
   renderRecentActions();
   pendingNewEntry = false;
-  updateActivityBarLatest();
-}
-
-function updateActivityBarLatest(): void {
-  const el = document.getElementById("activity-panel-latest");
-  if (!el) return;
-  if (recentActions.length === 0) {
-    el.textContent = "";
-    return;
-  }
-  const entry = recentActions[0]!;
-  const label = ACTION_LOG_LABELS[entry.action] ?? entry.action;
-  const author = entry.author.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-  const time = new Date(entry.timestamp).toLocaleTimeString("en-US", {
-    hour: "numeric", minute: "2-digit", hour12: true,
-  });
-  el.textContent = `· ${label} u/${author} · ${time}`;
 }
 
 function buildEntryEl(entry: RecentActionEntry, animate: boolean): HTMLElement {
@@ -150,36 +132,10 @@ async function init(): Promise<void> {
     void loadQueue();
   });
 
-  // Wire activity bar toggle
-  initActivityBar();
-
   // Hide risk icon img elements that fail to load (CSP-safe, no inline handlers)
   initRiskIconFallbacks();
 
   await Promise.all([loadQueue(), loadStats()]);
-}
-
-// =========================================================
-// ACTIVITY BAR
-// =========================================================
-
-function initActivityBar(): void {
-  document.getElementById("activity-panel-toggle")?.addEventListener("click", (event) => {
-    event.stopPropagation(); // prevent bubbling to initPanel's outside-click handler
-    toggleActivityBar();
-  });
-}
-
-function toggleActivityBar(): void {
-  activityPanelExpanded = !activityPanelExpanded;
-
-  const panel   = document.getElementById("activity-panel");
-  const entries = document.getElementById("activity-panel-entries");
-  const toggle  = document.getElementById("activity-panel-toggle");
-
-  panel?.classList.toggle("expanded", activityPanelExpanded);
-  toggle?.setAttribute("aria-expanded", String(activityPanelExpanded));
-  entries?.setAttribute("aria-hidden", String(!activityPanelExpanded));
 }
 
 // =========================================================
@@ -254,7 +210,6 @@ async function loadStats(): Promise<void> {
         title:     h.title,
       }));
       renderRecentActions();
-      updateActivityBarLatest();
     }
   } catch (err) {
     console.error("loadStats error:", err);

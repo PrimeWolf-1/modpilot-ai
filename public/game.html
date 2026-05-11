@@ -23,21 +23,9 @@
       <div class="ops-spacer"></div>
       <!-- 2×2 utility stack — absolute below nav right, within nav stacking context -->
       <div id="nav-utility">
-        <!-- Row 1: Recent Activity | AI chip -->
-        <div id="activity-panel">
-          <button id="activity-panel-toggle" aria-expanded="false">
-            <span class="activity-panel-label">Recent Activity</span>
-            <span class="activity-panel-latest" id="activity-panel-latest"></span>
-            <span class="activity-panel-chevron">
-              <svg width="10" height="6" viewBox="0 0 10 6" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M1 1l4 4 4-4"/></svg>
-            </span>
-          </button>
-          <div id="activity-panel-entries" aria-hidden="true"></div>
-        </div>
         <div class="nav-ai-chip" id="nav-ai-chip" title="Click for weekly summary">
           <span id="nav-ai-label">AI Active</span>
         </div>
-        <!-- Row 2: Change | Refresh -->
         <div class="motd-controls">
           <span class="motd-badge-manual hidden" id="motd-manual-badge">Manual</span>
           <button class="motd-auto-btn hidden" id="motd-auto-btn" title="Return to auto rotation">↺ Auto</button>
@@ -231,6 +219,12 @@
             <button class="action-btn neutral" id="btn-remove-no-note" style="flex: 1">Remove</button>
             <button class="action-btn neutral" id="btn-remove-cancel" style="flex: 1">Cancel</button>
           </div>
+        </div>
+
+        <!-- Recent Actions audit trail -->
+        <div class="panel-section panel-recent-actions">
+          <div class="panel-section-label">Recent Actions</div>
+          <div id="activity-panel-entries"></div>
         </div>
 
       </div>
