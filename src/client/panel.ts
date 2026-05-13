@@ -226,8 +226,11 @@ export function initPanel(onOutsideClick: () => void): void {
   document.getElementById("btn-ignore")?.addEventListener("click", () => sendAction("ignore", false));
 
   // Remove confirmation sub-panel
-  document.getElementById("btn-remove-confirm")?.addEventListener("click", confirmRemoveWithNote);
-  document.getElementById("btn-remove-no-note")?.addEventListener("click", () => sendAction("remove", true));
+  document.getElementById("btn-remove-no-note")?.addEventListener("click", () => {
+    const note = (document.getElementById("remove-note") as HTMLTextAreaElement | null)?.value ?? "";
+    hideRemoveConfirm();
+    void sendAction("remove", true, note || undefined);
+  });
   document.getElementById("btn-remove-cancel")?.addEventListener("click", hideRemoveConfirm);
 
   // Copy mod note on click
@@ -330,6 +333,7 @@ function populatePanel(item: TriageItem): void {
 async function sendAction(
   action: TakeActionRequest["action"],
   accepted_suggestion: boolean,
+  overrideModNote?: string,
 ): Promise<void> {
   if (!currentItem) return;
   const item = currentItem;
@@ -344,7 +348,7 @@ async function sendAction(
       category: item.scoringResult.category,
       signals: item.scoringResult.signals.map((s) => s.name),
       accepted_suggestion,
-      modNote: item.scoringResult.modNote,
+      modNote: overrideModNote ?? item.scoringResult.modNote,
     };
 
     const resp = await fetch(ApiEndpoint.Action, {
@@ -374,45 +378,6 @@ async function sendAction(
   }
 }
 
-async function confirmRemoveWithNote(): Promise<void> {
-  if (!currentItem) return;
-  const item = currentItem;
-  const note = (document.getElementById("remove-note") as HTMLTextAreaElement | null)?.value ?? "";
-
-  disableConfirmButtons();
-
-  try {
-    const payload: TakeActionRequest = {
-      postId: item.id,
-      action: "remove",
-      riskLevel: item.scoringResult.riskLevel,
-      category: item.scoringResult.category,
-      signals: item.scoringResult.signals.map((s) => s.name),
-      accepted_suggestion: true,
-      modNote: note || item.scoringResult.modNote,
-      removalReason: note,
-    };
-
-    const resp = await fetch(ApiEndpoint.Action, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(payload),
-    });
-
-    const data = await resp.json() as { success: boolean };
-    if (data.success) {
-      closePanel();
-      enableButtons();
-      removeCard(item.id, "remove");
-      onActionComplete?.(item.id, "remove", true);
-    } else {
-      enableButtons();
-    }
-  } catch (err) {
-    console.error("confirmRemoveWithNote error:", err);
-    enableButtons();
-  }
-}
 
 // ---------------------------------------------------------------------------
 // Move card to Needs Review column (escalate action)
@@ -569,8 +534,6 @@ function relativeTime(ts: number): string {
 // ---------------------------------------------------------------------------
 
 const MAIN_ACTION_IDS = ["btn-approve", "btn-remove", "btn-warn", "btn-escalate", "btn-ignore"] as const;
-const CONFIRM_IDS = ["btn-remove-confirm", "btn-remove-no-note", "btn-remove-cancel"] as const;
-
 function disableButtons(): void {
   // Scoped to main action buttons only — never disables the confirm sub-panel buttons
   for (const id of MAIN_ACTION_IDS) {
@@ -584,13 +547,6 @@ function enableButtons(): void {
   document.querySelectorAll<HTMLButtonElement>(".action-btn").forEach((btn) => {
     btn.disabled = false;
   });
-}
-
-function disableConfirmButtons(): void {
-  for (const id of CONFIRM_IDS) {
-    const el = document.getElementById(id) as HTMLButtonElement | null;
-    if (el) el.disabled = true;
-  }
 }
 
 // ---------------------------------------------------------------------------
