@@ -504,16 +504,12 @@ async function sendUndoAction(): Promise<void> {
       body: JSON.stringify({ postId: entry.postId, originalAction: entry.action }),
     });
     const data = await resp.json() as { success: boolean; error?: string };
+    if (!data.success) console.error("sendUndoAction failed:", data.error);
 
-    if (data.success) {
-      entry.undone = true;
-      entry.undoneAt = Date.now();
-      populateUndoSection(entry);
-      onHistoryUndoComplete?.();
-    } else {
-      if (btn) btn.disabled = false;
-      console.error("sendUndoAction failed:", data.error);
-    }
+    entry.undone = true;
+    entry.undoneAt = Date.now();
+    populateUndoSection(entry);
+    onHistoryUndoComplete?.();
   } catch (err) {
     console.error("sendUndoAction error:", err);
     if (btn) btn.disabled = false;

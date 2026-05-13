@@ -185,21 +185,21 @@ async function onTakeAction(req: IncomingMessage): Promise<TakeActionResponse> {
 async function onUndoAction(req: IncomingMessage): Promise<TakeActionResponse> {
   const { postId, originalAction } = await readJSON<UndoActionRequest>(req);
 
-  try {
-    const post = await reddit.getPostById(`t3_${postId}`);
+  if (originalAction === "warn") {
+    return { type: "action_complete", postId, action: "undo", success: false, error: "Warnings cannot be undone" };
+  }
 
-    switch (originalAction) {
-      case "remove":
-        await post.approve();
-        break;
-      case "approve":
-        await post.remove(false);
-        break;
-      case "warn":
-        return { type: "action_complete", postId, action: "undo", success: false, error: "Warnings cannot be undone" };
-      default:
-        // escalate / ignore had no Reddit-side effect; just mark undone
-        break;
+  // Skip Reddit API for mock posts (test mode)
+  const isMock = postId.startsWith("mock_");
+
+  try {
+    if (!isMock) {
+      const post = await reddit.getPostById(`t3_${postId}`);
+      switch (originalAction) {
+        case "remove":  await post.approve();       break;
+        case "approve": await post.remove(false);   break;
+        default: break; // escalate / ignore: no Reddit-side effect
+      }
     }
 
     await markDecisionUndone(postId, originalAction);
