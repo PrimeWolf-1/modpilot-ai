@@ -4,7 +4,7 @@ import type { TriageItem, TakeActionRequest, ScoringResult } from "../shared/typ
 import { ApiEndpoint } from "../shared/api.ts";
 import { selectCard, removeCard, clearCardFocus } from "./card.ts";
 
-type ActionCallback = (postId: string, action: string, accepted: boolean) => void;
+type ActionCallback = (postId: string, action: string, accepted: boolean, modNote?: string) => void;
 
 const PANEL_RISK_ICONS: Record<string, string> = {
   high:         "assets/icons/high-risk.png",
@@ -371,7 +371,7 @@ async function sendAction(
       removeCard(item.id, action);
     }
     // "warn": panel closes, card stays in its column for follow-up action
-    onActionComplete?.(item.id, action, accepted_suggestion);
+    onActionComplete?.(item.id, action, accepted_suggestion, overrideModNote);
   } catch (err) {
     console.error("sendAction error:", err);
     enableButtons();

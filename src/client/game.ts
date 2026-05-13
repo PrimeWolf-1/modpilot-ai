@@ -293,7 +293,7 @@ function renderQueue(items: TriageItem[]): void {
 // ACTION COMPLETE CALLBACK
 // =========================================================
 
-function onActionComplete(postId: string, action: string, _accepted: boolean): void {
+function onActionComplete(postId: string, action: string, _accepted: boolean, customNote?: string): void {
   const item = allItems.find((i) => i.id === postId);
   const sourceRiskLevel = item?.scoringResult.riskLevel;
 
@@ -309,7 +309,7 @@ function onActionComplete(postId: string, action: string, _accepted: boolean): v
       confidence:      item.scoringResult.confidence,
       category:        item.scoringResult.category,
       signals:         item.scoringResult.signals,
-      modNote:         item.scoringResult.modNote,
+      modNote:         customNote || item.scoringResult.modNote,
       aiSummary:       item.scoringResult.aiSummary,
       suggestedAction: item.scoringResult.suggestedAction,
       suggestedReason: item.scoringResult.suggestedReason,
