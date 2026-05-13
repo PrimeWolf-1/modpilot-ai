@@ -32,11 +32,12 @@ interface RecentActionEntry extends HistoryEntry {
 let recentActions: RecentActionEntry[] = [];
 
 const ACTION_LOG_LABELS: Record<string, string> = {
-  approve:  "Approved",
-  remove:   "Removed",
-  warn:     "Warned",
-  escalate: "→ Needs Review",
-  ignore:   "Ignored",
+  approve:   "Approved",
+  remove:    "Removed",
+  warn:      "Warned",
+  escalate:  "→ Needs Review",
+  ignore:    "Ignored",
+  reinstate: "Reinstated",
 };
 
 const RISK_LOG_LABELS: Record<string, string> = {
@@ -66,12 +67,50 @@ function buildEntryEl(entry: RecentActionEntry, animate: boolean): HTMLElement {
   el.innerHTML = `<span class="ops-log-dot"></span><span class="ops-log-action">${label}</span><span class="ops-log-author"> u/${author}</span><span class="ops-log-sep"> · </span><span class="ops-log-risk">${riskLbl}</span><span class="ops-log-time">${time}</span>`;
   el.dataset["key"] = `${entry.postId}-${entry.timestamp}`;
   if (entry.undone) el.classList.add("undone");
-  el.addEventListener("click", () => openHistoryPanel(entry, () => markLogEntryUndone(el)));
+  el.addEventListener("click", () => openHistoryPanel(entry, () => {
+    markLogEntryUndone(el);
+    reinstateItemFromHistory(entry);
+  }));
   return el;
 }
 
 function markLogEntryUndone(el: HTMLElement): void {
   el.classList.add("undone");
+}
+
+function reinstateItemFromHistory(entry: RecentActionEntry): void {
+  const item = allItems.find((i) => i.id === entry.postId);
+  if (!item) return;
+
+  item.status = "pending";
+
+  const colId = COLUMN_IDS[item.scoringResult.riskLevel];
+  const colEl = colId ? document.getElementById(colId) : null;
+  if (colEl) {
+    colEl.querySelector(".col-empty")?.remove();
+    const card = createCard(item, (clickedItem) => openPanel(clickedItem, onActionComplete));
+    colEl.prepend(card);
+  }
+
+  addRecentAction({
+    action:          "reinstate",
+    author:          item.author,
+    riskLevel:       item.scoringResult.riskLevel,
+    timestamp:       Date.now(),
+    postId:          item.id,
+    title:           item.title,
+    authorAge:       item.authorAge,
+    confidence:      item.scoringResult.confidence,
+    category:        item.scoringResult.category,
+    signals:         item.scoringResult.signals,
+    modNote:         item.scoringResult.modNote,
+    aiSummary:       item.scoringResult.aiSummary,
+    suggestedAction: item.scoringResult.suggestedAction,
+    suggestedReason: item.scoringResult.suggestedReason,
+  });
+
+  updateBadges();
+  syncColumnEmptyStates();
 }
 
 function renderRecentActions(): void {
