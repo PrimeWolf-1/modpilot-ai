@@ -28,13 +28,23 @@ let onHistoryUndoComplete: (() => void) | null = null;
  * @param callback - called when an action completes (postId, action, acceptedSuggestion)
  */
 export function openPanel(item: TriageItem, callback: ActionCallback): void {
+  // Clear all history/audit state so live mode is clean
+  currentHistoryEntry = null;
+  onHistoryUndoComplete = null;
+
   currentItem = item;
   onActionComplete = callback;
+
+  const panel = document.getElementById("detail-panel");
+  if (panel) delete panel.dataset["mode"];
+
+  // Hide reinstate/undo section — only valid in history mode
+  const undoSection = document.getElementById("panel-undo-section");
+  if (undoSection) undoSection.style.display = "none";
 
   populatePanel(item);
   selectCard(item.id, item.scoringResult.riskLevel);
 
-  const panel = document.getElementById("detail-panel");
   panel?.classList.add("open");
   document.getElementById("panel-backdrop")?.classList.add("visible");
 
