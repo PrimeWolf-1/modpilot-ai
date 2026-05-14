@@ -57,7 +57,7 @@
   --btn-neutral-hover: var(--border-2);
 
   /* Layout */
-  --nav-h: 50px;
+  --nav-h: 72px;
   --ops-h: 0px;
 
   /* Typography — HUD font system */
@@ -230,7 +230,7 @@ button {
   max-width: min(680px, 52vw);
   pointer-events: none;
   z-index: 0;
-  overflow: hidden;
+  overflow: visible;
   transition: opacity 0.35s ease;
 }
 .ops-motd > * { pointer-events: all; }
@@ -256,9 +256,8 @@ button {
   font-weight: 500;
   color: #bfcfe0;
   letter-spacing: 0.1px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  white-space: normal;
+  text-align: center;
   max-width: min(620px, 48vw);
   flex-shrink: 1;
   transition: opacity 0.25s ease;
@@ -1857,7 +1856,7 @@ button {
    MOBILE — bottom sheet panel + horizontal-scroll grid
    ========================================================= */
 @media (max-width: 767px) {
-  #motive-text       { font-size: 11px; max-width: 180px; }
+  #motive-text       { font-size: 11px; max-width: 260px; }
 
   #app-body { top: var(--nav-h); }
 
