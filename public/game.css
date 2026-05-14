@@ -341,28 +341,7 @@ button {
 
 /* ---- MOTD Message Picker (floating panel) ---- */
 #motd-picker {
-  position: fixed;
-  top: calc(var(--nav-h) + 6px);
-  left: 50%;
-  transform: translateX(-50%);
-  width: 340px;
-  z-index: 300;
-  background: rgba(16, 24, 38, 0.97);
-  backdrop-filter: blur(18px);
-  -webkit-backdrop-filter: blur(18px);
-  border: 1px solid var(--border-2);
-  border-radius: 10px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.55), inset 0 1px 0 rgba(255,255,255,0.04);
-  overflow: hidden;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateX(-50%) translateY(-6px);
-  transition: opacity 0.18s ease, transform 0.18s ease;
-}
-#motd-picker.visible {
-  opacity: 1;
-  pointer-events: all;
-  transform: translateX(-50%) translateY(0);
+  display: none;
 }
 
 .motd-picker-header {

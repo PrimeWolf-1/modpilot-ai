@@ -178,13 +178,11 @@ export const MOTD_MESSAGES: MotdMessage[] = [
 ];
 
 // ---------------------------------------------------------------------------
-// Persistence (localStorage, fail-safe)
+// Persistence helpers (localStorage, fail-safe)
 // ---------------------------------------------------------------------------
 
-const STORE_MODE      = "modpilot-motd-mode";       // "auto" | "manual"
-const STORE_INDEX     = "modpilot-motd-index";       // sequential rotation index
-const STORE_MANUAL_ID = "modpilot-motd-manual-id";  // manually selected message id
-const STORE_LAST_ROT  = "modpilot-motd-last-rot";   // timestamp of last auto-advance
+const STORE_INDEX    = "modpilot-motd-index";
+const STORE_LAST_ROT = "modpilot-motd-last-rot";
 
 const ROTATION_MS = 12 * 60 * 60 * 1000; // 12 hours
 
@@ -194,64 +192,63 @@ function lsGet(key: string): string | null {
 function lsSet(key: string, val: string): void {
   try { localStorage.setItem(key, val); } catch { /* unavailable */ }
 }
-function lsDel(key: string): void {
-  try { localStorage.removeItem(key); } catch { /* unavailable */ }
-}
+
+// ---------------------------------------------------------------------------
+// In-memory state — localStorage is best-effort persistence only.
+// Devvit sandboxed iframes may silently reject localStorage; reading it back
+// after a failed write would always return null and reset the index to 0.
+// Keeping authoritative state in module variables fixes that.
+// ---------------------------------------------------------------------------
+
+let _index: number = (() => {
+  const v = parseInt(lsGet(STORE_INDEX) ?? "0", 10);
+  return isNaN(v) ? 0 : v % MOTD_MESSAGES.length;
+})();
+
+let _lastRot: number = (() => {
+  const v = parseInt(lsGet(STORE_LAST_ROT) ?? "0", 10);
+  return isNaN(v) ? 0 : v;
+})();
 
 // ---------------------------------------------------------------------------
 // Core rotation logic
 // ---------------------------------------------------------------------------
 
-function isManual(): boolean {
-  return lsGet(STORE_MODE) === "manual";
-}
-
-function getAutoMessage(): MotdMessage {
-  const lastRot = parseInt(lsGet(STORE_LAST_ROT) ?? "0", 10);
-  const now     = Date.now();
-  let   index   = parseInt(lsGet(STORE_INDEX) ?? "0", 10);
-
-  if (lastRot === 0) {
-    // First ever load — seed the timer
-    lsSet(STORE_LAST_ROT, String(now));
-    lsSet(STORE_INDEX, "0");
-    index = 0;
-  } else if (now - lastRot >= ROTATION_MS) {
-    // 12 hours elapsed — advance
-    index = (index + 1) % MOTD_MESSAGES.length;
-    lsSet(STORE_INDEX, String(index));
-    lsSet(STORE_LAST_ROT, String(now));
-  }
-
-  return MOTD_MESSAGES[index] ?? MOTD_MESSAGES[0]!;
-}
-
 export function getCurrentMessage(): MotdMessage {
-  if (isManual()) {
-    const id = parseInt(lsGet(STORE_MANUAL_ID) ?? "1", 10);
-    return MOTD_MESSAGES.find((m) => m.id === id) ?? MOTD_MESSAGES[0]!;
+  const now = Date.now();
+  if (_lastRot === 0) {
+    _lastRot = now;
+    lsSet(STORE_LAST_ROT, String(now));
+  } else if (now - _lastRot >= ROTATION_MS) {
+    _index = (_index + 1) % MOTD_MESSAGES.length;
+    _lastRot = now;
+    lsSet(STORE_INDEX, String(_index));
+    lsSet(STORE_LAST_ROT, String(now));
   }
-  return getAutoMessage();
-}
-
-export function selectMessage(id: number): void {
-  lsSet(STORE_MODE, "manual");
-  lsSet(STORE_MANUAL_ID, String(id));
-}
-
-export function resetToAuto(): void {
-  lsSet(STORE_MODE, "auto");
-  lsDel(STORE_MANUAL_ID);
-  lsSet(STORE_LAST_ROT, String(Date.now())); // restart 12-hour timer
+  return MOTD_MESSAGES[_index] ?? MOTD_MESSAGES[0]!;
 }
 
 export function advanceMessage(): void {
-  const current = parseInt(lsGet(STORE_INDEX) ?? "0", 10);
-  const next = (current + 1) % MOTD_MESSAGES.length;
-  lsSet(STORE_MODE, "auto");
-  lsDel(STORE_MANUAL_ID);
-  lsSet(STORE_INDEX, String(next));
-  lsSet(STORE_LAST_ROT, String(Date.now()));
+  _index = (_index + 1) % MOTD_MESSAGES.length;
+  _lastRot = Date.now();
+  lsSet(STORE_INDEX, String(_index));
+  lsSet(STORE_LAST_ROT, String(_lastRot));
+  updateDisplay();
+}
+
+export function resetToAuto(): void {
+  _lastRot = Date.now();
+  lsSet(STORE_LAST_ROT, String(_lastRot));
+}
+
+// Keep selectMessage exported so nothing outside breaks if it's referenced
+export function selectMessage(id: number): void {
+  const msg = MOTD_MESSAGES.find((m) => m.id === id);
+  if (!msg) return;
+  _index = MOTD_MESSAGES.indexOf(msg);
+  _lastRot = Date.now();
+  lsSet(STORE_INDEX, String(_index));
+  lsSet(STORE_LAST_ROT, String(_lastRot));
   updateDisplay();
 }
 
@@ -260,54 +257,29 @@ export function advanceMessage(): void {
 // ---------------------------------------------------------------------------
 
 function updateDisplay(): void {
-  const msg      = getCurrentMessage();
-  const textEl   = document.getElementById("motive-text");
-  const badgeEl  = document.getElementById("motd-manual-badge");
-  const autoBtn  = document.getElementById("motd-auto-btn");
-
-  if (textEl) {
-    textEl.style.opacity = "0";
-    setTimeout(() => {
-      if (textEl) {
-        textEl.textContent  = msg.text;
-        textEl.style.opacity = "1";
-      }
-    }, 200);
-  }
-
-  if (badgeEl) {
-    badgeEl.classList.toggle("hidden", !isManual());
-  }
-  if (autoBtn) {
-    autoBtn.classList.toggle("hidden", !isManual());
-  }
+  const msg    = getCurrentMessage();
+  const textEl = document.getElementById("motive-text");
+  if (!textEl) return;
+  textEl.style.opacity = "0";
+  setTimeout(() => {
+    textEl.textContent   = msg.text;
+    textEl.style.opacity = "1";
+  }, 200);
 }
 
 
 export function initMotd(): void {
   updateDisplay();
 
-  const pickerBtn = document.getElementById("motd-picker-btn");
-  const autoBtn   = document.getElementById("motd-auto-btn");
-
   // Change button — rotate to next message directly
-  pickerBtn?.addEventListener("click", () => {
+  document.getElementById("motd-picker-btn")?.addEventListener("click", () => {
     advanceMessage();
-  });
-
-  // Nav-bar auto button (Manual badge area)
-  autoBtn?.addEventListener("click", () => {
-    resetToAuto();
-    updateDisplay();
   });
 
   // Check every minute whether the 12-hour window has elapsed
   setInterval(() => {
-    if (!isManual()) {
-      const lastRot = parseInt(lsGet(STORE_LAST_ROT) ?? "0", 10);
-      if (lastRot > 0 && Date.now() - lastRot >= ROTATION_MS) {
-        updateDisplay();
-      }
+    if (_lastRot > 0 && Date.now() - _lastRot >= ROTATION_MS) {
+      updateDisplay(); // getCurrentMessage() inside will advance _index
     }
   }, 60_000);
 }
