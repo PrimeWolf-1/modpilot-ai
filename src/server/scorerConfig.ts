@@ -142,6 +142,6 @@ export const THRESHOLDS = {
 // ---------------------------------------------------------------------------
 
 export const AUTO_HIGH_RISK_RULES = {
-  minSignalCount: 3,
+  minSignalCount: 4,
   maxAgeForPromoCombo: 7,
 } as const;
