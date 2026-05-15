@@ -69,7 +69,7 @@ export function prepareTriageItem(post: Post, authorAge: number): PreparedPost {
 // Test mode — flip to true to bypass the Reddit API and use mock posts
 // ---------------------------------------------------------------------------
 
-const TEST_MODE = true;
+const TEST_MODE = false;
 
 const MOCK_POSTS: PreparedPost[] = [
   {
