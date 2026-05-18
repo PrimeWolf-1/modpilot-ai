@@ -1,23 +1,77 @@
-## Devvit Hello World Starter
+# ModPilot AI
 
-A starter to build web applications on Reddit's developer platform
+**ModPilot AI** is a Reddit mod queue triage assistant built for the Reddit Mod Tools and Migrated Apps Hackathon using Devvit.
 
-- [Devvit](https://developers.reddit.com/): A way to build and deploy immersive games on Reddit
-- [TypeScript](https://www.typescriptlang.org/): For type safety
+The project helps moderators review posts faster by scanning queue items, detecting risk signals, assigning a risk level, and showing a clear reason for each decision.
 
-## Getting Started
+## What I Built
 
-> Make sure you have Node 22 downloaded on your machine before running!
+- Reddit moderation assistant built on Devvit
+- Rule-based risk scoring system for mod queue items
+- Dashboard-style interface for reviewing posts
+- Risk labels for Low, Medium, and High priority items
+- Signal detection for spam, promo language, money claims, urgency language, external links, missing flair, new accounts, and repeated phrases
+- Human-review workflow so moderators stay in control
+- Queue impact metrics such as items reviewed, high-risk items flagged, and estimated time saved
+- Fallback architecture designed after external AI API access was limited by Devvit HTTP domain restrictions
 
-1. Run `npm create devvit@latest --template=hello-world`
-2. Go through the installation wizard. You will need to create a Reddit account and connect it to Reddit developers
-3. Copy the command on the success page into your terminal
+## Risk Scoring Logic
 
-## Commands
+ModPilot AI uses practical moderation signals to help identify posts that may need closer review.
 
-- `npm run dev`: Starts a development server where you can develop your application live on Reddit.
-- `npm run build`: Builds your client and server projects
-- `npm run deploy`: Uploads a new version of your app
-- `npm run launch`: Publishes your app for review
-- `npm run login`: Logs your CLI into Reddit
-- `npm run type-check`: Type checks, lints, and prettifies your app
+Example scoring signals:
+
+- Account under 24 hours
+- Account under 7 days
+- External links
+- Urgency phrases
+- Money claims
+- Promo language
+- Missing flair
+- Too many links
+- Repeated phrases
+
+Risk levels:
+
+- **Low Risk:** 0–20
+- **Medium Risk:** 21–50
+- **High Risk:** 51+
+
+The project also includes an override rule where a money claim combined with an external link is treated as high risk.
+
+## Tech Stack
+
+- Devvit
+- TypeScript
+- Reddit Developer Platform
+- Rule-based moderation logic
+- Devvit key-value storage concepts for short-term session memory
+
+## Why This Project Matters
+
+Moderators often have to review posts quickly while still making fair decisions. ModPilot AI was designed to reduce repetitive review work, surface risky posts faster, and give moderators a cleaner way to understand why an item was flagged.
+
+The goal is not to replace human moderators. The goal is to support them with faster triage, clearer signals, and better queue visibility.
+
+## Development Notes
+
+This was built as a first-time Devvit project. A major challenge was that external HTTP domain restrictions blocked planned AI API usage, so the project shifted toward a predictable rule-based scoring system. That fallback made the tool more reliable for the hackathon demo and easier to explain.
+
+## Current Status
+
+Hackathon prototype completed.
+
+Future improvements could include:
+
+- Optional AI classification once API access is available
+- Better moderation analytics
+- More configurable scoring rules
+- Subreddit-specific rule profiles
+- Expanded dashboard filters
+- Improved onboarding for moderators
+
+## Author
+
+Built by **Rudy Castillo E. / PrimeWolf**
+
+GitHub: **PrimeWolf-1**
