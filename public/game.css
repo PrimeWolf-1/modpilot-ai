@@ -230,7 +230,7 @@ button {
   max-width: min(680px, 52vw);
   pointer-events: none;
   z-index: 0;
-  overflow: visible;
+  overflow: hidden;
   transition: opacity 0.35s ease;
 }
 .ops-motd > * { pointer-events: all; }
@@ -2121,4 +2121,50 @@ button {
 }
 .ops-log-entry.undone .ops-log-action {
   text-decoration: line-through;
+}
+
+/* =========================================================
+   MOTD RESPONSIVE — must live after the typography block
+   above so these rules win the cascade over the 25px
+   font-size set in the HUD typography section.
+   ========================================================= */
+
+/* Small desktop / medium preview (≤ 1200px)
+   Switch to single-line truncated text — prevents wrap-induced
+   bleed below the nav bar. */
+@media (max-width: 1200px) {
+  .ops-motd {
+    max-width: min(440px, 40vw);
+  }
+  #motive-text {
+    font-size: 14px;
+    letter-spacing: 0.6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%;
+    animation: none;
+  }
+}
+
+/* Narrow desktop (≤ 960px) — shrink further */
+@media (max-width: 960px) {
+  .ops-motd {
+    max-width: min(260px, 30vw);
+  }
+  #motive-text {
+    font-size: 12px;
+    letter-spacing: 0.3px;
+  }
+}
+
+/* Mobile / narrow preview (≤ 767px) — minimal footprint */
+@media (max-width: 767px) {
+  .ops-motd {
+    max-width: min(150px, 24vw);
+  }
+  #motive-text {
+    font-size: 10px;
+    letter-spacing: 0.1px;
+  }
 }
