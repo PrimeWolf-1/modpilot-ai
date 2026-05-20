@@ -4,3 +4,4 @@ dist
 .env
 public/*.js
 public/*.js.map
+src/server/secrets.ts

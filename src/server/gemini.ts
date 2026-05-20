@@ -1,8 +1,8 @@
 // ModPilot AI — Gemini API Integration (AI Summary only)
 
-import { settings } from "@devvit/web/server";
 import type { ScoringResult } from "../shared/types.ts";
 import { THRESHOLD_MEDIUM } from "./scorer.ts";
+import { GEMINI_API_KEY } from "./secrets.ts";
 
 const MODEL = "gemini-1.5-flash";
 
@@ -25,9 +25,8 @@ export async function analyzeWithGemini(
 ): Promise<string | null> {
   if (!shouldAnalyzeWithGemini(scoring.score)) return null;
 
-  const GEMINI_API_KEY = (await settings.get<string>("GEMINI_API_KEY")) ?? "";
   if (!GEMINI_API_KEY) {
-    console.warn("gemini.ts: GEMINI_API_KEY not configured — using rule-based summary");
+    console.warn("gemini.ts: GEMINI_API_KEY not set in secrets.ts — using rule-based summary");
     return null;
   }
 
