@@ -4,7 +4,7 @@ import { reddit, context } from "@devvit/web/server";
 import type { Post, User } from "@devvit/reddit";
 import type { PreparedPost, TriageItem } from "../shared/types.ts";
 import { scorePost } from "./scorer.ts";
-import { analyzeWithGroq, shouldAnalyzeWithGroq } from "./groq.ts";
+import { analyzeWithGemini, shouldAnalyzeWithGemini, buildFallbackSummary } from "./gemini.ts";
 
 // ---------------------------------------------------------------------------
 // Helpers
@@ -208,34 +208,30 @@ export async function fetchModQueue(): Promise<TriageItem[]> {
     });
   }
 
-  // 4. Run Groq only on medium/high risk items, in parallel
-  const groqResults = await Promise.allSettled(
-    preparedItems.map(({ prepared, scoringResult }) => {
-      if (!shouldAnalyzeWithGroq(scoringResult.score)) {
+  // 4. Run Gemini only on medium/high risk items, in parallel
+  const geminiResults = await Promise.allSettled(
+    preparedItems.map(({ scoringResult }) => {
+      if (!shouldAnalyzeWithGemini(scoringResult.score)) {
         return Promise.resolve(null);
       }
-      return analyzeWithGroq(prepared, scoringResult);
+      return analyzeWithGemini(scoringResult);
     }),
   );
 
   // 5. Assemble final TriageItems
   const items: TriageItem[] = preparedItems.map(({ prepared, scoringResult }, i) => {
-    const groqResult =
-      groqResults[i]?.status === "fulfilled"
-        ? groqResults[i].value
-        : null;
+    const geminiSummary =
+      geminiResults[i]?.status === "fulfilled" ? geminiResults[i].value : null;
 
-    const finalResult = groqResult
-      ? {
-          ...scoringResult,
-          aiSummary: groqResult.summary,
-          category: groqResult.category,
-        }
-      : scoringResult;
+    const aiSummary =
+      geminiSummary ??
+      (shouldAnalyzeWithGemini(scoringResult.score)
+        ? buildFallbackSummary(scoringResult)
+        : undefined);
 
     return {
       ...prepared,
-      scoringResult: finalResult,
+      scoringResult: { ...scoringResult, ...(aiSummary ? { aiSummary } : {}) },
       status: "pending" as const,
     };
   });

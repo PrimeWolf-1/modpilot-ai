@@ -31,7 +31,7 @@
   "permissions": {
     "http": {
       "enable": true,
-      "domains": ["api.groq.com"]
+      "domains": ["api.groq.com", "generativelanguage.googleapis.com"]
     }
   },
   "settings": {
@@ -39,6 +39,11 @@
       "GROQ_API_KEY": {
         "type": "string",
         "label": "Groq API Key",
+        "isSecret": true
+      },
+      "GEMINI_API_KEY": {
+        "type": "string",
+        "label": "Gemini API Key",
         "isSecret": true
       }
     }
