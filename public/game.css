@@ -2144,3 +2144,51 @@ button {
     display: none !important;
   }
 }
+
+/* =========================================================
+   LAPTOP — 1280–1599px wide (15-inch / 900px-tall screens)
+   Tightens spacing only. No structural or visual changes.
+   ========================================================= */
+@media (min-width: 1280px) and (max-width: 1599px) {
+
+  :root {
+    --nav-h: 58px;          /* was 72px — reclaims 14px of vertical height */
+  }
+
+  .col-header {
+    padding: 8px 12px 7px;  /* was 11px 14px 10px */
+  }
+
+  .col-title {
+    font-size: 14px;         /* was 16px */
+  }
+
+  .card {
+    padding: 9px 10px 8px;  /* was 12px 13px 11px */
+  }
+
+  .card-header {
+    margin-bottom: 3px;      /* was 5px */
+  }
+
+  .card-meta {
+    margin-bottom: 4px;      /* was 6px */
+  }
+
+  .card-confidence {
+    margin-bottom: 4px;      /* was 6px */
+  }
+
+  .card-signals {
+    margin-bottom: 5px;      /* was 8px */
+  }
+
+  .card-ai-reason {
+    margin-bottom: 4px;      /* was 6px */
+  }
+
+  .col-cards {
+    padding: 8px;            /* was 10px */
+    gap: 6px;                /* was 8px */
+  }
+}
