@@ -2135,3 +2135,12 @@ button {
     display: flex;
   }
 }
+
+@media (max-width: 768px) {
+  .motd-row, #motd-row, .motd-bar, #motd-bar {
+    display: none !important;
+  }
+  .ops-motd {
+    display: none !important;
+  }
+}
