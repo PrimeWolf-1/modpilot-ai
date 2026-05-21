@@ -18,7 +18,7 @@ import {
   BLACKLISTED_DOMAINS,
 } from "./scorerConfig.ts";
 
-// Re-export thresholds for groq.ts (backwards-compatible)
+// Re-export thresholds for gemini.ts
 export const THRESHOLD_HIGH = THRESHOLDS.high;
 export const THRESHOLD_MEDIUM = THRESHOLDS.medium;
 

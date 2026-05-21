@@ -150,14 +150,14 @@ const MOCK_POSTS: PreparedPost[] = [
 
 /**
  * Fetches the unmoderated queue for the current subreddit as a batch,
- * enriches each post with author age, scores it, optionally runs Groq
- * analysis, and returns TriageItems sorted by descending score.
+ * enriches each post with author age, scores it, optionally runs Gemini
+ * for an AI summary, and returns TriageItems sorted by descending score.
  *
  * Batch strategy:
  *   1. Fetch all posts via getUnmoderated listing in one call
  *   2. Deduplicate authors → resolve ages in parallel
- *   3. Score all posts locally (synchronous)
- *   4. Run Groq only on medium/high risk items (parallel)
+ *   3. Score all posts locally (synchronous, rule-based, authoritative)
+ *   4. Run Gemini only on medium/high risk items (parallel, summary only)
  */
 export async function fetchModQueue(): Promise<TriageItem[]> {
   const subreddit = context.subredditName ?? "test";
