@@ -216,14 +216,16 @@ button {
    MOTD — centered overlay inside #nav, no layout footprint
    ========================================================= */
 
-/* MOTD operator directive — absolute center of the nav bar */
+/* MOTD operator directive — absolute center of the nav bar.
+   Hidden by default; only shown on wide desktop layouts via
+   the min-width media query at the bottom of this file. */
 .ops-motd {
+  display: none;
   position: absolute;
   left: 50%;
   transform: translateX(-50%);
   top: 0;
   height: var(--nav-h);
-  display: flex;
   align-items: center;
   justify-content: center;
   gap: 8px;
@@ -2122,47 +2124,14 @@ button {
 }
 
 /* =========================================================
-   MOTD RESPONSIVE — must live after the typography block
-   above so these rules win the cascade over the 25px
-   font-size set in the HUD typography section.
+   MOTD VISIBILITY — wide desktop only.
+   The base .ops-motd rule is display:none everywhere.
+   Only restore it when there is enough horizontal space that
+   the absolute-centered element cannot overlap the nav logo,
+   subreddit label, AI chip, or any queue content below.
    ========================================================= */
-
-/* Small desktop / medium preview (≤ 1200px)
-   Switch to single-line truncated text — prevents wrap-induced
-   bleed below the nav bar. */
-@media (max-width: 1200px) {
+@media (min-width: 1200px) {
   .ops-motd {
-    max-width: min(440px, 40vw);
-  }
-  #motive-text {
-    font-size: 14px;
-    letter-spacing: 0.6px;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 100%;
-    animation: none;
-  }
-}
-
-/* Narrow desktop (≤ 960px) — shrink further */
-@media (max-width: 960px) {
-  .ops-motd {
-    max-width: min(260px, 30vw);
-  }
-  #motive-text {
-    font-size: 12px;
-    letter-spacing: 0.3px;
-  }
-}
-
-/* Mobile / narrow preview (≤ 768px)
-   The MOTD is a decorative element. On mobile every pixel of the
-   nav bar is needed for actual moderation controls.
-   Hide it entirely so the absolute-positioned element cannot
-   overlap the logo, subreddit label, AI chip, or column headers. */
-@media (max-width: 768px) {
-  .ops-motd {
-    display: none;
+    display: flex;
   }
 }
