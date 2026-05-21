@@ -1835,8 +1835,6 @@ button {
    MOBILE — bottom sheet panel + horizontal-scroll grid
    ========================================================= */
 @media (max-width: 767px) {
-  #motive-text       { font-size: 11px; max-width: 260px; }
-
   #app-body { top: var(--nav-h); }
 
   /* Grid scrolls horizontally so all 4 columns are reachable */
@@ -2158,13 +2156,13 @@ button {
   }
 }
 
-/* Mobile / narrow preview (≤ 767px) — minimal footprint */
-@media (max-width: 767px) {
+/* Mobile / narrow preview (≤ 768px)
+   The MOTD is a decorative element. On mobile every pixel of the
+   nav bar is needed for actual moderation controls.
+   Hide it entirely so the absolute-positioned element cannot
+   overlap the logo, subreddit label, AI chip, or column headers. */
+@media (max-width: 768px) {
   .ops-motd {
-    max-width: min(150px, 24vw);
-  }
-  #motive-text {
-    font-size: 10px;
-    letter-spacing: 0.1px;
+    display: none;
   }
 }
