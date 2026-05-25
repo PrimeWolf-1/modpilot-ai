@@ -20,7 +20,7 @@ The tool produces a risk score and label so moderators can quickly decide whethe
 - Signal detection for spam, promo language, money claims, urgency phrases, external links, missing flair, new accounts, and repeated phrases
 - Human-review workflow so moderators stay in control
 - Queue impact metrics such as reviewed items, high-risk flags, and estimated time saved
-- Fallback architecture designed after external AI API access was limited by Devvit HTTP domain restrictions
+- Gemini AI explanation layer implemented for medium and high risk posts; falls back to rule-based summaries when Devvit HTTP/runtime restrictions prevent external API calls
 
 ## Risk Scoring Logic
 
@@ -30,7 +30,7 @@ Example scoring signals:
 
 | Signal | Purpose |
 | --- | --- |
-| Account under 24 hours | Flags very new accounts |
+| Account under 24 hours | Flags very ew accounts |
 | Account under 7 days | Adds risk for recently created accounts |
 | External link | Detects posts sending users off-platform |
 | Urgency phrase | Finds pressure-based wording |
@@ -50,13 +50,22 @@ Risk levels:
 
 The project also includes an override rule where a money claim combined with an external link is treated as high risk.
 
+## AI Explanation Layer
+
+ModPilot AI includes a Gemini-powered explanation pipeline (`src/server/gemini.ts`) that runs for medium and high risk posts. When a post crosses the medium risk threshold, the queue loader calls Gemini to generate a plain-language explanation of why the post was flagged, based on the detected signals.
+
+The integration is fully implemented in the codebase. Whether it produces live AI output depends on Devvit's HTTP domain restrictions at runtime. If the external API call is unavailable or times out, ModPilot automatically falls back to a rule-based text summary generated from the same signal data.
+
+The API key is stored in a gitignored `secrets.ts` file and is never committed to the repository.
+
 ## Tech Stack
 
 - Devvit
 - TypeScript
 - Reddit Developer Platform
 - Rule-based moderation logic
-- Devvit key-value storage concepts for short-term session memory
+- Google Gemini API (AI explanation layer; subject to Devvit HTTP runtime restrictions)
+- - Devvit key-value storage concepts for short-term session memory
 
 ## Why It Matters
 
@@ -68,9 +77,11 @@ The system keeps the moderator in control. It is a triage assistant, not an auto
 
 Hackathon prototype completed.
 
-The current version focuses on rule-based risk scoring and queue visibility. Planned improvements include:
+The current version includes rule-based risk scoring, a prioritized queue dashboard, and a Gemini AI explanation pipeline for medium and high risk posts. The AI pipeline is implemented and called at runtime. Live output depends on whether Devvit's HTTP restrictions allow outbound calls to the Gemini API. When unavailable, the app falls back automatically to rule-based summaries.
 
-- Optional AI classification once API access is available
+Planned improvements include:
+
+- Resolving Devvit HTTP domain access for stable Gemini integration
 - More configurable scoring rules
 - Subreddit-specific rule profiles
 - Better moderation analytics
