@@ -2,13 +2,13 @@
 
 **ModPilot AI** is a Reddit mod queue triage assistant built for the Reddit Mod Tools and Migrated Apps Hackathon using Devvit.
 
-It helps moderators review queue items faster by scanning posts for risk signals, assigning a clear risk level, and showing the reason behind each flag. The goal is not to replace human moderators. The goal is to make repetitive moderation review faster, clearer, and easier to manage.
+It helps moderators review queue items faster by scanning posts for risk signals, assigning a clear risk level, and showing the reason behind each flag. The goal is not to replace human moderators, but to make repetitive moderation review faster, clearer, and easier to manage.
 
 ## Project Overview
 
 ModPilot AI gives moderators a dashboard-style workflow for reviewing queued Reddit posts. Each item is evaluated using practical moderation signals such as account age, external links, urgency language, money claims, promotional wording, missing flair, and repeated phrases.
 
-The tool produces a risk score and label so moderators can quickly decide whether an item should be approved, removed, marked as spam, or reviewed manually.
+The tool produces a risk score and explanation layer to help moderators decide whether an item should be approved, removed, marked as spam, or reviewed manually.
 
 ## Key Features
 
@@ -19,7 +19,7 @@ The tool produces a risk score and label so moderators can quickly decide whethe
 - Clear explanations for why a post was flagged
 - Signal detection for spam, promo language, money claims, urgency phrases, external links, missing flair, new accounts, and repeated phrases
 - Human-review workflow so moderators stay in control
-- Queue impact metrics such as reviewed items, high-risk flags, and estimated time saved
+- Queue impact metrics such as reviewed items, surfaced high-risk posts, and estimated review time saved
 - Gemini AI explanation layer implemented for medium and high risk posts; falls back to rule-based summaries when Devvit HTTP/runtime restrictions prevent external API calls
 
 ## Risk Scoring Logic
@@ -30,7 +30,7 @@ Example scoring signals:
 
 | Signal | Purpose |
 | --- | --- |
-| Account under 24 hours | Flags very ew accounts |
+| Account under 24 hours | Flags very new accounts |
 | Account under 7 days | Adds risk for recently created accounts |
 | External link | Detects posts sending users off-platform |
 | Urgency phrase | Finds pressure-based wording |
