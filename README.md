@@ -2,7 +2,7 @@
 
 **ModPilot AI** is a Reddit mod queue triage assistant built for the Reddit Mod Tools and Migrated Apps Hackathon using Devvit.
 
-It helps moderators review queue items faster by scanning posts for risk signals, assigning a clear risk level, and showing the reason behind each flag. The goal is not to replace human moderators. The goal is to make repetitive moderation review faster, clearer, and easier to manage.
+It helps moderators review queue items faster by scanning posts for risk signals, assigning a clear risk level, and showing the reason behind each flag. The goal is not to replace human moderators, but to make repetitive moderation review faster, clearer, and easier to manage.
 
 ## Project Overview
 
