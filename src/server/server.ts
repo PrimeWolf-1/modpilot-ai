@@ -56,6 +56,10 @@ async function onRequest(
 
   switch (endpoint) {
     case ApiEndpoint.Queue:
+      if (!await isModerator()) {
+        writeJSON(403, { error: "forbidden", status: 403 }, rsp);
+        return;
+      }
       writeJSON(200, await onGetQueue(), rsp);
       break;
     case ApiEndpoint.Action:
@@ -73,6 +77,10 @@ async function onRequest(
       writeJSON(200, await onUndoAction(req), rsp);
       break;
     case ApiEndpoint.Stats:
+      if (!await isModerator()) {
+        writeJSON(403, { error: "forbidden", status: 403 }, rsp);
+        return;
+      }
       writeJSON(200, await onGetStats(), rsp);
       break;
     case ApiEndpoint.OnPostCreate:

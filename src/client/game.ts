@@ -176,6 +176,11 @@ async function init(): Promise<void> {
     void loadQueue();
   });
 
+  // Wire weekly summary chip
+  document.getElementById("nav-ai-chip")?.addEventListener("click", () => {
+    if (latestStats) openSummary(latestStats, currentUsername);
+  });
+
   // Hide risk icon img elements that fail to load (CSP-safe, no inline handlers)
   initRiskIconFallbacks();
 
