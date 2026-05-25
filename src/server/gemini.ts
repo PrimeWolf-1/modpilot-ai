@@ -1,8 +1,8 @@
 // ModPilot AI — Gemini API Integration (AI Summary only)
 
+import { context } from "@devvit/web/server";
 import type { ScoringResult } from "../shared/types.ts";
 import { THRESHOLD_MEDIUM } from "./scorer.ts";
-import { GEMINI_API_KEY } from "./secrets.ts";
 
 const MODEL = "gemini-1.5-flash";
 
@@ -25,14 +25,15 @@ export async function analyzeWithGemini(
 ): Promise<string | null> {
   if (!shouldAnalyzeWithGemini(scoring.score)) return null;
 
-  if (!GEMINI_API_KEY) {
-    console.warn("gemini.ts: GEMINI_API_KEY not set in secrets.ts — using rule-based summary");
+  const apiKey = await context.settings.get("GEMINI_API_KEY") as string | undefined;
+  if (!apiKey) {
+    console.warn("gemini.ts: GEMINI_API_KEY not set in Devvit settings — using rule-based summary");
     return null;
   }
 
   const signals = scoring.signals.map((s) => s.label);
   const prompt = buildPrompt(signals, scoring.riskLevel, scoring.confidence);
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${GEMINI_API_KEY}`;
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent?key=${apiKey}`;
 
   const controller = new AbortController();
   const timeoutId = setTimeout(() => controller.abort(), 10_000);

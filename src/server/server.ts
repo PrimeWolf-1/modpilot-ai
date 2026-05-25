@@ -59,9 +59,17 @@ async function onRequest(
       writeJSON(200, await onGetQueue(), rsp);
       break;
     case ApiEndpoint.Action:
+      if (!await isModerator()) {
+        writeJSON(403, { error: "forbidden", status: 403 }, rsp);
+        return;
+      }
       writeJSON(200, await onTakeAction(req), rsp);
       break;
     case ApiEndpoint.Undo:
+      if (!await isModerator()) {
+        writeJSON(403, { error: "forbidden", status: 403 }, rsp);
+        return;
+      }
       writeJSON(200, await onUndoAction(req), rsp);
       break;
     case ApiEndpoint.Stats:
@@ -254,6 +262,13 @@ async function onAppInstall(): Promise<TriggerResponse> {
 // ---------------------------------------------------------------------------
 // Utilities
 // ---------------------------------------------------------------------------
+
+async function isModerator(): Promise<boolean> {
+  const username = context.username;
+  if (!username) return false;
+  const mods = await reddit.getModerators({ subredditName: context.subredditName ?? "" }).all();
+  return mods.some((m) => m.username === username);
+}
 
 function writeJSON<T>(
   status: number,
